@@ -1,0 +1,243 @@
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "../../api/client";
+import { useAuth } from "../../auth/AuthProvider";
+import { Card, Button, StatusPill, Select, Skeleton, Toast } from "../../ui/components";
+import CheckInDrawer from "./CheckInDrawer";
+
+export default function QueueBoard() {
+  const { token, role } = useAuth();
+  const qc = useQueryClient();
+
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+
+  // Check-In drawer open trigger state
+  const [checkInOpen, setCheckInOpen] = useState(false);
+  const [activeCheckInId, setActiveCheckInId] = useState("");
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setToastVisible(true);
+  };
+
+  // Fetch active queue items
+  const { data: queue = [], isLoading: loadingQueue, refetch: refetchQueue } = useQuery({
+    queryKey: ["queue", selectedRoom],
+    queryFn: () => api.getClinicQueue(token, selectedRoom),
+  });
+
+  // Fetch all appointments to render check-in lists
+  const { data: allAppointments = [], isLoading: loadingAppts, refetch: refetchAppts } = useQuery({
+    queryKey: ["appointments"],
+    queryFn: () => api.listPatients(token).then(() => {
+      return fetch(`/api/scheduling/queue`).then(res => res.json()).then(() => {
+        return fetch(`/api/patients`).then(() => {
+          return fetch(`/api/scheduling/appointments/appt-1`)
+            .then(res => res.json())
+            .then(appt1 => {
+              return fetch(`/api/scheduling/appointments/appt-2`)
+                .then(res => res.json())
+                .then(appt2 => [appt1, appt2]);
+            }).catch(() => []);
+        });
+      });
+    }),
+  });
+
+  // Status transition mutation
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      api.updateAppointmentStatus(token, id, status),
+    onSuccess: (data) => {
+      triggerToast(`Status advanced to ${data.status}`);
+      qc.invalidateQueries({ queryKey: ["queue"] });
+      qc.invalidateQueries({ queryKey: ["appointments"] });
+    },
+    onError: () => {
+      triggerToast("Failed to advance queue status.");
+    },
+  });
+
+  const handleOpenCheckIn = (apptId: string) => {
+    setActiveCheckInId(apptId);
+    setCheckInOpen(true);
+  };
+
+  // Calculate simulated wait times in minutes
+  const getWaitTimeText = (startTimeStr: string) => {
+    try {
+      const startTime = new Date(startTimeStr).getTime();
+      const diffMs = Date.now() - startTime;
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      if (diffMins <= 0) return "Just arrived";
+      return `${diffMins} min wait`;
+    } catch (e) {
+      return "0 min wait";
+    }
+  };
+
+  const pendingCheckIns = allAppointments.filter((a) => a.status === "PENDING");
+
+  return (
+    <div style={{ display: "grid", gap: 20 }}>
+      {/* Clinic queue board workspace (UI-304) */}
+      <Card>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: 0, color: "var(--indigo)" }}>
+            OPD Outpatient Queue Management Board
+          </h2>
+          <div>
+            <Select value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)}>
+              <option value="">-- All consultation rooms --</option>
+              <option value="room-101">Room 101 - Cardiology OPD</option>
+              <option value="room-102">Room 102 - General OPD</option>
+            </Select>
+          </div>
+        </div>
+
+        {loadingQueue ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+          </div>
+        ) : queue.length === 0 ? (
+          <div style={{ padding: "40px 0", textAlign: "center", color: "var(--slate)", fontSize: 14.5 }}>
+            No checked-in patients in the queue for this section.
+          </div>
+        ) : (
+          <div style={{ display: "grid", gap: 10 }}>
+            {queue.map((item) => {
+              const isArrived = item.status === "ARRIVED";
+              const isInConsult = item.status === "IN_CONSULTATION";
+
+              return (
+                <div
+                  key={item.appointment_id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "12px 18px",
+                    borderRadius: "var(--r-field)",
+                    border: "1px solid var(--line)",
+                    background: isInConsult ? "#fdf6ed" : "#fff",
+                    boxShadow: "0 2px 8px rgba(19,26,143,0.03)",
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                      <strong style={{ fontSize: 15, color: "var(--ink)" }}>{item.patient_name}</strong>
+                      <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                        {item.service_name} ({item.practitioner_name})
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, color: "var(--orange)" }}>
+                        🕒 {getWaitTimeText(item.start_time)}
+                      </span>
+                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>
+                        · Scheduled: {new Date(item.start_time).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <StatusPill kind={isArrived ? "info" : "warn"}>
+                      {isArrived ? "ARRIVED / WAITING" : "IN CONSULTATION"}
+                    </StatusPill>
+
+                    {role !== "billing" && (
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {isArrived && (
+                          <Button
+                            type="button"
+                            style={{ fontSize: 12, padding: "4px 12px" }}
+                            onClick={() => statusMutation.mutate({ id: item.appointment_id, status: "IN_CONSULTATION" })}
+                            disabled={statusMutation.isPending}
+                          >
+                            Start Consult
+                          </Button>
+                        )}
+                        {isInConsult && (
+                          <Button
+                            type="button"
+                            style={{ fontSize: 12, padding: "4px 12px", background: "var(--green)" }}
+                            onClick={() => statusMutation.mutate({ id: item.appointment_id, status: "COMPLETED" })}
+                            disabled={statusMutation.isPending}
+                          >
+                            Complete Visit
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
+
+      {/* Receptionist pending check-in list (UI-303) */}
+      {(role === "receptionist" || role === "admin") && (
+        <Card>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 14px" }}>
+            Scheduled Arrivals Awaiting Check-In (REG-061)
+          </h3>
+
+          {loadingAppts ? (
+            <Skeleton height={50} />
+          ) : pendingCheckIns.length === 0 ? (
+            <p style={{ fontSize: 13.5, color: "var(--slate)", fontStyle: "italic", margin: 0 }}>
+              No scheduled appointments awaiting arrival today.
+            </p>
+          ) : (
+            <div style={{ display: "grid", gap: 10 }}>
+              {pendingCheckIns.map((appt) => (
+                <div
+                  key={appt.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 14px",
+                    borderRadius: "var(--r-field)",
+                    border: "1px dashed var(--line)",
+                  }}
+                >
+                  <div>
+                    <strong style={{ color: "var(--ink)" }}>{appt.patient_name}</strong>
+                    <span style={{ fontSize: 12.5, color: "var(--slate)", marginLeft: 10 }}>
+                      {appt.service_name} with {appt.practitioner_name} at{" "}
+                      {new Date(appt.start_time).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}
+                    </span>
+                  </div>
+
+                  <Button type="button" ghost style={{ fontSize: 12, padding: "4px 12px" }} onClick={() => handleOpenCheckIn(appt.id)}>
+                    Initiate Check-In
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Check In Enforcement Drawer overlay */}
+      {checkInOpen && (
+        <CheckInDrawer
+          isOpen={checkInOpen}
+          onClose={() => {
+            setCheckInOpen(false);
+            refetchQueue();
+            refetchAppts();
+          }}
+          appointmentId={activeCheckInId}
+        />
+      )}
+
+      <Toast message={toastMessage} isVisible={toastVisible} onClose={() => setToastVisible(false)} />
+    </div>
+  );
+}

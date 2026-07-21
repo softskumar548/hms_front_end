@@ -1,0 +1,59 @@
+/* MediGo design tokens — single source of truth for the UI (matches the mockup). */
+:root {
+  --indigo: #131A8F;
+  --indigo-deep: #0A1166;
+  --indigo-soft: #E4E9FF;
+  --ink: #23263B;
+  --slate: #5B6172;
+  --line: #E3E8F4;
+  --card: #FFFFFF;
+  --wash-a: #F6FAFF;
+  --wash-b: #DDEBFC;
+  --cyan: #5FC6E9;    /* info */
+  --orange: #F08125;  /* attention */
+  --pink: #ED2E7C;    /* promo/highlight */
+  --green: #1C9A4E;   /* success */
+  --danger: #D93A3A;
+  --r-card: 22px;
+  --r-field: 14px;
+  --r-pill: 999px;
+  --shadow-card: 0 10px 30px rgba(19, 26, 143, 0.08);
+  --shadow-pop: 0 18px 50px rgba(10, 17, 102, 0.22);
+  --font-display: "Baloo 2", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--wash-a), var(--wash-b));
+  min-height: 100vh;
+}
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; border-radius: 6px; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+.skeleton-pulse {
+  background: var(--line);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .skeleton-pulse { animation: none !important; }
+}
+
+
