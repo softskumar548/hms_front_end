@@ -30,6 +30,9 @@ const PatientPortal = React.lazy(() => import("./features/portal/PatientPortal")
 const IntakeForms = React.lazy(() => import("./features/portal/IntakeForms"));
 const OpsDashboard = React.lazy(() => import("./features/reports/OpsDashboard"));
 const ReferralAnalytics = React.lazy(() => import("./features/reports/ReferralAnalytics"));
+const TenantManagementScreen = React.lazy(() => import("./features/tenants/TenantManagementScreen").then(m => ({ default: m.TenantManagementScreen })));
+const OnboardingWizardScreen = React.lazy(() => import("./features/tenants/OnboardingWizardScreen").then(m => ({ default: m.OnboardingWizardScreen })));
+const OperationalControlScreen = React.lazy(() => import("./features/tenants/OperationalControlScreen").then(m => ({ default: m.OperationalControlScreen })));
 
 
 
@@ -62,6 +65,9 @@ function Shell({ children }: { children: React.ReactNode }) {
           {role === "physician" && <Link to="/results" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Results Inbox</Link>}
           {showSettings && <Link to="/settings" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_settings")}</Link>}
           {showSettings && <Link to="/settings/reminders" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_reminders")}</Link>}
+          <Link to="/tenants" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>Tenants Control</Link>
+          <Link to="/onboarding" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>Onboarding Wizard</Link>
+          <Link to="/ops-control" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>Ops Control</Link>
           {role === "patient" && <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Patient Portal</Link>}
           {(role === "admin" || role === "receptionist") && <Link to="/dashboard" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Ops Dashboard</Link>}
           {(role === "admin" || role === "billing") && <Link to="/reports/referrals" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Referrals Report</Link>}
@@ -634,6 +640,10 @@ function App() {
             </RequireRole>
           } />
           
+          <Route path="/tenants" element={<TenantManagementScreen token={token} />} />
+          <Route path="/onboarding" element={<OnboardingWizardScreen token={token} />} />
+          <Route path="/ops-control" element={<OperationalControlScreen token={token} />} />
+
           <Route path="/design" element={<DesignSystem />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

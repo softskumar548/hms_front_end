@@ -127,4 +127,38 @@ export const api = {
     request<any>(`/rpt/ops-metrics?site_id=${siteId}`, token),
   listReferralAnalytics: (token: string | null) =>
     request<any[]>("/rpt/referrals", token),
+
+  // Tenant Operations & Platform Control Endpoints (Sprints N3, N4, N5)
+  listTenants: (token: string | null) =>
+    request<any[]>("/tenants", token),
+  provisionTenant: (token: string | null, body: any) =>
+    request<any>("/tenants", token, { method: "POST", body: JSON.stringify(body) }),
+  getTenant: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}`, token),
+  updateTenantStatus: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/status`, token, { method: "PATCH", body: JSON.stringify(body) }),
+  configureSetupWizard: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/wizard/config`, token, { method: "POST", body: JSON.stringify(body) }),
+  inviteStaff: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/invitations`, token, { method: "POST", body: JSON.stringify(body) }),
+  stageMigration: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/migration/stage`, token, { method: "POST", body: JSON.stringify(body) }),
+  reconcileMigration: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/migration/reconcile`, token, { method: "POST", body: JSON.stringify(body) }),
+  getReadinessChecklist: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}/readiness`, token),
+  goLiveTenant: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}/go-live`, token, { method: "POST" }),
+  exportTenantFhir: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}/export/fhir`, token),
+  getTenantMetrics: (token: string | null) =>
+    request<any>("/tenants/metrics", token),
+  createSubscriptionInvoice: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/invoices`, token, { method: "POST", body: JSON.stringify(body) }),
+  processPreAuthClaim: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/claims/pre-auth`, token, { method: "POST", body: JSON.stringify(body) }),
+  suspendTenant: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/suspend`, token, { method: "POST", body: JSON.stringify(body) }),
+  overrideTenant: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/override`, token, { method: "POST", body: JSON.stringify(body) }),
 };
