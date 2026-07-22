@@ -164,7 +164,7 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
                   <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 12, color: "#5B6172" }}>
                     <span>Region: <b>{t.region}</b></span>
                     <span>Currency: <b>{t.currency}</b></span>
-                    <span>Doctor Commission: <b style={{ color: "#B22B2B" }}>LOCKED OFF</b></span>
+                    <span>Doctor Fee Payout: <b style={{ color: "#B22B2B" }}>LOCKED OFF</b></span>
                   </div>
                 </div>
 

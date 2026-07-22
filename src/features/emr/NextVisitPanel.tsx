@@ -98,6 +98,7 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
               1 Week
             </Chip>
             <Chip
+              data-testid="followup-interval-2w"
               active={selectedInterval === "2w"}
               onClick={() => !isConfigLocked && setSelectedInterval("2w")}
             >
@@ -180,7 +181,7 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
         )}
 
         {isConfigLocked && (
-          <div style={{ background: "rgba(19, 26, 143, 0.05)", border: "1px solid var(--indigo)", color: "var(--indigo)", padding: 12, borderRadius: "14px", fontSize: 13, fontWeight: 600 }}>
+          <div data-testid="followup-card" style={{ background: "rgba(19, 26, 143, 0.05)", border: "1px solid var(--indigo)", color: "var(--indigo)", padding: 12, borderRadius: "14px", fontSize: 13, fontWeight: 600 }}>
             ✓ Follow-up scheduled for{" "}
             {savedFollowUp
               ? new Date(savedFollowUp.follow_up_date).toLocaleDateString("en-IN", { dateStyle: "long" })

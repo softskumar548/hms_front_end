@@ -46,9 +46,9 @@ export const api = {
   updatePatient: (token: string | null, id: string, body: PatientCreate) =>
     request<PatientOut>(`/patients/${id}`, token, { method: "PUT", body: JSON.stringify(body) }),
   listAllergies: (token: string | null, patientId: string) =>
-    request<AllergyIntoleranceOut[]>(`/emr/patients/${patientId}/allergies`, token),
+    request<any>(`/patients/${patientId}/summary`, token).then((res) => res?.allergies || []),
   assertAllergy: (token: string | null, patientId: string, body: AllergyIntoleranceCreate) =>
-    request<AllergyIntoleranceOut>(`/emr/patients/${patientId}/allergies`, token, { method: "POST", body: JSON.stringify(body) }),
+    request<AllergyIntoleranceOut>(`/patients/${patientId}/allergies`, token, { method: "POST", body: JSON.stringify(body) }),
   bookAppointment: (token: string | null, body: AppointmentCreate) =>
     request<AppointmentOut>("/scheduling/appointments", token, { method: "POST", body: JSON.stringify(body) }),
   getAppointment: (token: string | null, id: string) =>

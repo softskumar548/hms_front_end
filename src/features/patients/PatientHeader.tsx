@@ -121,6 +121,7 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
 
       {/* 2. EMR Allergy banner (EMR-005) - Non-negotiable sticky warning banner */}
       <div
+        data-testid="allergy-banner"
         style={{
           background: allergies.length === 0 ? "var(--orange)" : hasNoKnown ? "#e3f5ea" : "#fbe3e3",
           borderTop: "1px solid var(--line)",

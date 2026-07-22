@@ -31,6 +31,7 @@ export default function EncounterNote() {
   const [assessment, setAssessment] = useState("");
   const [plan, setPlan] = useState("");
   const [icdCode, setIcdCode] = useState("");
+  const [signoffError, setSignoffError] = useState("");
   
   // Vitals inputs state
   const [bps, setBps] = useState("");
@@ -163,9 +164,11 @@ export default function EncounterNote() {
 
   const handleSignOff = () => {
     if (!icdCode) {
+      setSignoffError("An ICD-10 diagnosis selection is required before sign-off.");
       triggerToast("Error: An ICD-10 diagnosis selection is required before sign-off.");
       return;
     }
+    setSignoffError("");
     signOffMutation.mutate();
   };
 
@@ -204,7 +207,7 @@ export default function EncounterNote() {
         </Link>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {isSigned ? (
-            <StatusPill kind="success">SIGNED NOTE</StatusPill>
+            <StatusPill data-testid="note-locked-badge" kind="success">SIGNED NOTE</StatusPill>
           ) : (
             <span style={{ fontSize: 13, color: "var(--slate)", fontWeight: 600 }}>
               🟢 {autosaveStatus} {lastSavedTime && `at ${lastSavedTime}`}
@@ -227,6 +230,7 @@ export default function EncounterNote() {
                   Subjective (Symptoms, patient complains)
                 </label>
                 <textarea
+                  data-testid="note-section-subjective"
                   value={subjective}
                   onChange={(e) => setSubjective(e.target.value)}
                   disabled={isSigned}
@@ -270,10 +274,10 @@ export default function EncounterNote() {
                 <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
                   ICD-10 Diagnostic Assertion * (EMR-008)
                 </label>
-                <Select value={icdCode} onChange={(e) => setIcdCode(e.target.value)} disabled={isSigned}>
+                <Select data-testid="dx-search" value={icdCode} onChange={(e) => { setIcdCode(e.target.value); setSignoffError(""); }} disabled={isSigned}>
                   <option value="">-- Search and select ICD-10 code --</option>
                   {icd10List.map((i) => (
-                    <option key={i.code} value={i.code}>
+                    <option key={i.code} value={i.code} data-testid="dx-option">
                       ({i.code}) {i.display}
                     </option>
                   ))}
@@ -325,10 +329,16 @@ export default function EncounterNote() {
               </div>
             </div>
 
+            {signoffError && (
+              <div data-testid="signoff-error" style={{ color: "var(--danger)", background: "#fbe3e3", padding: 12, borderRadius: "var(--r-field)", fontSize: 13, fontWeight: 600, marginTop: 12 }}>
+                ⚠️ {signoffError}
+              </div>
+            )}
+
             {/* Final Sign Off controls */}
             {!isSigned && (
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20, borderTop: "1px solid var(--line)", paddingTop: 16 }}>
-                <Button disabled={signOffMutation.isPending} onClick={handleSignOff}>
+                <Button data-testid="note-signoff" disabled={signOffMutation.isPending} onClick={handleSignOff}>
                   {signOffMutation.isPending ? "Finalizing Note..." : "🖋️ Sign-off Note & Lock"}
                 </Button>
               </div>
@@ -436,7 +446,7 @@ export default function EncounterNote() {
                   }}
                   required
                 />
-                <Button disabled={addendumMutation.isPending} style={{ width: "100%" }}>
+                <Button data-testid="note-add-addendum" disabled={addendumMutation.isPending} style={{ width: "100%" }}>
                   Add Addendum Comment
                 </Button>
               </form>

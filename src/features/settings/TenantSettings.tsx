@@ -155,7 +155,7 @@ export default function TenantSettings() {
             >
               <div>
                 <strong style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  Referral Commissions (REF-010)
+                  Referral Fee Payouts (REF-010)
                   <span
                     style={{
                       display: "inline-block",

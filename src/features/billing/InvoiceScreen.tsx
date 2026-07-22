@@ -108,7 +108,7 @@ export default function InvoiceScreen() {
                     </div>
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                       {isAarogyasriEligible && (
-                        <StatusPill kind="success">
+                        <StatusPill data-testid="scheme-indicator" kind="success">
                           AAROGYASRI CASHLESS
                         </StatusPill>
                       )}
@@ -121,7 +121,7 @@ export default function InvoiceScreen() {
                   {/* Charge lines details */}
                   <div style={{ display: "grid", gap: 8, marginBottom: 14 }}>
                     {inv.lines.map((line: any) => (
-                      <div key={line.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, padding: "4px 0" }}>
+                      <div key={line.id} data-testid="invoice-line" style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, padding: "4px 0" }}>
                         <span>{line.description}</span>
                         <strong>₹{line.amount.toLocaleString("en-IN")}</strong>
                       </div>
@@ -152,6 +152,7 @@ export default function InvoiceScreen() {
                   <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
                     {!isLocked && (
                       <Button
+                        data-testid="invoice-finalize"
                         type="button"
                         onClick={() => finalizeMutation.mutate(inv.id)}
                         disabled={finalizeMutation.isPending}

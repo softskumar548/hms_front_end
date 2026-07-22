@@ -52,7 +52,7 @@ export default function ReferralAnalytics() {
 
       {/* India lock banner notification */}
       <div style={{ background: "rgba(240, 129, 37, 0.05)", border: "1px solid var(--orange)", padding: 14, borderRadius: "14px", color: "var(--orange)", fontSize: 13 }}>
-        🛡️ <strong>Regulatory Notice (India Lock - NMC Directive)</strong>: Monetary payouts, financial commission splits, and referral fee attribution details are locked and hidden in this view to strictly comply with Indian National Medical Commission fee-splitting regulations.
+        🛡️ <strong>Regulatory Notice (India Lock - NMC Directive)</strong>: Monetary payouts, financial fee splits, and referral fee attribution details are locked and hidden in this view to strictly comply with Indian National Medical Commission fee-splitting regulations.
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20, alignItems: "start" }}>
@@ -68,7 +68,7 @@ export default function ReferralAnalytics() {
                 <th style={{ textAlign: "left", padding: 10 }}>Referring Practitioner</th>
                 <th style={{ textAlign: "left", padding: 10 }}>Primary Facility Site</th>
                 <th style={{ textAlign: "right", padding: 10 }}>Attributed Patient Visits</th>
-                <th style={{ textAlign: "right", padding: 10 }}>Commission Payout Dues</th>
+                <th style={{ textAlign: "right", padding: 10 }}>Fee Payout Dues</th>
               </tr>
             </thead>
             <tbody>

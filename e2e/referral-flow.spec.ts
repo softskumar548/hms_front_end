@@ -2,7 +2,23 @@
 // Precondition: docker compose up (Postgres+API healthy), VITE_USE_MOCKS=false,
 // seeded demo tenants. Selectors below use data-testid — add the listed testids
 // to screens if missing; do NOT loosen the assertions to make this pass.
-import { test, expect } from "@playwright/test";
+import { test as baseTest, expect, Page } from "@playwright/test";
+
+let sharedPage: Page;
+
+const test = baseTest.extend<{ page: Page }>({
+  page: async ({}, use) => {
+    await use(sharedPage);
+  },
+});
+
+test.beforeAll(async ({ browser }) => {
+  sharedPage = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await sharedPage.close();
+});
 
 const PATIENT = { given: "E2E", family: `Referral${Date.now()}` };
 
@@ -37,7 +53,7 @@ test.describe.serial("Flagship #1 — referral: intake → prereq CT → blocked
     await page.goto("/scheduling/book");
     await page.getByTestId("book-patient-search").fill(PATIENT.family);
     await page.getByTestId("book-patient-result").first().click();
-    await page.getByTestId("book-service").selectOption({ label: /CT/i });
+    await page.getByTestId("book-service").selectOption({ label: "CT Scan Cardiology" });
     await page.getByTestId("book-slot").first().click();
     // Prereqs visible, structured, with hard-stop styling:
     await expect(page.getByTestId("prereq-item-hardstop").first()).toBeVisible();

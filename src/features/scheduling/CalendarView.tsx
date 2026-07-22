@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { useAuth } from "../../auth/AuthProvider";
-import { Card, Button, Select, StatusPill, Skeleton } from "../../ui/components";
+import { Card, Button, Select, Input, StatusPill, Skeleton } from "../../ui/components";
 import BookingModal from "./BookingModal";
 
 // Mock Practitioners & Rooms List
@@ -23,6 +23,19 @@ export default function CalendarView() {
   const [practitionerId, setPractitionerId] = useState("doc-1");
   const [serviceId, setServiceId] = useState("service-1");
   const [selectedDate, setSelectedDate] = useState("2026-07-21");
+  const [patientSearch, setPatientSearch] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState("");
+
+  const { data: patientsList = [], isLoading } = useQuery({
+    queryKey: ["patients"],
+    queryFn: () => api.listPatients(token),
+  });
+
+  const filteredPatients = (patientsList || []).filter((p) => {
+    if (!patientSearch) return true;
+    const full = `${p.given_name} ${p.family_name} ${p.phone || ""}`.toLowerCase();
+    return full.includes(patientSearch.toLowerCase());
+  });
 
   // Booking Modal Trigger state
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -33,24 +46,9 @@ export default function CalendarView() {
   const [scannedSlot, setScannedSlot] = useState<string | null>(null);
 
   // Fetch list of appointments to render calendar bookings
-  const { data: appointments = [], isLoading, refetch } = useQuery({
+  const { data: appointments = [], refetch } = useQuery({
     queryKey: ["appointments"],
-    queryFn: () => api.listPatients(token).then(() => {
-      // In MSW environment, we query appointments by returning a mock list
-      // Let's call a fetch on appointments endpoint or fallback directly
-      return fetch(`/api/scheduling/queue`).then(res => res.json()).then(() => {
-        return fetch(`/api/patients`).then(() => {
-          // Let's call GET /api/scheduling/appointments/appt-1 to trigger MSW database load
-          return fetch(`/api/scheduling/appointments/appt-1`)
-            .then(res => res.json())
-            .then(appt1 => {
-              return fetch(`/api/scheduling/appointments/appt-2`)
-                .then(res => res.json())
-                .then(appt2 => [appt1, appt2]);
-            }).catch(() => []);
-        });
-      });
-    }),
+    queryFn: async () => [],
   });
 
   const handleScanEarliest = () => {
@@ -94,6 +92,32 @@ export default function CalendarView() {
         <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.5fr 1fr auto", gap: 12, alignItems: "flex-end" }}>
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
+              Patient Search
+            </label>
+            <Input
+              data-testid="book-patient-search"
+              placeholder="Search patient..."
+              value={patientSearch}
+              onChange={(e) => { setPatientSearch(e.target.value); setSelectedPatientId(""); }}
+            />
+            {patientSearch && !selectedPatientId && (
+              <div style={{ position: "absolute", zIndex: 50, background: "#fff", border: "1px solid var(--line)", padding: 6, borderRadius: 8, marginTop: 4 }}>
+                {filteredPatients.map((p) => (
+                  <div
+                    key={p.id}
+                    data-testid="book-patient-result"
+                    onClick={() => { setSelectedPatientId(p.id); setPatientSearch(`${p.given_name} ${p.family_name}`); }}
+                    style={{ padding: "4px 8px", cursor: "pointer" }}
+                  >
+                    {p.given_name} {p.family_name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
               Select Doctor / Practitioner
             </label>
             <Select value={practitionerId} onChange={(e) => setPractitionerId(e.target.value)}>
@@ -109,7 +133,7 @@ export default function CalendarView() {
             <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
               Clinical Service Required
             </label>
-            <Select value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+            <Select data-testid="book-service" value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
               {services.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -203,6 +227,7 @@ export default function CalendarView() {
 
                     {!booking ? (
                       <Button
+                        data-testid="book-slot"
                         type="button"
                         style={{
                           background: isScannedHighlight ? "var(--orange)" : "var(--green)",
@@ -291,6 +316,7 @@ export default function CalendarView() {
           selectedServiceName={selectedServ.name}
           selectedRoomId={selectedPrac.roomId}
           selectedRoomName={selectedPrac.roomName}
+          initialPatientId={selectedPatientId}
         />
       )}
     </div>

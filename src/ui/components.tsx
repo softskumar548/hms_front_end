@@ -48,10 +48,10 @@ const statusColors: Record<string, { bg: string; fg: string }> = {
   danger:  { bg: "#FBE3E3", fg: "#B22B2B" },   // e.g. hard-stop prerequisite unmet
 };
 
-export function StatusPill({ kind = "brand", children }: { kind?: keyof typeof statusColors; children: React.ReactNode }) {
-  const c = statusColors[kind];
+export function StatusPill({ kind = "brand", children, ...props }: React.HTMLAttributes<HTMLSpanElement> & { kind?: keyof typeof statusColors; children: React.ReactNode }) {
+  const c = statusColors[kind] || statusColors.brand;
   return (
-    <span style={{ display: "inline-block", padding: "4px 12px", borderRadius: "var(--r-pill)", fontSize: 12, fontWeight: 800, background: c.bg, color: c.fg }}>
+    <span {...props} style={{ display: "inline-block", padding: "4px 12px", borderRadius: "var(--r-pill)", fontSize: 12, fontWeight: 800, background: c.bg, color: c.fg, ...props.style }}>
       {children}
     </span>
   );
@@ -325,6 +325,7 @@ export function Toast({ message, isVisible, onClose, duration = 2500 }: { messag
 
   return (
     <div
+      data-testid="toast"
       role="status"
       aria-live="polite"
       style={{

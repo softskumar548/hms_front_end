@@ -10,3 +10,16 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run E2E Playwright tests against Live Stack
+        env:
+          VITE_USE_MOCKS: "false"
+        run: npm run e2e

@@ -134,6 +134,7 @@ export default function CheckInDrawer({ isOpen, onClose, appointmentId }: CheckI
 
                   {!p.satisfied && (
                     <Button
+                      data-testid="prereq-resolve"
                       type="button"
                       ghost
                       style={{ fontSize: 11, padding: "4px 10px" }}
@@ -152,6 +153,7 @@ export default function CheckInDrawer({ isOpen, onClose, appointmentId }: CheckI
         {/* Hard-stop block display (REF-061) */}
         {isBlocked && (
           <div
+            data-testid="checkin-blocked-panel"
             style={{
               background: "#fbe3e3",
               border: "1px solid var(--danger)",
@@ -202,7 +204,7 @@ export default function CheckInDrawer({ isOpen, onClose, appointmentId }: CheckI
           <Button ghost onClick={onClose}>
             Close
           </Button>
-          <Button disabled={!checkInEnabled || checkInMutation.isPending} onClick={() => checkInMutation.mutate()}>
+          <Button data-testid="checkin-submit" disabled={!checkInEnabled || checkInMutation.isPending} onClick={() => checkInMutation.mutate()}>
             {checkInMutation.isPending ? "Checking in..." : "Perform Check-In"}
           </Button>
         </div>

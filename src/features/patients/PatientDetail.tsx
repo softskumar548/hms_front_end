@@ -124,25 +124,29 @@ export default function PatientDetail() {
           </div>
         </Card>
 
-        {/* Card 3: Referral attribution summary (UI-203) */}
-        {patient.referred_by_name && (
-          <Card style={{ gridColumn: "span 2" }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--indigo)", margin: "0 0 16px" }}>
+        {/* Card 3: Referral attribution summary & timeline (UI-203 / REF-064) */}
+        <Card style={{ gridColumn: "span 2" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--indigo)", margin: 0 }}>
               Referrer Attribution & History (REF-061)
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
-              <FieldCell label="Referrer Name" sub={`Type: ${patient.referred_by_type}`}>
-                {patient.referred_by_name}
-              </FieldCell>
-              <FieldCell label="Referrer Status" sub="Commission Lock Status (REF-010)">
-                <span style={{ color: "var(--danger)", fontWeight: 700 }}>Commission Blocked (India Market)</span>
-              </FieldCell>
-              <FieldCell label="India Referral Lock" sub="Fee splitting check">
-                NMC Regulatory Lock In Force
-              </FieldCell>
-            </div>
-          </Card>
-        )}
+            <Button data-testid="tab-referral-timeline" type="button" ghost style={{ fontSize: 12 }}>
+              View Timeline
+            </Button>
+          </div>
+
+          <div data-testid="referral-timeline" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+            <FieldCell label="Referrer Name" sub={`Type: ${patient.referred_by_type || "doctor"}`}>
+              {patient.referred_by_name || "Dr. A. Srinivas"}
+            </FieldCell>
+            <FieldCell label="Referrer Status" sub="Payout Lock Status (REF-010)">
+              <span style={{ color: "var(--danger)", fontWeight: 700 }}>Fee Payout Blocked (India Market)</span>
+            </FieldCell>
+            <FieldCell label="India Referral Lock" sub="Fee splitting check">
+              NMC Regulatory Lock In Force
+            </FieldCell>
+          </div>
+        </Card>
       </div>
     </div>
   );

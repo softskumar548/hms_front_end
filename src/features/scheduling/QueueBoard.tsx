@@ -143,7 +143,7 @@ export default function QueueBoard() {
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <StatusPill kind={isArrived ? "info" : "warn"}>
+                    <StatusPill data-testid="queue-status" kind={isArrived ? "info" : "warn"}>
                       {isArrived ? "ARRIVED / WAITING" : "IN CONSULTATION"}
                     </StatusPill>
 
@@ -194,10 +194,13 @@ export default function QueueBoard() {
             </p>
           ) : (
             <div style={{ display: "grid", gap: 10 }}>
-              {pendingCheckIns.map((appt) => (
-                <div
-                  key={appt.id}
-                  style={{
+              {pendingCheckIns.map((appt) => {
+                const familyName = appt.patient_name?.split(" ").pop() || appt.id;
+                return (
+                  <div
+                    key={appt.id}
+                    data-testid={`checkin-row-${familyName}`}
+                    style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",

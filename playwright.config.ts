@@ -10,7 +10,11 @@ export default defineConfig({
     baseURL: process.env.E2E_BASE_URL || "http://localhost:5173",
     trace: "retain-on-failure",
   },
-  webServer: process.env.CI
-    ? { command: "npm run dev", url: "http://localhost:5173", reuseExistingServer: false, timeout: 120_000 }
-    : undefined,
+  webServer: {
+    command: "npm run dev",
+    url: "http://localhost:5173",
+    reuseExistingServer: true,
+    timeout: 120_000,
+    env: { VITE_USE_MOCKS: "false" },
+  },
 });

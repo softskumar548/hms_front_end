@@ -223,6 +223,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
               </label>
               <div style={{ position: "relative" }}>
                 <Input
+                  data-testid="rx-drug-search"
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -234,6 +235,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                     {drugResults.map((drug) => (
                       <div
                         key={drug.id}
+                        data-testid="rx-drug-option"
                         onClick={() => handleSelectDrug(drug)}
                         style={{ padding: "10px 14px", borderBottom: "1px solid var(--wash-b)", cursor: "pointer", fontSize: 13.5 }}
                         onMouseOver={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
@@ -266,6 +268,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
               <div>
                 <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Dose (e.g. 500mg)</label>
                 <Input
+                  data-testid="rx-dose"
                   value={dose}
                   onChange={(e) => setDose(e.target.value)}
                   placeholder="500mg"
@@ -287,7 +290,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                 <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
                   Frequency
                 </label>
-                <Select value={frequency} onChange={(e) => setFrequency(e.target.value)}>
+                <Select data-testid="rx-frequency" value={frequency} onChange={(e) => setFrequency(e.target.value)}>
                   <option value="Once daily">Once daily</option>
                   <option value="Twice daily">Twice daily (BD)</option>
                   <option value="TDS">Thrice daily (TDS)</option>
@@ -298,6 +301,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
               <div>
                 <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Duration</label>
                 <Input
+                  data-testid="rx-duration"
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
                   placeholder="5 days"
@@ -356,7 +360,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
 
           {/* Drug-Allergy Warning safety display alerts (RX-003) */}
           {hasAllergyConflict && !isRxSigned && (
-            <div style={{ background: "#fbe3e3", border: "1px solid var(--danger)", color: "#b22b2b", padding: 14, borderRadius: "14px", fontSize: 13 }}>
+            <div data-testid="rx-alert-danger" style={{ background: "#fbe3e3", border: "1px solid var(--danger)", color: "#b22b2b", padding: 14, borderRadius: "14px", fontSize: 13 }}>
               <strong style={{ display: "block", marginBottom: 6 }}>⚠️ CRITICAL ALLERGY ALERT (RX-003)</strong>
               Patient has a documented <strong>Penicillin Allergy</strong>. Prescribing <strong>Amoxicillin</strong> is blocked.
               To override and proceed, you must provide a clinical override justification.
@@ -366,7 +370,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                   <label style={{ fontSize: 11, fontWeight: 700, display: "block", marginBottom: 4 }}>
                     Override Coded Reason *
                   </label>
-                  <Select value={overrideCode} onChange={(e) => setOverrideCode(e.target.value)} style={{ borderColor: "var(--danger)" }}>
+                  <Select data-testid="rx-override-reason" value={overrideCode} onChange={(e) => setOverrideCode(e.target.value)} style={{ borderColor: "var(--danger)" }}>
                     <option value="">-- Choose override reason code --</option>
                     <option value="BENEFIT_OUTWEIGHS_RISK">Clinical benefit outweighs documented risk</option>
                     <option value="NO_ALTERNATIVE">No viable therapeutic alternative exists</option>
@@ -389,6 +393,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
           {signedRx && !isRxSigned && (
             <div style={{ display: "flex", justifyContent: "flex-end", borderTop: "1px dashed var(--line)", paddingTop: 12 }}>
               <Button
+                data-testid="rx-sign"
                 type="button"
                 disabled={signMutation.isPending || (hasAllergyConflict && !overrideCode)}
                 onClick={handleSign}

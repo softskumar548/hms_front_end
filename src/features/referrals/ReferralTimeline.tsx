@@ -95,7 +95,7 @@ export default function ReferralTimeline() {
 
       {/* India lock banner notification */}
       <div style={{ background: "var(--wash-a)", border: "1px solid var(--indigo)", padding: 14, borderRadius: "14px", color: "var(--indigo)", fontSize: 13 }}>
-        🛡️ <strong>Regulatory Notice (India Lock - NMC Directive)</strong>: Referral financial/commission tracking is locked and disabled on this system. Only clinical and process workflow steps are illustrated.
+        🛡️ <strong>Regulatory Notice (India Lock - NMC Directive)</strong>: Referral financial/fee tracking is locked and disabled on this system. Only clinical and process workflow steps are illustrated.
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: 20, alignItems: "start" }}>

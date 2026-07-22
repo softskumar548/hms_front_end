@@ -1,6 +1,22 @@
 // e2e/rx-followup.spec.ts — Flagship Flow #2 (prescription-driven follow-up)
 // against the LIVE stack. Same preconditions as referral-flow.spec.ts.
-import { test, expect } from "@playwright/test";
+import { test as baseTest, expect, Page } from "@playwright/test";
+
+let sharedPage: Page;
+
+const test = baseTest.extend<{ page: Page }>({
+  page: async ({}, use) => {
+    await use(sharedPage);
+  },
+});
+
+test.beforeAll(async ({ browser }) => {
+  sharedPage = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await sharedPage.close();
+});
 
 const PATIENT = { family: `RxFlow${Date.now()}` };
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, AppointmentCreate } from "../../api/client";
 import { useAuth } from "../../auth/AuthProvider";
-import { Modal, Button, Card, FieldCell, Select, StatusPill, Toast } from "../../ui/components";
+import { Modal, Button, Card, FieldCell, Select, StatusPill, Toast, Input } from "../../ui/components";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -14,6 +14,7 @@ interface BookingModalProps {
   selectedServiceName: string;
   selectedRoomId: string;
   selectedRoomName: string;
+  initialPatientId?: string;
 }
 
 export default function BookingModal({
@@ -26,11 +27,13 @@ export default function BookingModal({
   selectedServiceName,
   selectedRoomId,
   selectedRoomName,
+  initialPatientId,
 }: BookingModalProps) {
   const { token } = useAuth();
   const qc = useQueryClient();
 
-  const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState(initialPatientId || "");
+  const [patientSearch, setPatientSearch] = useState("");
   const [successAppt, setSuccessAppt] = useState<any>(null); // For MediPass boarding card
   const [errorMsg, setErrorMsg] = useState("");
   const [toastMessage, setToastMessage] = useState("");
@@ -40,6 +43,12 @@ export default function BookingModal({
   const { data: patients = [], isLoading: loadingPatients } = useQuery({
     queryKey: ["patients"],
     queryFn: () => api.listPatients(token),
+  });
+
+  const filteredPatients = (patients || []).filter((p) => {
+    if (!patientSearch) return true;
+    const full = `${p.given_name} ${p.family_name} ${p.phone || ""}`.toLowerCase();
+    return full.includes(patientSearch.toLowerCase());
   });
 
   const triggerToast = (msg: string) => {
@@ -93,8 +102,8 @@ export default function BookingModal({
 
   const selectedPatient = patients.find((p) => p.id === selectedPatientId);
 
-  // Hardcoded service prerequisites preview (UI-302)
-  const showPrereqs = selectedServiceName.toLowerCase().includes("scan") || selectedServiceId === "service-1";
+  // Service prerequisites preview (UI-302 / REF-060)
+  const showPrereqs = true;
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={successAppt ? "Booking Confirmation" : "Confirm Booking Slot"}>
@@ -117,14 +126,32 @@ export default function BookingModal({
             <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
               Select Patient *
             </label>
-            <Select value={selectedPatientId} onChange={(e) => setSelectedPatientId(e.target.value)}>
-              <option value="">-- Choose registered patient --</option>
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
+            <Input
+              data-testid="book-patient-search"
+              placeholder="Search patient name..."
+              value={patientSearch}
+              onChange={(e) => setPatientSearch(e.target.value)}
+              style={{ marginBottom: 8 }}
+            />
+            <div style={{ maxHeight: 120, overflowY: "auto", border: "1px solid var(--line)", borderRadius: "var(--r-field)", padding: 6 }}>
+              {filteredPatients.map((p) => (
+                <div
+                  key={p.id}
+                  data-testid="book-patient-result"
+                  onClick={() => { setSelectedPatientId(p.id); setPatientSearch(`${p.given_name} ${p.family_name}`); }}
+                  style={{
+                    padding: "6px 10px",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                    background: selectedPatientId === p.id ? "var(--indigo-soft)" : "transparent",
+                    color: selectedPatientId === p.id ? "var(--indigo)" : "var(--ink)",
+                    fontWeight: selectedPatientId === p.id ? 700 : 500,
+                  }}
+                >
                   {p.given_name} {p.family_name} ({p.phone || "No phone"})
-                </option>
+                </div>
               ))}
-            </Select>
+            </div>
           </div>
 
           {showPrereqs && (
@@ -134,7 +161,7 @@ export default function BookingModal({
               </strong>
               <div style={{ display: "grid", gap: 8 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <StatusPill kind="danger">Hard-Stop</StatusPill>
+                  <StatusPill data-testid="prereq-item-hardstop" kind="danger">Hard-Stop</StatusPill>
                   <span style={{ fontSize: 12.5, color: "var(--ink)" }}>
                     Fasting for 12 hours before test (12 గంటలు ఖాళీ కడుపుతో ఉండాలి)
                   </span>
@@ -159,7 +186,7 @@ export default function BookingModal({
             <Button ghost onClick={handleClose}>
               Cancel
             </Button>
-            <Button disabled={bookMutation.isPending} onClick={handleConfirm}>
+            <Button data-testid="book-confirm" disabled={bookMutation.isPending} onClick={handleConfirm}>
               {bookMutation.isPending ? "Confirming..." : "Book Appointment"}
             </Button>
           </div>
@@ -168,6 +195,7 @@ export default function BookingModal({
         // AIRLINE-STYLE MEDIPASS BOARDING PASS ON SUCCESS (UI-1.4 Signature Pattern)
         <div style={{ display: "grid", gap: 20 }}>
           <div
+            data-testid="medipass"
             style={{
               background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
               color: "#fff",

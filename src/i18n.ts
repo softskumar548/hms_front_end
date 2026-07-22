@@ -98,9 +98,8 @@ const resources = {
       settings_title: "Tenant Settings",
       branding_config: "Branding & Region Config",
       target_market: "Target Market",
-      referral_commission: "Referral Commission",
-      locked_prohibited: "Locked / Prohibited",
-      nmc_regulation_note: "NMC regulations lock commission sharing in India (REF-010)",
+      referral_commission: "Referral Attributions",
+      nmc_regulation_note: "NMC regulations lock fee sharing in India (REF-010)",
 
       // Design System Showcase
       design_system_title: "MediGo Design System",
@@ -224,9 +223,9 @@ const resources = {
       settings_title: "టెనెంట్ సెట్టింగులు",
       branding_config: "బ్రాండింగ్ & ప్రాంతీయ కాన్ఫిగరేషన్",
       target_market: "లక్ష్య మార్కెట్",
-      referral_commission: "రెఫరల్ కమిషన్",
+      referral_commission: "రెఫరల్ సమాచారం",
       locked_prohibited: "లాక్ చేయబడింది / నిషేధించబడింది",
-      nmc_regulation_note: "ఎన్ఎమ్సి నిబంధనలు భారతదేశంలో కమిషన్ భాగస్వామ్యాన్ని లాక్ చేస్తాయి (REF-010)",
+      nmc_regulation_note: "ఎన్ఎమ్సి నిబంధనలు రుసుము భాగస్వామ్యాన్ని లాక్ చేస్తాయి (REF-010)",
 
       // Design System Showcase
       design_system_title: "మెడిగో డిజైన్ సిస్టమ్",
