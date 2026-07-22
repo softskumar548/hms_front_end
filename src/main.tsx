@@ -73,7 +73,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           {(role === "admin" || role === "billing") && <Link to="/reports/referrals" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Referrals Report</Link>}
           <Link to="/design" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_design")}</Link>
         </nav>
-        <span style={{ marginLeft: "auto", fontSize: 13, color: "var(--slate)", display: "flex", alignItems: "center", gap: 12 }}>
+        <span data-testid="shell-tenant-indicator" style={{ marginLeft: "auto", fontSize: 13, color: "var(--slate)", display: "flex", alignItems: "center", gap: 12 }}>
           <span>{formatIndianDate(new Date())}</span>
           <span style={{ height: 12, width: 1, background: "var(--line)" }}></span>
           <span>{tenant} · {role}</span>
@@ -110,19 +110,19 @@ function Login() {
         )}
         <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
           <FieldCell label={t("tenant")}>
-            <select value={tenant} onChange={(e) => setTenant(e.target.value)}
+            <select data-testid="login-tenant" value={tenant} onChange={(e) => setTenant(e.target.value)}
               style={{ font: "inherit", color: "inherit", border: 0, background: "transparent", width: "100%" }}>
               <option value="apollo">Apollo Clinic (demo)</option>
               <option value="kims">KIMS Hospital (demo)</option>
             </select>
           </FieldCell>
           <FieldCell label={t("role")}>
-            <select value={role} onChange={(e) => setRole(e.target.value)}
+            <select data-testid="login-role" value={role} onChange={(e) => setRole(e.target.value)}
               style={{ font: "inherit", color: "inherit", border: 0, background: "transparent", width: "100%" }}>
               <option>receptionist</option><option>physician</option><option>admin</option><option>billing</option>
             </select>
           </FieldCell>
-          <Button onClick={() => login(tenant, role)}>{t("continue")}</Button>
+          <Button data-testid="login-continue" onClick={() => login(tenant, role)}>{t("continue")}</Button>
         </div>
       </Card>
     </div>
