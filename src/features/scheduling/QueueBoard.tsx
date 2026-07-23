@@ -221,7 +221,8 @@ export default function QueueBoard() {
                     Initiate Check-In
                   </Button>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </Card>

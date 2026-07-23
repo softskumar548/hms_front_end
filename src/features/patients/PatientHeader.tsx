@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, PatientOut, AllergyIntoleranceCreate } from "../../api/client";
+import { api, PatientOut, AllergyIntoleranceCreate, type AllergyIntoleranceOut } from "../../api/client";
 import { useAuth } from "../../auth/AuthProvider";
 import { Button, Card, StatusPill, Chip, Modal, Input, Select, Toast } from "../../ui/components";
 
@@ -27,7 +27,7 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
   };
 
   // Fetch Patient Allergies (EMR-005)
-  const { data: allergies = [], isLoading } = useQuery({
+  const { data: allergies = [], isLoading } = useQuery<AllergyIntoleranceOut[]>({
     queryKey: ["allergies", patient.id],
     queryFn: () => api.listAllergies(token, patient.id),
     enabled: !!patient.id,
