@@ -8,7 +8,7 @@ import PatientHeader from "../patients/PatientHeader";
 
 export default function PatientSummary() {
   const { id: patientId } = useParams<{ id: string }>();
-  const { token, role } = useAuth();
+  const { token, role, tenant } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   
@@ -39,8 +39,8 @@ export default function PatientSummary() {
     mutationFn: () =>
       api.createEncounter(token, {
         patient_id: patientId || "",
-        practitioner_id: "doc-1", // Logged-in doc context stub
-        site_id: "site-1",
+        practitioner_id: `doc_${tenant}_1`, // seeded practitioner for the active tenant
+        site_id: `site_${tenant}_main`,
       }),
     onSuccess: (data) => {
       triggerToast("New clinical encounter initialized.");
@@ -245,6 +245,7 @@ export default function PatientSummary() {
               </h3>
               {role === "physician" && (
                 <Button
+                  data-testid="start-encounter"
                   type="button"
                   style={{ fontSize: 12, padding: "4px 14px" }}
                   onClick={() => createEncounterMutation.mutate()}

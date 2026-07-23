@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../../api/client";
+import { api, type AppointmentDetailOut } from "../../api/client";
 import { useAuth } from "../../auth/AuthProvider";
 import { Card, Button, Select, Input, StatusPill, Skeleton } from "../../ui/components";
 import BookingModal from "./BookingModal";
@@ -46,7 +46,7 @@ export default function CalendarView() {
   const [scannedSlot, setScannedSlot] = useState<string | null>(null);
 
   // Fetch list of appointments to render calendar bookings
-  const { data: appointments = [], refetch } = useQuery({
+  const { data: appointments = [], refetch } = useQuery<AppointmentDetailOut[]>({
     queryKey: ["appointments"],
     queryFn: async () => [],
   });

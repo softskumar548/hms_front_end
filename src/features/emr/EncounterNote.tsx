@@ -12,6 +12,7 @@ const icd10List = [
   { code: "I10", display: "Essential (primary) hypertension" },
   { code: "E11.9", display: "Type 2 diabetes mellitus without complications" },
   { code: "J00", display: "Acute nasopharyngitis [common cold]" },
+  { code: "J06.9", display: "Acute upper respiratory infection, unspecified" },
   { code: "G44.2", display: "Tension-type headache" },
   { code: "K21.9", display: "Gastro-esophageal reflux disease without esophagitis" },
 ];
@@ -31,6 +32,8 @@ export default function EncounterNote() {
   const [assessment, setAssessment] = useState("");
   const [plan, setPlan] = useState("");
   const [icdCode, setIcdCode] = useState("");
+  const [dxQuery, setDxQuery] = useState("");
+  const [composerOpen, setComposerOpen] = useState(false);
   const [signoffError, setSignoffError] = useState("");
   
   // Vitals inputs state
@@ -274,14 +277,31 @@ export default function EncounterNote() {
                 <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
                   ICD-10 Diagnostic Assertion * (EMR-008)
                 </label>
-                <Select data-testid="dx-search" value={icdCode} onChange={(e) => { setIcdCode(e.target.value); setSignoffError(""); }} disabled={isSigned}>
-                  <option value="">-- Search and select ICD-10 code --</option>
-                  {icd10List.map((i) => (
-                    <option key={i.code} value={i.code} data-testid="dx-option">
-                      ({i.code}) {i.display}
-                    </option>
-                  ))}
-                </Select>
+                <div style={{ position: "relative" }}>
+                  <Input
+                    data-testid="dx-search"
+                    value={dxQuery}
+                    onChange={(e) => { setDxQuery(e.target.value); setIcdCode(""); setSignoffError(""); }}
+                    disabled={isSigned}
+                    placeholder="Search ICD-10 code or term…"
+                  />
+                  {!isSigned && dxQuery.trim() !== "" && !icdCode && (
+                    <div style={{ position: "absolute", zIndex: 20, top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid var(--line)", borderRadius: "var(--r-field)", marginTop: 4, maxHeight: 200, overflowY: "auto", boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}>
+                      {icd10List
+                        .filter((i) => `${i.code} ${i.display}`.toLowerCase().includes(dxQuery.toLowerCase()))
+                        .map((i) => (
+                          <div
+                            key={i.code}
+                            data-testid="dx-option"
+                            onClick={() => { setIcdCode(i.code); setDxQuery(`(${i.code}) ${i.display}`); setSignoffError(""); }}
+                            style={{ padding: "8px 12px", fontSize: 13.5, cursor: "pointer", borderBottom: "1px solid var(--wash-a)" }}
+                          >
+                            ({i.code}) {i.display}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -345,8 +365,15 @@ export default function EncounterNote() {
             )}
           </Card>
 
-          {/* Prescription composer block */}
-          <PrescriptionComposer encounterId={encounterId || ""} patientId={patientId || ""} isLocked={isSigned} />
+          {/* Prescription composer block (revealed on demand; auto-shown once signed) */}
+          {!composerOpen && !isSigned && (
+            <Button data-testid="rx-open-composer" type="button" onClick={() => setComposerOpen(true)}>
+              + Add Prescription
+            </Button>
+          )}
+          {(composerOpen || isSigned) && (
+            <PrescriptionComposer encounterId={encounterId || ""} patientId={patientId || ""} isLocked={isSigned} />
+          )}
 
           {/* Follow up Next visit configuration */}
           <NextVisitPanel encounterId={encounterId || ""} patientId={patientId || ""} isLocked={isSigned} />

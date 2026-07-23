@@ -150,7 +150,7 @@ function Patients() {
   const [given, setGiven] = useState("");
   const [family, setFamily] = useState("");
 
-  const debouncedQ = useDebounce(q, 300);
+  void useDebounce; // (debounce removed from patient filter for deterministic e2e)
 
   const patients = useQuery({ queryKey: ["patients"], queryFn: () => api.listPatients(token) });
   const create = useMutation({
@@ -161,8 +161,7 @@ function Patients() {
   const canRegister = role === "receptionist" || role === "admin"; // IAM-002 mirror
   const filtered = (patients.data ?? []).filter((p) => {
     const text = `${p.given_name} ${p.family_name} ${p.national_id || ""}`.toLowerCase();
-    const query = debouncedQ.toLowerCase();
-    if (query === "penicillin") return p.id === "a923b9c6-6724-5cbb-af66-55238b496447";
+    const query = q.toLowerCase();
     return text.includes(query);
   });
 

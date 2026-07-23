@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Card, Button, StatusPill, Chip, Toast } from "../../ui/components";
+import { Card, Button, StatusPill, Chip, Toast, Input } from "../../ui/components";
 
 // Pre-defined pre-visit prerequisites from library (EMR-013)
 const prereqsLibrary = [
   { code: "FASTING", label: "Fasting for 12 hours before test (12 గంటలు ఖాళీ కడుపుతో ఉండాలి)", type: "hard-stop" },
   { code: "SCAN_PREVIOUS", label: "Bring previous report scans (మునుపటి నివేదిక తీసుకురండి)", type: "advisory" },
-  { code: "DUES_CLEAR", label: "Clear billing dues before check-in (బిల్లు బకాయిలను క్లియర్ చేయండి)", type: "advisory" }
+  { code: "DUES_CLEAR", label: "Clear billing dues before check-in (బిల్లు బకాయిలను క్లియర్ చేయండి)", type: "advisory" },
+  { code: "CBC", label: "Complete Blood Count (CBC) lab before visit", type: "advisory" }
 ];
 
 interface NextVisitPanelProps {
@@ -25,6 +26,8 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
   // Selected prerequisites list
   const [selectedPrereqs, setSelectedPrereqs] = useState<string[]>([]);
   const [savedFollowUp, setSavedFollowUp] = useState<any>(null);
+  const [followupReason, setFollowupReason] = useState("");
+  const [prereqQuery, setPrereqQuery] = useState("");
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -135,6 +138,55 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
           </div>
         </div>
 
+        {/* Follow-up reason (EMR-013) */}
+        <div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 8 }}>
+            Reason for Follow-Up
+          </span>
+          <Input
+            data-testid="followup-reason"
+            value={followupReason}
+            onChange={(e) => setFollowupReason(e.target.value)}
+            disabled={isConfigLocked}
+            placeholder="e.g. Review response to antibiotics"
+          />
+        </div>
+
+        {/* Structured prerequisite search (REF-060) — library, never free text */}
+        <div>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 8 }}>
+            Add Structured Prerequisite
+          </span>
+          <div style={{ position: "relative" }}>
+            <Input
+              data-testid="followup-prereq-search"
+              value={prereqQuery}
+              onChange={(e) => setPrereqQuery(e.target.value)}
+              disabled={isConfigLocked}
+              placeholder="Search prerequisite library (e.g. CBC)…"
+            />
+            {!isConfigLocked && prereqQuery.trim() !== "" && (
+              <div style={{ position: "absolute", zIndex: 20, top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid var(--line)", borderRadius: "var(--r-field)", marginTop: 4, maxHeight: 180, overflowY: "auto", boxShadow: "0 6px 20px rgba(0,0,0,0.08)" }}>
+                {prereqsLibrary
+                  .filter((p) => `${p.code} ${p.label}`.toLowerCase().includes(prereqQuery.toLowerCase()))
+                  .map((p) => (
+                    <div
+                      key={p.code}
+                      data-testid="followup-prereq-option"
+                      onClick={() => {
+                        if (!selectedPrereqs.includes(p.code)) setSelectedPrereqs([...selectedPrereqs, p.code]);
+                        setPrereqQuery("");
+                      }}
+                      style={{ padding: "8px 12px", fontSize: 13.5, cursor: "pointer", borderBottom: "1px solid var(--wash-a)" }}
+                    >
+                      ({p.code}) {p.label}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Prerequisites selection Checklist */}
         <div>
           <span style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 8 }}>
@@ -182,7 +234,7 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
 
         {isConfigLocked && (
           <div data-testid="followup-card" style={{ background: "rgba(19, 26, 143, 0.05)", border: "1px solid var(--indigo)", color: "var(--indigo)", padding: 12, borderRadius: "14px", fontSize: 13, fontWeight: 600 }}>
-            ✓ Follow-up scheduled for{" "}
+            ✓ DRAFT follow-up (not auto-booked — Flag F1) for{" "}
             {savedFollowUp
               ? new Date(savedFollowUp.follow_up_date).toLocaleDateString("en-IN", { dateStyle: "long" })
               : "Next Scheduled Consultation"}{" "}

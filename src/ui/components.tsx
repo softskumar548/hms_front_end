@@ -103,7 +103,7 @@ export function Skeleton({ width = "100%", height = "1em", style, circular }: { 
   );
 }
 
-export function Chip({ active, children, onClick, style }: { active?: boolean; children: React.ReactNode; onClick?: () => void; style?: React.CSSProperties }) {
+export function Chip({ active, children, onClick, style, "data-testid": testId }: { active?: boolean; children: React.ReactNode; onClick?: () => void; style?: React.CSSProperties; "data-testid"?: string }) {
   const baseStyle: React.CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
@@ -130,7 +130,7 @@ export function Chip({ active, children, onClick, style }: { active?: boolean; c
     : {};
 
   return (
-    <button onClick={onClick} style={{ ...baseStyle, ...activeStyle }} type="button">
+    <button onClick={onClick} style={{ ...baseStyle, ...activeStyle }} type="button" data-testid={testId}>
       {children}
     </button>
   );
