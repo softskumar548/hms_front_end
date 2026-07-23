@@ -294,6 +294,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                   <option value="Once daily">Once daily</option>
                   <option value="Twice daily">Twice daily (BD)</option>
                   <option value="TDS">Thrice daily (TDS)</option>
+                  <option value="TID">Thrice daily (TID)</option>
                   <option value="QDS">Four times daily</option>
                   <option value="SOS">As needed (SOS)</option>
                 </Select>

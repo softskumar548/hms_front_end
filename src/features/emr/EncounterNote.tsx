@@ -33,6 +33,7 @@ export default function EncounterNote() {
   const [plan, setPlan] = useState("");
   const [icdCode, setIcdCode] = useState("");
   const [dxQuery, setDxQuery] = useState("");
+  const [composerOpen, setComposerOpen] = useState(false);
   const [signoffError, setSignoffError] = useState("");
   
   // Vitals inputs state
@@ -364,8 +365,15 @@ export default function EncounterNote() {
             )}
           </Card>
 
-          {/* Prescription composer block */}
-          <PrescriptionComposer encounterId={encounterId || ""} patientId={patientId || ""} isLocked={isSigned} />
+          {/* Prescription composer block (revealed on demand; auto-shown once signed) */}
+          {!composerOpen && !isSigned && (
+            <Button data-testid="rx-open-composer" type="button" onClick={() => setComposerOpen(true)}>
+              + Add Prescription
+            </Button>
+          )}
+          {(composerOpen || isSigned) && (
+            <PrescriptionComposer encounterId={encounterId || ""} patientId={patientId || ""} isLocked={isSigned} />
+          )}
 
           {/* Follow up Next visit configuration */}
           <NextVisitPanel encounterId={encounterId || ""} patientId={patientId || ""} isLocked={isSigned} />
