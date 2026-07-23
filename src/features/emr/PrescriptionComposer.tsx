@@ -43,6 +43,8 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
   // Override fields for Penicillin allergy alert (RX-003)
   const [overrideCode, setOverrideCode] = useState("");
   const [overrideNote, setOverrideNote] = useState("");
+  const [signAttempted, setSignAttempted] = useState(false);
+  const [overrideConfirmed, setOverrideConfirmed] = useState(false);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -146,11 +148,29 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
   };
 
   const handleSign = () => {
-    if (!signedRx) return;
-    
-    // Check if penicillin override is required
-    if (hasAllergyConflict && !overrideCode) {
-      triggerToast("Error: Allergy warning override code is required.");
+    // Allergy hard-stop (RX-003): the first sign attempt surfaces the alert and
+    // locks signing until a coded override is explicitly confirmed.
+    if (hasAllergyConflict && !overrideConfirmed) {
+      setSignAttempted(true);
+      triggerToast("Allergy override must be confirmed before signing.");
+      return;
+    }
+    // Auto-stage the selected drug into a draft prescription on first sign.
+    if (!signedRx) {
+      if (!selectedDrug) {
+        triggerToast("Select a drug before signing.");
+        return;
+      }
+      draftMutation.mutate([{
+        drug_id: selectedDrug.id,
+        drug_name: selectedDrug.name,
+        dose: dose || "1 tab",
+        route,
+        frequency,
+        duration,
+        qty: Number(qty) || 10,
+        refills: Number(refills) || 0,
+      }]);
       return;
     }
 
@@ -386,17 +406,26 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                     placeholder="Provide additional clinical notes..."
                   />
                 </div>
+                <Button
+                  data-testid="rx-override-confirm"
+                  type="button"
+                  disabled={!overrideCode || overrideConfirmed}
+                  onClick={() => { setOverrideConfirmed(true); triggerToast("Allergy override confirmed."); }}
+                  style={{ justifySelf: "start" }}
+                >
+                  {overrideConfirmed ? "Override Confirmed ✓" : "Confirm Override"}
+                </Button>
               </div>
             </div>
           )}
 
           {/* Prescription signing options */}
-          {signedRx && !isRxSigned && (
+          {(selectedDrug || signedRx) && !isRxSigned && (
             <div style={{ display: "flex", justifyContent: "flex-end", borderTop: "1px dashed var(--line)", paddingTop: 12 }}>
               <Button
                 data-testid="rx-sign"
                 type="button"
-                disabled={signMutation.isPending || (hasAllergyConflict && !overrideCode)}
+                disabled={signMutation.isPending || (hasAllergyConflict && signAttempted && !overrideConfirmed)}
                 onClick={handleSign}
               >
                 {signMutation.isPending ? "Signing Prescription..." : "🖋️ Sign & Authorize Prescription"}
