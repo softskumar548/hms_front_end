@@ -44,10 +44,9 @@ export default function CalendarView() {
   const [scanning, setScanning] = useState(false);
   const [scannedSlot, setScannedSlot] = useState<string | null>(null);
 
-  // Fetch list of appointments to render calendar bookings
-  const { data: appointments = [], refetch } = useQuery<AppointmentDetailOut[]>({
+  const { data: appointments = [], refetch } = useQuery<any[]>({
     queryKey: ["appointments"],
-    queryFn: async () => [],
+    queryFn: () => api.listAppointments(token),
   });
 
   const handleScanEarliest = () => {

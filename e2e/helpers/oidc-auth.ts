@@ -20,7 +20,7 @@ export async function loginViaOIDC(
 
   let token = `dev.${tenant}.${role}`;
   try {
-    const response = await fetch("http://127.0.0.1:8080/realms/hms/protocol/openid-connect/token", {
+    const response = await fetch(KEYCLOAK_TOKEN_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params,
@@ -29,14 +29,13 @@ export async function loginViaOIDC(
     if (response.ok) {
       const data = await response.json();
       token = data.access_token;
-    } else {
-      console.warn("Keycloak OIDC fetch failed:", response.status, await response.text());
     }
   } catch (err) {
     console.warn("Keycloak OIDC login helper error:", err);
   }
 
-  await page.addInitScript(
+  await page.goto("/");
+  await page.evaluate(
     ({ token, tenant, role }) => {
       localStorage.setItem("hms_token", token);
       localStorage.setItem("hms_tenant", tenant);
@@ -44,6 +43,7 @@ export async function loginViaOIDC(
     },
     { token, tenant, role }
   );
+  await page.reload();
 
   return token;
 }

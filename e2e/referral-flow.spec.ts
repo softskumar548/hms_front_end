@@ -26,7 +26,7 @@ import { loginViaOIDC } from "./helpers/oidc-auth";
 
 test.describe.serial("Flagship #1 — referral: intake → prereq CT → blocked check-in → resolve → invoice → timeline", () => {
   test("login as receptionist via Keycloak OIDC helper (apollo)", async ({ page }) => {
-    await loginViaOIDC(page, "dr.smith@apollo.com", "Password123!", "apollo", "physician");
+    await loginViaOIDC(page, "receptionist@apollo.com", "Password123!", "apollo", "receptionist");
     await page.goto("/patients");
     await expect(page.getByTestId("shell-tenant-indicator")).toContainText("apollo");
   });

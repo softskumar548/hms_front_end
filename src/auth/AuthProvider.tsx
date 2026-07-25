@@ -86,7 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (claims) {
         const parsedTenant = claims["app"]?.["tenant_id"] || claims["app.tenant_id"] || claims["tenant_id"] || claims["tenant"] || "apollo";
         const roles = claims["roles"] || claims["realm_access"]?.roles || [];
-        let parsedRole = Array.isArray(roles) && roles.length > 0 ? roles[0] : "receptionist";
+        const knownRoles = ["doctor", "physician", "receptionist", "admin", "billing", "operator", "patient", "nurse"];
+        const rolesList = Array.isArray(roles) ? roles : [];
+        let parsedRole = rolesList.find((r: string) => knownRoles.includes(r)) || rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") || "receptionist";
         if (parsedRole === "doctor") parsedRole = "physician";
         setTenant(parsedTenant);
         setRole(parsedRole);
