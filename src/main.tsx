@@ -674,6 +674,7 @@ function App() {
           <Route path="/onboarding" element={<OnboardingWizardScreen token={token} />} />
           <Route path="/ops-control" element={<OperationalControlScreen token={token} />} />
 
+          <Route path="/callback" element={<div style={{ padding: 40, textAlign: "center", color: "var(--indigo)", fontWeight: 700 }}>Completing Keycloak OIDC Authentication...</div>} />
           <Route path="/design" element={<DesignSystem />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
