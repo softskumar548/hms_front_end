@@ -46,14 +46,16 @@ jobs:
           PGPASSWORD: postgres_change_me
           DATABASE_URL: postgresql+asyncpg://hms_app:app_password_change_me@localhost:5432/hms
           SEED_DATABASE_URL: postgresql+asyncpg://postgres:postgres_change_me@localhost:5432/hms
-          PYTHONPATH: backend/libs:backend/services/plt
+          PYTHONPATH: libs:services/plt
+        working-directory: backend
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
-          psql -h localhost -U postgres -d hms -f backend/infra/postgres/init.sql
-          pip install -e "backend/services/plt[dev]"
+          psql -h localhost -U postgres -d hms -f infra/postgres/init.sql
+          pip install -e "services/plt[dev]"
           python -m app.seed
           nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
           sleep 5
+          curl -f http://127.0.0.1:8000/health || cat uvicorn.log
 
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
