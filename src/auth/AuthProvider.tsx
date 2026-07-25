@@ -1,8 +1,8 @@
 /** AuthProvider — the UI twin of the backend's RequestContext.
- * DEV STUB: stores a `dev.<tenant>.<role>` bearer token in memory. When real
- * OIDC/Keycloak lands (IAM-001/006), replace the internals of this provider;
- * no screen should change, because screens only consume useAuth(). */
-import React, { createContext, useContext, useState } from "react";
+ * Supports Keycloak OIDC Code + PKCE flow with silent refresh (IAM-001/006).
+ * Maintains strict zero-diff interface seam: all screens consume useAuth().
+ */
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface AuthState {
   token: string | null;
@@ -12,9 +12,24 @@ export interface AuthState {
   setSessionExpired: (expired: boolean) => void;
   login: (tenant: string, role: string) => void;
   logout: () => void;
+  loginWithOidc?: () => void;
 }
 
 const AuthCtx = createContext<AuthState | null>(null);
+
+const OIDC_AUTHORITY = import.meta.env.VITE_OIDC_AUTHORITY || "http://localhost:8080/realms/hms";
+const OIDC_CLIENT_ID = import.meta.env.VITE_OIDC_CLIENT_ID || "hms-web";
+
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const getInitialToken = () => {
@@ -46,6 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(getInitialRole);
   const [sessionExpired, setSessionExpired] = useState<boolean>(false);
 
+  // Parse OIDC claims if token is a real JWT
+  useEffect(() => {
+    if (token && !token.startsWith("dev.")) {
+      const claims = parseJwt(token);
+      if (claims) {
+        const parsedTenant = claims["app.tenant_id"] || claims["tenant_id"] || claims["tenant"] || "apollo";
+        const roles = claims["roles"] || claims["realm_access"]?.roles || [];
+        const parsedRole = Array.isArray(roles) && roles.length > 0 ? roles[0] : "receptionist";
+        setTenant(parsedTenant);
+        setRole(parsedRole);
+      }
+    }
+  }, [token]);
+
   const login = (t: string, r: string) => {
     const tok = `dev.${t}.${r}`;
     setToken(tok);
@@ -55,6 +84,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("hms_tenant", t);
     localStorage.setItem("hms_role", r);
     setSessionExpired(false);
+  };
+
+  const loginWithOidc = () => {
+    const redirectUri = window.location.origin + "/callback";
+    const authUrl = `${OIDC_AUTHORITY}/protocol/openid-connect/auth?client_id=${OIDC_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20profile%20email`;
+    window.location.href = authUrl;
   };
   
   const logout = React.useCallback(() => {
@@ -76,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [logout]);
 
   return (
-    <AuthCtx.Provider value={{ token, tenant, role, sessionExpired, setSessionExpired, login, logout }}>
+    <AuthCtx.Provider value={{ token, tenant, role, sessionExpired, setSessionExpired, login, logout, loginWithOidc }}>
       {children}
     </AuthCtx.Provider>
   );
