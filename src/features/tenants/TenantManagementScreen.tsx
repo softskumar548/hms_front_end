@@ -2,6 +2,7 @@
  * Operator dashboard for multi-tenant SaaS accounts.
  */
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 
 interface TenantItem {
@@ -15,6 +16,7 @@ interface TenantItem {
 }
 
 export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ token }) => {
+  const navigate = useNavigate();
   const [tenants, setTenants] = useState<TenantItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showProvisionModal, setShowProvisionModal] = useState(false);
@@ -22,6 +24,15 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
   const [newName, setNewName] = useState("");
   const [newRegion, setNewRegion] = useState("india");
   const [error, setError] = useState<string | null>(null);
+
+  // Staff Invite Modal State (TEN-103)
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteTenantId, setInviteTenantId] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("physician");
+  const [inviteGivenName, setInviteGivenName] = useState("");
+  const [inviteFamilyName, setInviteFamilyName] = useState("");
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
   const loadTenants = async () => {
     setLoading(true);
@@ -66,6 +77,26 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
     }
   };
 
+  const handleInviteStaff = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteTenantId || !inviteEmail || !inviteGivenName || !inviteFamilyName) return;
+    try {
+      await api.inviteStaff(token, inviteTenantId, {
+        email: inviteEmail,
+        role: inviteRole,
+        given_name: inviteGivenName,
+        family_name: inviteFamilyName,
+      });
+      setShowInviteModal(false);
+      setInviteMessage(`Staff invitation sent to ${inviteEmail} as ${inviteRole}!`);
+      setInviteEmail("");
+      setInviteGivenName("");
+      setInviteFamilyName("");
+    } catch (err: any) {
+      setError(err.message || "Failed to invite staff member");
+    }
+  };
+
   const statusColor = (st: string) => {
     switch (st) {
       case "active": return { bg: "#E3F5EA", color: "#1C9A4E", label: "Active (LIVE)" };
@@ -92,10 +123,10 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
       }}>
         <div>
           <h1 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: 0, fontSize: 28, fontWeight: 700 }}>
-            Platform Control Center — Tenant Operations (TEN-101)
+            Platform Control Center — Tenant Operations (TEN-101 .. TEN-108)
           </h1>
           <p style={{ margin: "4px 0 0", color: "#DDEBFC", fontSize: 14 }}>
-            Multi-tenant SaaS provisioning & lifecycle management (Andhra Pradesh Region)
+            Multi-tenant SaaS provisioning, staff enrollment, and setup wizard management
           </p>
         </div>
         <button
@@ -115,6 +146,12 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
           + Provision New Tenant
         </button>
       </div>
+
+      {inviteMessage && (
+        <div style={{ background: "#E3F5EA", color: "#1C9A4E", padding: "12px 20px", borderRadius: 14, marginBottom: 20, fontWeight: 600 }}>
+          ✓ {inviteMessage}
+        </div>
+      )}
 
       {error && (
         <div style={{ background: "#FBE3E3", color: "#B22B2B", padding: "12px 20px", borderRadius: 14, marginBottom: 20, fontWeight: 600 }}>
@@ -170,7 +207,7 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
 
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
-                    onClick={() => alert(`Navigating to Onboarding Setup Wizard for ${t.id}`)}
+                    onClick={() => navigate("/onboarding")}
                     style={{
                       flex: 1,
                       background: "#E4E9FF",
@@ -186,7 +223,10 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
                     Setup Wizard
                   </button>
                   <button
-                    onClick={() => alert(`Viewing Tenant Detail for ${t.id}`)}
+                    onClick={() => {
+                      setInviteTenantId(t.id);
+                      setShowInviteModal(true);
+                    }}
                     style={{
                       flex: 1,
                       background: "#FFF",
@@ -199,7 +239,7 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
                       fontSize: 13
                     }}
                   >
-                    Manage
+                    + Invite Staff
                   </button>
                 </div>
               </div>
@@ -271,6 +311,94 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
                   style={{ background: "#131A8F", color: "#FFF", border: "none", borderRadius: 999, padding: "10px 24px", fontWeight: 700, cursor: "pointer" }}
                 >
                   Provision Account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Staff Invitation Modal (TEN-103) */}
+      {showInviteModal && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(35, 38, 59, 0.5)",
+          display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000
+        }}>
+          <div style={{ background: "#FFF", borderRadius: 22, padding: 32, width: 480, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: "0 0 8px", color: "#131A8F" }}>
+              Invite Staff Member (TEN-103)
+            </h2>
+            <p style={{ fontSize: 13, color: "#5B6172", marginBottom: 20 }}>
+              Send an OIDC-linked invitation to enroll hospital staff into <b>{inviteTenantId}</b>.
+            </p>
+
+            <form onSubmit={handleInviteStaff}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#5B6172", marginBottom: 4 }}>GIVEN NAME</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Ramesh"
+                    value={inviteGivenName}
+                    onChange={e => setInviteGivenName(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid #E3E8F4", fontSize: 14 }}
+                    required
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#5B6172", marginBottom: 4 }}>FAMILY NAME</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Rao"
+                    value={inviteFamilyName}
+                    onChange={e => setInviteFamilyName(e.target.value)}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid #E3E8F4", fontSize: 14 }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#5B6172", marginBottom: 4 }}>WORK EMAIL ADDRESS</label>
+                <input
+                  type="email"
+                  placeholder="e.g. dr.rao@kims.com"
+                  value={inviteEmail}
+                  onChange={e => setInviteEmail(e.target.value)}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid #E3E8F4", fontSize: 14 }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#5B6172", marginBottom: 4 }}>STAFF ROLE ASSIGNMENT</label>
+                <select
+                  value={inviteRole}
+                  onChange={e => setInviteRole(e.target.value)}
+                  style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid #E3E8F4", fontSize: 14 }}
+                >
+                  <option value="physician">Physician / Clinician</option>
+                  <option value="receptionist">Receptionist / Front Desk</option>
+                  <option value="nurse">Nurse</option>
+                  <option value="billing_clerk">Billing Clerk</option>
+                  <option value="admin">Tenant Admin</option>
+                </select>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowInviteModal(false)}
+                  style={{ background: "#FFF", color: "#5B6172", border: "1px solid #E3E8F4", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ background: "#131A8F", color: "#FFF", border: "none", borderRadius: 999, padding: "10px 24px", fontWeight: 700, cursor: "pointer" }}
+                >
+                  Send Invitation
                 </button>
               </div>
             </form>

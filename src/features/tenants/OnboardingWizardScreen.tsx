@@ -267,60 +267,82 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
 
       {/* Tab 3: Readiness & Go-Live */}
       {activeTab === "readiness" && (
-        <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: 0 }}>
-              Tenant Readiness Checklist Engine (TEN-203)
-            </h2>
-            <button
-              onClick={handleEvaluateReadiness}
-              style={{ background: "#E4E9FF", color: "#131A8F", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}
-            >
-              Evaluate Readiness Checklist
-            </button>
+        <div style={{ display: "grid", gap: 20 }}>
+          {/* Legal & Regional Dossier Attestation (TEN-205) */}
+          <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+            <h3 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: "0 0 8px" }}>
+              Regional Legal Dossier & Counsel Attestation (TEN-205)
+            </h3>
+            <p style={{ fontSize: 13, color: "#5B6172", marginBottom: 16 }}>
+              Attest regional compliance with Indian Healthcare Regulations & National Medical Commission (NMC) rules.
+            </p>
+
+            <div style={{ background: "#F6FAFF", padding: 16, borderRadius: 14, border: "1px solid #E3E8F4", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong style={{ fontSize: 14, color: "#131A8F", display: "block" }}>India Regional Dossier Terms (en-IN)</strong>
+                <span style={{ fontSize: 12, color: "#5B6172" }}>Doctor Fee-Splitting Commission: <b>LOCKED OFF</b> (NMC Compliant)</span>
+              </div>
+              <span style={{ background: "#E3F5EA", color: "#1C9A4E", borderRadius: 999, padding: "6px 16px", fontWeight: 700, fontSize: 12 }}>
+                ✓ ATTESTED & COMPLIANT
+              </span>
+            </div>
           </div>
 
-          {readiness && (
-            <div>
-              <div style={{ display: "grid", gap: 12, marginBottom: 24 }}>
-                {readiness.checks.map((chk: any) => (
-                  <div key={chk.code} style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "14px 20px", borderRadius: 14, background: chk.passed ? "#E3F5EA" : "#FBE3E3",
-                    border: `1px solid ${chk.passed ? "#1C9A4E" : "#B22B2B"}`
-                  }}>
-                    <div>
-                      <div style={{ fontWeight: 700, color: chk.passed ? "#1C9A4E" : "#B22B2B" }}>{chk.name}</div>
-                      <div style={{ fontSize: 12, color: "#5B6172" }}>{chk.details}</div>
-                    </div>
-                    <span style={{ fontWeight: 800, fontSize: 16, color: chk.passed ? "#1C9A4E" : "#B22B2B" }}>
-                      {chk.passed ? "PASS ✓" : "FAIL ✗"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ textAlign: "center", paddingTop: 16, borderTop: "1px solid #E3E8F4" }}>
-                <button
-                  onClick={handleGoLive}
-                  disabled={!readiness.ready_for_golive || goliveActive}
-                  style={{
-                    background: goliveActive ? "#1C9A4E" : readiness.ready_for_golive ? "#F08125" : "#A5ADBB",
-                    color: "#FFF",
-                    border: "none",
-                    borderRadius: 999,
-                    padding: "16px 36px",
-                    fontWeight: 800,
-                    fontSize: 18,
-                    cursor: readiness.ready_for_golive ? "pointer" : "not-allowed",
-                    boxShadow: "0 6px 20px rgba(240, 129, 37, 0.3)"
-                  }}
-                >
-                  {goliveActive ? "✓ TENANT IS LIVE (ACTIVE)" : "⚡ FLIP TO LIVE (GO-LIVE)"}
-                </button>
-              </div>
+          <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: 0 }}>
+                Tenant Readiness Checklist Engine (TEN-203)
+              </h2>
+              <button
+                onClick={handleEvaluateReadiness}
+                style={{ background: "#E4E9FF", color: "#131A8F", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}
+              >
+                Evaluate Readiness Checklist
+              </button>
             </div>
-          )}
+
+            {readiness && (
+              <div>
+                <div style={{ display: "grid", gap: 12, marginBottom: 24 }}>
+                  {readiness.checks.map((chk: any) => (
+                    <div key={chk.code} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "14px 20px", borderRadius: 14, background: chk.passed ? "#E3F5EA" : "#FBE3E3",
+                      border: `1px solid ${chk.passed ? "#1C9A4E" : "#B22B2B"}`
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 700, color: chk.passed ? "#1C9A4E" : "#B22B2B" }}>{chk.name}</div>
+                        <div style={{ fontSize: 12, color: "#5B6172" }}>{chk.details}</div>
+                      </div>
+                      <span style={{ fontWeight: 800, fontSize: 16, color: chk.passed ? "#1C9A4E" : "#B22B2B" }}>
+                        {chk.passed ? "PASS ✓" : "FAIL ✗"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ textAlign: "center", paddingTop: 16, borderTop: "1px solid #E3E8F4" }}>
+                  <button
+                    onClick={handleGoLive}
+                    disabled={!readiness.ready_for_golive || goliveActive}
+                    style={{
+                      background: goliveActive ? "#1C9A4E" : readiness.ready_for_golive ? "#F08125" : "#A5ADBB",
+                      color: "#FFF",
+                      border: "none",
+                      borderRadius: 999,
+                      padding: "16px 36px",
+                      fontWeight: 800,
+                      fontSize: 18,
+                      cursor: readiness.ready_for_golive ? "pointer" : "not-allowed",
+                      boxShadow: "0 6px 20px rgba(240, 129, 37, 0.3)"
+                    }}
+                  >
+                    {goliveActive ? "✓ TENANT IS LIVE (ACTIVE)" : "⚡ FLIP TO LIVE (GO-LIVE)"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
