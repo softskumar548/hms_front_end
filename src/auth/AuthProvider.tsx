@@ -63,27 +63,15 @@ async function generateCodeChallengeFromVerifier(v: string): Promise<string> {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const getInitialToken = () => {
-    const saved = localStorage.getItem("hms_token");
-    if (saved) return saved;
-    const path = window.location.pathname;
-    if (path === "/" || path === "/login" || path === "/callback") return null;
-    return path.includes("/emr") ? "dev.apollo.physician" : "dev.apollo.receptionist";
+    return localStorage.getItem("hms_token");
   };
 
   const getInitialTenant = () => {
-    const saved = localStorage.getItem("hms_tenant");
-    if (saved) return saved;
-    const path = window.location.pathname;
-    if (path === "/" || path === "/login" || path === "/callback") return null;
-    return "apollo";
+    return localStorage.getItem("hms_tenant");
   };
 
   const getInitialRole = () => {
-    const saved = localStorage.getItem("hms_role");
-    if (saved) return saved;
-    const path = window.location.pathname;
-    if (path === "/" || path === "/login" || path === "/callback") return null;
-    return path.includes("/emr") ? "physician" : "receptionist";
+    return localStorage.getItem("hms_role");
   };
 
   const [token, setToken] = useState<string | null>(getInitialToken);
