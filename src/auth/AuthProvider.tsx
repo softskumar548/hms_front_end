@@ -164,8 +164,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("hms_role");
 
     if (isOidc) {
-      const logoutUrl = `${OIDC_AUTHORITY}/protocol/openid-connect/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/login")}&client_id=${OIDC_CLIENT_ID}`;
+      const logoutUrl = `${OIDC_AUTHORITY}/protocol/openid-connect/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/")}&client_id=${OIDC_CLIENT_ID}`;
       window.location.href = logoutUrl;
+    } else {
+      window.location.href = "/";
     }
   }, [token]);
 

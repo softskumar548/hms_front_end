@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import "./ui/tokens.css";
 import i18n from "./i18n";
-import { useTranslation } from "react-i18next";
+import { useTranslation, I18nextProvider } from "react-i18next";
 import { AuthProvider, useAuth } from "./auth/AuthProvider";
 import { api } from "./api/client";
 import { Button, Card, FieldCell, Input, PageTitle, StatusPill, Select, Skeleton, Chip, RadioPill, DateChips, Modal, Drawer, Toast } from "./ui/components";
@@ -54,7 +54,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   const { t, i18n } = useTranslation();
   const { tenant, role, logout } = useAuth();
   const location = useLocation();
-  
+
   const isOperatorRoute = role === "operator" ||
     location.pathname.startsWith("/tenants") ||
     location.pathname.startsWith("/onboarding") ||
@@ -71,7 +71,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   const showQueue = role === "receptionist" || role === "admin" || isPhysician;
   const showReferrals = role === "receptionist" || isPhysician || role === "admin" || role === "billing";
   const showDashboard = role === "admin" || role === "receptionist";
-  
+
   const handleLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);
   };
@@ -126,51 +126,176 @@ function Shell({ children }: { children: React.ReactNode }) {
             <option value="te">TE</option>
           </select>
         </span>
-        <Button ghost onClick={logout}>{t("logout")}</Button>
+        <Button ghost type="button" data-testid="logout-btn" onClick={() => logout()}>{t("logout")}</Button>
       </header>
       <main style={{ maxWidth: 1080, margin: "0 auto", padding: "26px 20px" }}>{children}</main>
     </div>
   );
 }
 
-/* ---------- Login (dev stub — swaps for OIDC without touching screens) ---------- */
+/* ---------- Login Screen (per HMS-Login-Screen-Spec.docx) ---------- */
 function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { login, loginWithOidc, sessionExpired } = useAuth();
   const [tenant, setTenant] = useState("apollo");
   const [role, setRole] = useState("receptionist");
+  const [showDevPicker, setShowDevPicker] = useState(false);
+  const [currentLng, setCurrentLng] = useState(i18n.language?.startsWith("te") ? "te" : "en");
+
+  const isDevAllowed = import.meta.env.DEV || import.meta.env.VITE_ALLOW_DEV_TOKENS === "true";
+
+  const handleLangToggle = (lng: string) => {
+    setCurrentLng(lng);
+    i18n.changeLanguage(lng);
+  };
+
   return (
-    <div style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
-      <Card style={{ width: 380 }}>
-        <PageTitle>{t("sign_in")}</PageTitle>
-        <p style={{ color: "var(--slate)", fontSize: 13, marginTop: -8 }}>
-          {t("dev_login_desc")}
-        </p>
+    <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "linear-gradient(135deg, var(--wash-a) 0%, var(--wash-b) 100%)", padding: 20 }}>
+      <Card style={{ width: "100%", maxWidth: 420, padding: 36, position: "relative", boxShadow: "var(--shadow-card)", borderRadius: 22 }}>
+        {/* Top Header: Language Switcher & MediGo Logo */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+              <div style={{ background: "var(--indigo)", color: "#FFF", borderRadius: 10, padding: "6px 12px", fontWeight: 800, fontSize: 16, fontFamily: "var(--font-display, 'Baloo 2', sans-serif)" }}>
+                MediGo
+              </div>
+              <span style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", fontSize: 24, fontWeight: 700, color: "var(--indigo)" }}>
+                MediGo HMS
+              </span>
+            </div>
+            <p style={{ color: "var(--slate)", fontSize: 14, margin: 0 }}>
+              {t("login_tagline")}
+            </p>
+          </div>
+
+          {/* Language Selector Bar */}
+          <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#F6FAFF", padding: 3, borderRadius: 999, border: "1px solid var(--line)" }}>
+            <button
+              onClick={() => handleLangToggle("en")}
+              style={{
+                background: currentLng === "en" ? "var(--indigo)" : "transparent",
+                color: currentLng === "en" ? "#FFF" : "var(--slate)",
+                border: "none",
+                borderRadius: 999,
+                padding: "4px 10px",
+                fontWeight: 700,
+                fontSize: 11,
+                cursor: "pointer"
+              }}
+            >
+              EN
+            </button>
+            <button
+              onClick={() => handleLangToggle("te")}
+              style={{
+                background: currentLng === "te" ? "var(--indigo)" : "transparent",
+                color: currentLng === "te" ? "#FFF" : "var(--slate)",
+                border: "none",
+                borderRadius: 999,
+                padding: "4px 10px",
+                fontWeight: 700,
+                fontSize: 11,
+                cursor: "pointer"
+              }}
+            >
+              TE
+            </button>
+          </div>
+        </div>
+
         {sessionExpired && (
-          <div style={{ marginBottom: 12 }}>
+          <div style={{ marginBottom: 20 }}>
             <StatusPill kind="danger">{t("session_expired")}</StatusPill>
           </div>
         )}
-        <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-          <FieldCell label={t("tenant")}>
-            <select data-testid="login-tenant" value={tenant} onChange={(e) => setTenant(e.target.value)}
-              style={{ font: "inherit", color: "inherit", border: 0, background: "transparent", width: "100%" }}>
-              <option value="apollo">Apollo Clinic (demo)</option>
-              <option value="kims">KIMS Hospital (demo)</option>
-            </select>
-          </FieldCell>
-          <FieldCell label={t("role")}>
-            <select data-testid="login-role" value={role} onChange={(e) => setRole(e.target.value)}
-              style={{ font: "inherit", color: "inherit", border: 0, background: "transparent", width: "100%" }}>
-              <option>receptionist</option><option>physician</option><option>admin</option><option>billing</option>
-            </select>
-          </FieldCell>
-          <Button data-testid="login-continue" onClick={() => login(tenant, role)}>{t("continue")}</Button>
-          <div style={{ textAlign: "center", fontSize: 12, color: "var(--slate)", margin: "4px 0" }}>OR</div>
-          <Button data-testid="login-oidc" onClick={() => loginWithOidc && loginWithOidc()} style={{ background: "var(--indigo)", color: "#fff" }}>
-            Sign In with Keycloak (OIDC PKCE)
-          </Button>
-        </div>
+
+        {/* Primary Production Action Button */}
+        <Button
+          data-testid="login-oidc"
+          onClick={() => loginWithOidc && loginWithOidc()}
+          style={{
+            background: "var(--indigo)",
+            color: "#FFF",
+            width: "100%",
+            padding: "14px",
+            borderRadius: 999,
+            fontWeight: 800,
+            fontSize: 16,
+            marginBottom: isDevAllowed ? 16 : 0,
+            boxShadow: "0 6px 18px rgba(19, 26, 143, 0.25)"
+          }}
+        >
+          {t("login_primary_cta")}
+        </Button>
+
+        {/* Developer Login Disclosure (Only when environment allows dev tokens) */}
+        {isDevAllowed && (
+          <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, marginTop: 12 }}>
+            <button
+              onClick={() => setShowDevPicker(!showDevPicker)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--slate)",
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                padding: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                margin: "0 auto 12px"
+              }}
+            >
+              <span>{t("dev_login_toggle")}</span>
+              <span style={{ fontSize: 10 }}>{showDevPicker ? "▴" : "▾"}</span>
+            </button>
+
+            {showDevPicker && (
+              <div style={{ display: "grid", gap: 12, background: "#F6FAFF", padding: 16, borderRadius: 16, border: "1px solid var(--line)" }}>
+                <p style={{ color: "var(--slate)", fontSize: 11.5, margin: 0, textAlign: "center" }}>
+                  {t("dev_login_desc")}
+                </p>
+
+                <FieldCell label={t("tenant")}>
+                  <select
+                    data-testid="login-tenant"
+                    value={tenant}
+                    onChange={(e) => setTenant(e.target.value)}
+                    style={{ font: "inherit", color: "inherit", border: 0, background: "transparent", width: "100%", fontWeight: 700 }}
+                  >
+                    <option value="apollo">Apollo Clinic (demo)</option>
+                    <option value="kims">KIMS Hospital (demo)</option>
+                  </select>
+                </FieldCell>
+
+                <FieldCell label={t("role")}>
+                  <select
+                    data-testid="login-role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    style={{ font: "inherit", color: "inherit", border: 0, background: "transparent", width: "100%", fontWeight: 700 }}
+                  >
+                    <option value="receptionist">receptionist</option>
+                    <option value="physician">physician</option>
+                    <option value="billing">billing</option>
+                    <option value="admin">admin</option>
+                    <option value="operator">operator</option>
+                    <option value="patient">patient</option>
+                  </select>
+                </FieldCell>
+
+                <Button
+                  data-testid="login-continue"
+                  onClick={() => login(tenant, role)}
+                  style={{ background: "#E4E9FF", color: "var(--indigo)", border: "1px solid var(--line)", fontWeight: 700, padding: "10px" }}
+                >
+                  {t("continue")}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -313,7 +438,7 @@ function DesignSystem() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
-  
+
   const [selectedChip, setSelectedChip] = useState("all");
   const [radioVal, setRadioVal] = useState("routine");
   const [dateVal, setDateVal] = useState("2026-07-21");
@@ -339,9 +464,9 @@ function DesignSystem() {
   return (
     <div>
       <PageTitle>{t("design_system_title")}</PageTitle>
-      
+
       <div style={{ display: "grid", gap: 20 }}>
-        
+
         {/* Section 1: Primitives */}
         <Card>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 12px", color: "var(--indigo)" }}>{t("buttons_statuses")}</h2>
@@ -365,7 +490,7 @@ function DesignSystem() {
               <FieldCell label={t("field_specialty")} sub={t("specialty_sub")}>Cardiology</FieldCell>
               <FieldCell label={t("field_selected_date")} sub={t("selected_date_sub")}>{dateVal}</FieldCell>
             </div>
-            
+
             <div>
               <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>{t("dropdown_select")}</label>
               <Select value={selectVal} onChange={(e) => setSelectVal(e.target.value)}>
@@ -440,7 +565,7 @@ function DesignSystem() {
           <FieldCell label={t("full_name")}>Venkata Rama Rao</FieldCell>
           <FieldCell label={t("abha_status")}>ABHA Linked (12-3456-7890)</FieldCell>
           <FieldCell label={t("mobile_number")}>+91 98765 43210</FieldCell>
-          
+
           <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
             <Button style={{ width: "100%" }} onClick={() => { setDrawerOpen(false); triggerToast("Opened full EMR record!"); }}>
               {t("open_full_record")}
@@ -663,7 +788,7 @@ function App() {
               <ReferralAnalytics />
             </RequireRole>
           } />
-          
+
           <Route path="/scheduling" element={
             <RequireRole roles={["receptionist", "admin"]}>
               <CalendarView />
@@ -699,13 +824,13 @@ function App() {
               <InvoiceScreen />
             </RequireRole>
           } />
-          
+
           <Route path="/emr" element={
             <RequireRole roles={["physician", "admin"]}>
               <EMRStub />
             </RequireRole>
           } />
-          
+
           <Route path="/settings" element={
             <RequireRole roles={["admin"]}>
               <TenantSettings />
@@ -717,7 +842,7 @@ function App() {
               <ReminderPreview />
             </RequireRole>
           } />
-          
+
           <Route path="/tenants" element={<TenantManagementScreen token={token} />} />
           <Route path="/onboarding" element={<OnboardingWizardScreen token={token} />} />
           <Route path="/ops-control" element={<OperationalControlScreen token={token} />} />
@@ -747,11 +872,13 @@ enableMocking().then(() => {
     <React.StrictMode>
       <ErrorBoundary>
         <QueryClientProvider client={qc}>
-          <AuthProvider>
-            <BrowserRouter>
-              <App />
-            </BrowserRouter>
-          </AuthProvider>
+          <I18nextProvider i18n={i18n}>
+            <AuthProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </AuthProvider>
+          </I18nextProvider>
         </QueryClientProvider>
       </ErrorBoundary>
     </React.StrictMode>,

@@ -55,10 +55,13 @@ const resources = {
       requested_service: "Requested Treatment / Service",
       consent_general: "General Treatment Consent (v1.2)",
       consent_sharing: "ABDM Data Exchange Consent (v2.0)",
-      
-      // Sign In screen
+
+      // Sign In & Landing screen
       sign_in: "Sign in",
-      dev_login_desc: "Dev login — replaced by OIDC/Keycloak (IAM-001) with no screen changes.",
+      dev_login_desc: "For local testing only.",
+      login_primary_cta: "Log in",
+      login_tagline: "Sign in to your clinic workspace.",
+      dev_login_toggle: "Developer login",
       tenant: "Tenant",
       role: "Role",
       continue: "Continue",
@@ -188,9 +191,12 @@ const resources = {
       consent_general: "సాధారణ చికిత్స సమ్మతి (v1.2)",
       consent_sharing: "ABDM డేటా మార్పిడి సమ్మతి (v2.0)",
 
-      // Sign In screen
+      // Sign In & Landing screen
       sign_in: "సైన్ ఇన్",
-      dev_login_desc: "దేవ్ లాగిన్ — ఎటువంటి స్క్రీన్ మార్పులు లేకుండా OIDC/కీక్లోక్ (IAM-001) ద్వారా భర్తీ చేయబడుతుంది.",
+      dev_login_desc: "స్థానిక పరీక్ష కోసం మాత్రమే.",
+      login_primary_cta: "లాగిన్",
+      login_tagline: "మీ క్లినిక్ వర్క్‌స్పేస్‌కి లాగిన్ చేయండి.",
+      dev_login_toggle: "డెవలపర్ లాగిన్",
       tenant: "టెనెంట్",
       role: "పాత్ర (రోల్)",
       continue: "కొనసాగించు",
@@ -281,6 +287,10 @@ i18n
     resources,
     lng: savedLng,
     fallbackLng: "en",
+    supportedLngs: ["en", "te"],
+    nonExplicitSupportedLngs: true,
+    load: "languageOnly",
+    debug: true,
     interpolation: {
       escapeValue: false
     }
