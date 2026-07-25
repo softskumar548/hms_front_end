@@ -13,8 +13,11 @@ export default defineConfig({
   webServer: {
     command: "npm run dev",
     url: "http://localhost:5173",
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-    env: { VITE_USE_MOCKS: "false" },
+    env: {
+      VITE_USE_MOCKS: "false",
+      VITE_API_TARGET: process.env.VITE_API_TARGET || "http://127.0.0.1:8000",
+    },
   },
 });

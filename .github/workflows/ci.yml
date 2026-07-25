@@ -52,7 +52,7 @@ jobs:
           psql -h localhost -U postgres -d hms -f backend/infra/postgres/init.sql
           pip install -e "backend/services/plt[dev]"
           python -m app.seed
-          nohup uvicorn app.main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
+          nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
           sleep 5
 
       - uses: actions/setup-node@v4
