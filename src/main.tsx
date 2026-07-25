@@ -93,7 +93,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 /* ---------- Login (dev stub — swaps for OIDC without touching screens) ---------- */
 function Login() {
   const { t } = useTranslation();
-  const { login, sessionExpired } = useAuth();
+  const { login, loginWithOidc, sessionExpired } = useAuth();
   const [tenant, setTenant] = useState("apollo");
   const [role, setRole] = useState("receptionist");
   return (
@@ -123,6 +123,10 @@ function Login() {
             </select>
           </FieldCell>
           <Button data-testid="login-continue" onClick={() => login(tenant, role)}>{t("continue")}</Button>
+          <div style={{ textAlign: "center", fontSize: 12, color: "var(--slate)", margin: "4px 0" }}>OR</div>
+          <Button data-testid="login-oidc" onClick={() => loginWithOidc && loginWithOidc()} style={{ background: "var(--indigo)", color: "#fff" }}>
+            Sign In with Keycloak (OIDC PKCE)
+          </Button>
         </div>
       </Card>
     </div>
