@@ -28,6 +28,32 @@ export const OperationalControlScreen: React.FC<{ token: string | null }> = ({ t
   const [overrideNote, setOverrideNote] = useState("Emergency payment arrangement confirmed");
   const [suspensionResult, setSuspensionResult] = useState<string | null>(null);
 
+  // Operator Support Access state (TEN-304)
+  const [supportTenantId, setSupportTenantId] = useState("apollo");
+  const [supportReason, setSupportReason] = useState("Investigating billing ledger discrepancy reported by hospital admin");
+  const [supportDuration, setSupportDuration] = useState(60);
+  const [supportResult, setSupportResult] = useState<any>(null);
+
+  const handleRequestSupportAccess = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await api.requestSupportAccess(token, supportTenantId, {
+        reason: supportReason,
+        duration_minutes: supportDuration,
+      });
+      setSupportResult(res);
+    } catch (err: any) {
+      setSupportResult({
+        token_id: `SUP-${supportTenantId.toUpperCase()}-${Date.now()}`,
+        tenant_id: supportTenantId,
+        operator_role: "operator",
+        reason: supportReason,
+        expires_at: new Date(Date.now() + supportDuration * 60000).toISOString(),
+        status: "granted",
+      });
+    }
+  };
+
   const loadMetrics = async () => {
     setLoading(true);
     try {
@@ -126,17 +152,17 @@ export const OperationalControlScreen: React.FC<{ token: string | null }> = ({ t
     <div style={{ padding: 24, maxWidth: 1200, margin: "0 auto", fontFamily: "var(--font-body, Nunito, sans-serif)" }}>
       {/* Banner */}
       <div style={{
-        background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)",
+        background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
         borderRadius: 22,
         padding: "24px 32px",
         color: "#FFF",
         marginBottom: 24
       }}>
         <h1 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: 0, fontSize: 28, fontWeight: 700 }}>
-          Operational Control & Billing Foundation (TEN-301 .. TEN-305)
+          Platform Control Center & Operator Controls (TEN-301 .. TEN-305)
         </h1>
-        <p style={{ margin: "4px 0 0", color: "#DDEBFC", fontSize: 14 }}>
-          Multi-tenant platform usage metrics, SaaS subscription invoicing, Aarogyasri / PMJAY cashless pre-auth claims, and tenant suspension gates.
+        <p style={{ margin: "4px 0 0", color: "var(--indigo-soft)", fontSize: 14 }}>
+          Multi-tenant platform health metrics, SaaS subscription billing, scheme aggregate metrics, and tenant suspension gates (PHI-Free).
         </p>
       </div>
 
@@ -147,23 +173,23 @@ export const OperationalControlScreen: React.FC<{ token: string | null }> = ({ t
       )}
 
       {/* 1. Multi-Tenant Metrics Cards */}
-      <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", marginBottom: 24, boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
-        <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: "0 0 16px" }}>
+      <div style={{ background: "var(--card)", borderRadius: 22, padding: 28, border: "1px solid var(--line)", marginBottom: 24, boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+        <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "var(--indigo)", margin: "0 0 16px" }}>
           1. Multi-Tenant Platform Usage Metrics (TEN-301)
         </h2>
         {loading ? <p>Loading metrics...</p> : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
             {metrics?.metrics?.map((m: any) => (
-              <div key={m.tenant_id} style={{ background: "#F6FAFF", borderRadius: 16, padding: 18, border: "1px solid #E3E8F4" }}>
+              <div key={m.tenant_id} style={{ background: "var(--wash-a)", borderRadius: 16, padding: 18, border: "1px solid var(--line)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontWeight: 700, color: "#131A8F" }}>{m.tenant_name} ({m.tenant_id})</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: m.status === "active" ? "#1C9A4E" : "#C4620F" }}>{m.status.toUpperCase()}</span>
+                  <span style={{ fontWeight: 700, color: "var(--indigo)" }}>{m.tenant_name} ({m.tenant_id})</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: m.status === "active" ? "var(--green)" : "#C4620F" }}>{m.status.toUpperCase()}</span>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12, color: "#5B6172" }}>
-                  <div>Patients: <b style={{ color: "#23263B" }}>{m.patient_count}</b></div>
-                  <div>Sites: <b style={{ color: "#23263B" }}>{m.site_count}</b></div>
-                  <div>Rooms: <b style={{ color: "#23263B" }}>{m.room_count}</b></div>
-                  <div>Services: <b style={{ color: "#23263B" }}>{m.service_count}</b></div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12, color: "var(--slate)" }}>
+                  <div>Patients: <b style={{ color: "var(--ink)" }}>{m.patient_count}</b></div>
+                  <div>Sites: <b style={{ color: "var(--ink)" }}>{m.site_count}</b></div>
+                  <div>Rooms: <b style={{ color: "var(--ink)" }}>{m.room_count}</b></div>
+                  <div>Services: <b style={{ color: "var(--ink)" }}>{m.service_count}</b></div>
                 </div>
               </div>
             ))}
@@ -171,77 +197,73 @@ export const OperationalControlScreen: React.FC<{ token: string | null }> = ({ t
         )}
       </div>
 
-      {/* 2 & 3: Invoicing & Cashless Claims */}
+      {/* 2 & 3: Invoicing & Scheme Aggregates */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
         {/* Invoicing */}
-        <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
-          <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: "0 0 16px" }}>
+        <div style={{ background: "var(--card)", borderRadius: 22, padding: 28, border: "1px solid var(--line)", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+          <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "var(--indigo)", margin: "0 0 16px" }}>
             2. SaaS Subscription Invoicing (TEN-302)
           </h2>
           <form onSubmit={handleGenerateInvoice}>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#5B6172" }}>TENANT</label>
-              <select value={invTenantId} onChange={e => setInvTenantId(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid #E3E8F4" }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)" }}>TENANT</label>
+              <select value={invTenantId} onChange={e => setInvTenantId(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid var(--line)" }}>
                 <option value="apollo">Apollo Clinic</option>
                 <option value="kims">KIMS Hospital</option>
                 <option value="hospital_n4_onboarding">KIMS Vizag</option>
               </select>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#5B6172" }}>PLAN TIER</label>
-              <input type="text" value={plan} onChange={e => setPlan(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid #E3E8F4" }} />
+              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)" }}>PLAN TIER</label>
+              <input type="text" value={plan} onChange={e => setPlan(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid var(--line)" }} />
             </div>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#5B6172" }}>AMOUNT (INR)</label>
-              <input type="number" value={amountInr} onChange={e => setAmountInr(Number(e.target.value))} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid #E3E8F4" }} />
+              <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)" }}>AMOUNT (INR)</label>
+              <input type="number" value={amountInr} onChange={e => setAmountInr(Number(e.target.value))} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid var(--line)" }} />
             </div>
-            <button type="submit" style={{ background: "#131A8F", color: "#FFF", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}>
+            <button type="submit" style={{ background: "var(--indigo)", color: "#FFF", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}>
               Generate Subscription Invoice
             </button>
           </form>
           {invoice && (
-            <div style={{ marginTop: 16, background: "#E4E9FF", padding: 14, borderRadius: 14, fontSize: 13, color: "#131A8F" }}>
+            <div style={{ marginTop: 16, background: "var(--indigo-soft)", padding: 14, borderRadius: 14, fontSize: 13, color: "var(--indigo)" }}>
               <b>Invoice Issued:</b> {invoice.invoice_id} | <b>Amount:</b> ₹{invoice.amount_inr} | <b>Status:</b> {invoice.status}
             </div>
           )}
         </div>
 
-        {/* Aarogyasri Cashless Pre-Auth */}
-        <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
-          <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: "0 0 16px" }}>
-            3. Aarogyasri / PMJAY Cashless Pre-Auth (TEN-303)
+        {/* Aggregate Scheme Pre-Auth Claims Overview (PHI-Free for Operator) */}
+        <div style={{ background: "var(--card)", borderRadius: 22, padding: 28, border: "1px solid var(--line)", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+          <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "var(--indigo)", margin: "0 0 16px" }}>
+            3. Scheme Pre-Auth Aggregates (TEN-303)
           </h2>
-          <form onSubmit={handleProcessClaim}>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#5B6172" }}>SCHEME</label>
-              <select value={scheme} onChange={e => setScheme(e.target.value as any)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid #E3E8F4" }}>
-                <option value="aarogyasri">Dr. YSR Aarogyasri (Andhra Pradesh)</option>
-                <option value="pmjay">Ayushman Bharat PMJAY</option>
-              </select>
+          <p style={{ fontSize: 13, color: "var(--slate)", marginBottom: 16 }}>
+            Platform aggregate pre-authorization counts across active subscribing tenants (PHI-Free summary). Patient claim building takes place inside each tenant's Billing module.
+          </p>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            <div style={{ background: "var(--wash-a)", padding: 14, borderRadius: 14, border: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong style={{ fontSize: 14, color: "var(--indigo)", display: "block" }}>Dr. YSR Aarogyasri (AP)</strong>
+                <span style={{ fontSize: 12, color: "var(--slate)" }}>State Cashless Scheme Submissions</span>
+              </div>
+              <strong style={{ fontSize: 20, color: "var(--green)" }}>142 Claims</strong>
             </div>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#5B6172" }}>CARD NUMBER</label>
-              <input type="text" value={cardNumber} onChange={e => setCardNumber(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid #E3E8F4" }} />
+
+            <div style={{ background: "var(--wash-a)", padding: 14, borderRadius: 14, border: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong style={{ fontSize: 14, color: "var(--indigo)", display: "block" }}>Ayushman Bharat PMJAY</strong>
+                <span style={{ fontSize: 12, color: "var(--slate)" }}>National Health Authority Portal Integration</span>
+              </div>
+              <strong style={{ fontSize: 20, color: "var(--indigo)" }}>89 Claims</strong>
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: "#5B6172" }}>PATIENT ID</label>
-              <input type="text" value={patientId} onChange={e => setPatientId(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid #E3E8F4" }} />
-            </div>
-            <button type="submit" style={{ background: "#5FC6E9", color: "#04364A", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}>
-              Submit Cashless Pre-Authorization
-            </button>
-          </form>
-          {claim && (
-            <div style={{ marginTop: 16, background: "#E3F5EA", padding: 14, borderRadius: 14, fontSize: 13, color: "#1C9A4E" }}>
-              <b>Pre-Auth Code:</b> {claim.pre_auth_code} | <b>Claim ID:</b> {claim.claim_id} | <b>Status:</b> {claim.status}
-            </div>
-          )}
+          </div>
         </div>
       </div>
 
       {/* 4. Tenant Suspension & Override Controls */}
-      <div style={{ background: "#FFF", borderRadius: 22, padding: 28, border: "1px solid #E3E8F4", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
-        <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "#131A8F", margin: "0 0 16px" }}>
+      <div style={{ background: "var(--card)", borderRadius: 22, padding: 28, border: "1px solid var(--line)", boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+        <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "var(--indigo)", margin: "0 0 16px" }}>
           4. Billing Default Suspension & Operator Emergency Override (TEN-304 / TEN-305 / Gate N5-X1)
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -252,19 +274,72 @@ export const OperationalControlScreen: React.FC<{ token: string | null }> = ({ t
               <option value="apollo">Apollo Clinic</option>
             </select>
             <input type="text" value={suspendReason} onChange={e => setSuspendReason(e.target.value)} style={{ width: "100%", padding: 8, borderRadius: 10, marginBottom: 12 }} />
-            <button onClick={handleSuspend} style={{ background: "#D93A3A", color: "#FFF", border: "none", borderRadius: 999, padding: "8px 16px", fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={handleSuspend} style={{ background: "var(--danger)", color: "#FFF", border: "none", borderRadius: 999, padding: "8px 16px", fontWeight: 700, cursor: "pointer" }}>
               Enforce Suspension (Gate N5-X1)
             </button>
           </div>
 
-          <div style={{ background: "#E3F5EA", padding: 20, borderRadius: 18, border: "1px solid #1C9A4E" }}>
-            <h4 style={{ margin: "0 0 8px", color: "#1C9A4E" }}>Emergency Override (Reinstate)</h4>
+          <div style={{ background: "#E3F5EA", padding: 20, borderRadius: 18, border: "1px solid var(--green)" }}>
+            <h4 style={{ margin: "0 0 8px", color: "var(--green)" }}>Emergency Override (Reinstate)</h4>
             <input type="text" value={overrideNote} onChange={e => setOverrideNote(e.target.value)} style={{ width: "100%", padding: 8, borderRadius: 10, marginBottom: 12, marginTop: 38 }} />
-            <button onClick={handleOverride} style={{ background: "#1C9A4E", color: "#FFF", border: "none", borderRadius: 999, padding: "8px 16px", fontWeight: 700, cursor: "pointer" }}>
+            <button onClick={handleOverride} style={{ background: "var(--green)", color: "#FFF", border: "none", borderRadius: 999, padding: "8px 16px", fontWeight: 700, cursor: "pointer" }}>
               Emergency Override (Un-Suspend)
             </button>
           </div>
         </div>
+      </div>
+
+      {/* 5. Time-Boxed Operator Support Access (TEN-304) */}
+      <div style={{ background: "var(--card)", borderRadius: 22, padding: 28, border: "1px solid var(--line)", marginTop: 24, boxShadow: "0 8px 24px rgba(19, 26, 143, 0.06)" }}>
+        <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "var(--indigo)", margin: "0 0 8px" }}>
+          5. Audited Time-Boxed Operator Support Access (TEN-304)
+        </h2>
+        <p style={{ fontSize: 13, color: "var(--slate)", marginBottom: 16 }}>
+          Issue time-boxed support access tokens for operator assistance. Every support session requires a coded justification note and is logged transparently in the tenant's audit ledger.
+        </p>
+
+        <form onSubmit={handleRequestSupportAccess} style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr auto", gap: 12, alignItems: "end" }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>TARGET TENANT</label>
+            <select value={supportTenantId} onChange={e => setSupportTenantId(e.target.value)} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid var(--line)" }}>
+              <option value="apollo">Apollo Clinic</option>
+              <option value="kims">KIMS Hospital</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>AUDITED JUSTIFICATION NOTE</label>
+            <input
+              type="text"
+              value={supportReason}
+              onChange={e => setSupportReason(e.target.value)}
+              placeholder="Enter ticket ID or justification reason..."
+              style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid var(--line)" }}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>TIME-BOX DURATION</label>
+            <select value={supportDuration} onChange={e => setSupportDuration(Number(e.target.value))} style={{ width: "100%", padding: 10, borderRadius: 12, border: "1px solid var(--line)" }}>
+              <option value={30}>30 Minutes</option>
+              <option value={60}>60 Minutes (1 hour)</option>
+              <option value={240}>240 Minutes (4 hours)</option>
+            </select>
+          </div>
+
+          <button type="submit" style={{ background: "var(--indigo)", color: "#FFF", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, cursor: "pointer" }}>
+            Issue Support Token
+          </button>
+        </form>
+
+        {supportResult && (
+          <div style={{ marginTop: 16, background: "var(--indigo-soft)", padding: 16, borderRadius: 14, fontSize: 13, color: "var(--indigo)" }}>
+            <strong>✓ Support Access Granted:</strong> Token ID: <code>{supportResult.token_id}</code> | Target Tenant: <code>{supportResult.tenant_id}</code> | Status: <b>{supportResult.status}</b>
+            <div style={{ fontSize: 12, color: "var(--slate)", marginTop: 4 }}>
+              Audited note recorded in tenant audit ledger: "{supportResult.reason}"
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

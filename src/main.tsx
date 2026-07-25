@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import "./ui/tokens.css";
 import i18n from "./i18n";
@@ -33,6 +33,18 @@ const ReferralAnalytics = React.lazy(() => import("./features/reports/ReferralAn
 const TenantManagementScreen = React.lazy(() => import("./features/tenants/TenantManagementScreen").then(m => ({ default: m.TenantManagementScreen })));
 const OnboardingWizardScreen = React.lazy(() => import("./features/tenants/OnboardingWizardScreen").then(m => ({ default: m.OnboardingWizardScreen })));
 const OperationalControlScreen = React.lazy(() => import("./features/tenants/OperationalControlScreen").then(m => ({ default: m.OperationalControlScreen })));
+const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
+
+function RoleHomeRedirect() {
+  const { role } = useAuth();
+  if (role === "receptionist") return <Navigate to="/queue" replace />;
+  if (role === "physician" || role === "doctor" || role === "nurse") return <Navigate to="/my-schedule" replace />;
+  if (role === "billing") return <Navigate to="/billing" replace />;
+  if (role === "admin") return <Navigate to="/dashboard" replace />;
+  if (role === "operator") return <Navigate to="/tenants" replace />;
+  if (role === "patient") return <Navigate to="/portal" replace />;
+  return <Navigate to="/queue" replace />;
+}
 
 
 
@@ -41,12 +53,24 @@ const OperationalControlScreen = React.lazy(() => import("./features/tenants/Ope
 function Shell({ children }: { children: React.ReactNode }) {
   const { t, i18n } = useTranslation();
   const { tenant, role, logout } = useAuth();
+  const location = useLocation();
   
+  const isOperatorRoute = role === "operator" ||
+    location.pathname.startsWith("/tenants") ||
+    location.pathname.startsWith("/onboarding") ||
+    location.pathname.startsWith("/ops-control");
+
+  const isPatientRoute = role === "patient" || location.pathname.startsWith("/portal");
+
+  const isPhysician = role === "physician" || role === "doctor" || role === "nurse";
+
   const showBilling = role === "receptionist" || role === "admin" || role === "billing";
-  const showEMR = role === "physician" || role === "admin";
+  const showEMR = isPhysician || role === "admin";
   const showSettings = role === "admin";
-  const showScheduling = role === "receptionist" || role === "admin";
-  const showQueue = role === "receptionist" || role === "admin" || role === "physician";
+  const showScheduling = role === "receptionist" || role === "admin" || isPhysician;
+  const showQueue = role === "receptionist" || role === "admin" || isPhysician;
+  const showReferrals = role === "receptionist" || isPhysician || role === "admin" || role === "billing";
+  const showDashboard = role === "admin" || role === "receptionist";
   
   const handleLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);
@@ -55,23 +79,42 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <header style={{ background: "#fff", borderBottom: "1px solid var(--line)", padding: "12px 24px", display: "flex", alignItems: "center", gap: 18 }}>
-        <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, color: "var(--indigo)" }}>MediGo</span>
+        <Link to="/" style={{ textDecoration: "none", fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, color: "var(--indigo)" }}>
+          {isOperatorRoute ? "MediGo Operator" : isPatientRoute ? "MediGo Portal" : "MediGo"}
+        </Link>
         <nav style={{ display: "flex", gap: 14, alignItems: "center" }}>
-          <Link to="/patients" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_patients")}</Link>
-          {showScheduling && <Link to="/scheduling" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_scheduling")}</Link>}
-          {showQueue && <Link to="/queue" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_queue")}</Link>}
-          {showBilling && <Link to="/billing" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_billing")}</Link>}
-          {showEMR && <Link to="/emr" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_emr")}</Link>}
-          {role === "physician" && <Link to="/results" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Results Inbox</Link>}
-          {showSettings && <Link to="/settings" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_settings")}</Link>}
-          {showSettings && <Link to="/settings/reminders" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_reminders")}</Link>}
-          <Link to="/tenants" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>Tenants Control</Link>
-          <Link to="/onboarding" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>Onboarding Wizard</Link>
-          <Link to="/ops-control" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>Ops Control</Link>
-          {role === "patient" && <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Patient Portal</Link>}
-          {(role === "admin" || role === "receptionist") && <Link to="/dashboard" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Ops Dashboard</Link>}
-          {(role === "admin" || role === "billing") && <Link to="/reports/referrals" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Referrals Report</Link>}
-          <Link to="/design" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_design")}</Link>
+          {isOperatorRoute ? (
+            /* Operator Console Navigation (PHI-Free) */
+            <>
+              <Link to="/tenants" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_operator_tenants", "Tenants")}</Link>
+              <Link to="/onboarding" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_operator_onboarding", "Onboarding")}</Link>
+              <Link to="/ops-control" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_operator_ops", "Billing Ops")}</Link>
+              <Link to="/design" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_design")}</Link>
+            </>
+          ) : isPatientRoute ? (
+            /* Patient Portal Navigation */
+            <>
+              <Link to="/portal" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_home", "Home")}</Link>
+              <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Appointments</Link>
+              <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>My Records</Link>
+              <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Billing</Link>
+            </>
+          ) : (
+            /* Clinic Staff Navigation (5-7 visible items max per role) */
+            <>
+              <Link to="/" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_home", "Home")}</Link>
+              <Link to="/patients" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_patients")}</Link>
+              {isPhysician && <Link to="/my-schedule" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_my_schedule", "My Schedule")}</Link>}
+              {showScheduling && <Link to="/scheduling" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_scheduling")}</Link>}
+              {showQueue && <Link to="/queue" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_queue")}</Link>}
+              {showEMR && <Link to="/emr" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_emr")}</Link>}
+              {isPhysician && <Link to="/results" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Results Inbox</Link>}
+              {showBilling && <Link to="/billing" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_billing")}</Link>}
+              {showReferrals && <Link to="/reports/referrals" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_referrals")}</Link>}
+              {showDashboard && <Link to="/dashboard" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_reports")}</Link>}
+              {showSettings && <Link to="/settings" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_settings")}</Link>}
+            </>
+          )}
         </nav>
         <span data-testid="shell-tenant-indicator" style={{ marginLeft: "auto", fontSize: 13, color: "var(--slate)", display: "flex", alignItems: "center", gap: 12 }}>
           <span>{formatIndianDate(new Date())}</span>
@@ -542,7 +585,12 @@ function App() {
       <OfflineBanner />
       <React.Suspense fallback={<div style={{ padding: 40 }}><Skeleton height={200} /></div>}>
         <Routes>
-          <Route path="/" element={<Navigate to="/patients" replace />} />
+          <Route path="/" element={<RoleHomeRedirect />} />
+          <Route path="/my-schedule" element={
+            <RequireRole roles={["physician", "nurse", "admin"]}>
+              <MyScheduleView />
+            </RequireRole>
+          } />
           <Route path="/patients" element={<Patients />} />
           <Route path="/patients/new" element={
             <RequireRole roles={["receptionist", "admin"]}>

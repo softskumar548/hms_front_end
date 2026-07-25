@@ -65,13 +65,20 @@ const resources = {
       session_expired: "Session expired. Please sign in again.",
 
       // Header shell
+      nav_home: "Home",
       nav_patients: "Patients",
+      nav_my_schedule: "My Schedule",
       nav_billing: "Billing",
-      nav_emr: "EMR",
+      nav_emr: "EMR / Clinical",
+      nav_referrals: "Referrals",
+      nav_reports: "Reports & Dashboard",
       nav_settings: "Settings",
       nav_scheduling: "Scheduling",
       nav_queue: "Queue Board",
       nav_reminders: "Reminders Preview",
+      nav_operator_tenants: "Tenants Management",
+      nav_operator_onboarding: "Onboarding Wizard",
+      nav_operator_ops: "Platform Billing & Ops",
       nav_design: "Design",
       logout: "Log out",
 

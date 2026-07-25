@@ -157,6 +157,10 @@ export const api = {
     request<any>("/tenants/metrics", token),
   createSubscriptionInvoice: (token: string | null, id: string, body: any) =>
     request<any>(`/tenants/${id}/invoices`, token, { method: "POST", body: JSON.stringify(body) }),
+  listSubscriptionInvoices: (token: string | null, id: string) =>
+    request<any[]>(`/tenants/${id}/invoices`, token),
+  requestSupportAccess: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/support-access`, token, { method: "POST", body: JSON.stringify(body) }),
   processPreAuthClaim: (token: string | null, id: string, body: any) =>
     request<any>(`/tenants/${id}/claims/pre-auth`, token, { method: "POST", body: JSON.stringify(body) }),
   suspendTenant: (token: string | null, id: string, body: any) =>

@@ -68,6 +68,12 @@ export default function QueueBoard() {
 
   const pendingCheckIns = allAppointments.filter((a: any) => a.status === "BOOKED" || a.status === "PENDING");
 
+  const sortedQueue = [...queue].sort((a, b) => {
+    if (a.status === "ARRIVED" && b.status !== "ARRIVED") return -1;
+    if (a.status !== "ARRIVED" && b.status === "ARRIVED") return 1;
+    return 0;
+  });
+
   return (
     <div style={{ display: "grid", gap: 20 }}>
       {/* Clinic queue board workspace (UI-304) */}
@@ -90,13 +96,13 @@ export default function QueueBoard() {
             <Skeleton height={50} />
             <Skeleton height={50} />
           </div>
-        ) : queue.length === 0 ? (
+        ) : sortedQueue.length === 0 ? (
           <div style={{ padding: "40px 0", textAlign: "center", color: "var(--slate)", fontSize: 14.5 }}>
             No checked-in patients in the queue for this section.
           </div>
         ) : (
           <div style={{ display: "grid", gap: 10 }}>
-            {queue.map((item) => {
+            {sortedQueue.map((item) => {
               const isArrived = item.status === "ARRIVED";
               const isInConsult = item.status === "IN_CONSULTATION";
 
