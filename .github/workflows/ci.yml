@@ -16,22 +16,53 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
-    # Manual-only until the live stack is wired into CI. These Playwright specs
-    # run against a LIVE backend (VITE_USE_MOCKS=false, "never against MSW"), but
-    # PR runners have no backend/Postgres, so /api calls get ECONNREFUSED and the
-    # specs cannot pass. Rather than fake a green check or spam red PR checks, the
-    # job runs only on manual dispatch. To make it a real PR gate (Option B):
-    # add a Postgres service + the hms_backend image (init.sql applied + seeded),
-    # a /health readiness wait, point the Vite proxy at it, and change this `if`
-    # back to run on pull_request. Do NOT switch these specs to mocks.
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: hms
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_change_me
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres -d hms"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: softskumar548/hms_backend
+          path: backend
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Start disposable backend stack
+        env:
+          PGPASSWORD: postgres_change_me
+          DATABASE_URL: postgresql+asyncpg://hms_app:app_password_change_me@localhost:5432/hms
+          SEED_DATABASE_URL: postgresql+asyncpg://postgres:postgres_change_me@localhost:5432/hms
+          PYTHONPATH: libs:services/plt
+        working-directory: backend
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d hms -f infra/postgres/init.sql
+          pip install -e "services/plt[dev]"
+          python -m app.seed
+          nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
+          sleep 5
+          curl -f http://127.0.0.1:8000/health || cat uvicorn.log
+
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Run E2E Playwright tests against Live Stack
+      - name: Run E2E Playwright tests against Live Disposable Stack
         env:
           VITE_USE_MOCKS: "false"
+          VITE_API_TARGET: "http://127.0.0.1:8000"
         run: npm run e2e

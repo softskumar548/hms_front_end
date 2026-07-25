@@ -45,6 +45,14 @@ export default function BookingModal({
     queryFn: () => api.listPatients(token),
   });
 
+  React.useEffect(() => {
+    if (initialPatientId) {
+      setSelectedPatientId(initialPatientId);
+      const p = (patients || []).find((pt) => pt.id === initialPatientId);
+      if (p) setPatientSearch(`${p.given_name} ${p.family_name}`);
+    }
+  }, [initialPatientId, patients]);
+
   const filteredPatients = (patients || []).filter((p) => {
     if (!patientSearch) return true;
     const full = `${p.given_name} ${p.family_name} ${p.phone || ""}`.toLowerCase();
@@ -85,11 +93,12 @@ export default function BookingModal({
     bookMutation.mutate({
       patient_id: selectedPatientId,
       practitioner_id: selectedPractitionerId,
-      site_id: "site-1",
+      site_id: "site_apollo_main",
       room_id: selectedRoomId,
       service_id: selectedServiceId,
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
+      prerequisites: showPrereqs ? ["prq_fasting_apollo"] : undefined,
     });
   };
 
@@ -242,7 +251,7 @@ export default function BookingModal({
                 {selectedPatient ? `${selectedPatient.given_name} ${selectedPatient.family_name}` : "Patient"}
               </FieldCell>
               <FieldCell label="Practitioner">
-                {successAppt.practitioner_name}
+                {successAppt.practitioner_name || selectedPractitionerName}
               </FieldCell>
               <FieldCell label="Date & Time">
                 {new Date(successAppt.start_time).toLocaleString("en-IN", {
@@ -251,10 +260,10 @@ export default function BookingModal({
                 })}
               </FieldCell>
               <FieldCell label="Service Scheduled">
-                {successAppt.service_name}
+                {successAppt.service_name || selectedServiceName}
               </FieldCell>
               <FieldCell label="Clinic Room">
-                {successAppt.room_name}
+                {successAppt.room_name || selectedRoomName}
               </FieldCell>
               <FieldCell label="Queue Token">
                 {successAppt.id?.substring(5, 8).toUpperCase() || "T-01"}
