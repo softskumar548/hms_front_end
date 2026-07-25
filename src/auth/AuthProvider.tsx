@@ -165,13 +165,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   
   const logout = React.useCallback(() => {
+    const isOidc = token && !token.startsWith("dev.");
     setToken(null);
     setTenant(null);
     setRole(null);
     localStorage.removeItem("hms_token");
     localStorage.removeItem("hms_tenant");
     localStorage.removeItem("hms_role");
-  }, []);
+
+    if (isOidc) {
+      const logoutUrl = `${OIDC_AUTHORITY}/protocol/openid-connect/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/login")}&client_id=${OIDC_CLIENT_ID}`;
+      window.location.href = logoutUrl;
+    }
+  }, [token]);
 
   React.useEffect(() => {
     const handle401 = () => {
