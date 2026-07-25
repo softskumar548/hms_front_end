@@ -31,19 +31,7 @@ export default function QueueBoard() {
   // Fetch all appointments to render check-in lists
   const { data: allAppointments = [], isLoading: loadingAppts, refetch: refetchAppts } = useQuery({
     queryKey: ["appointments"],
-    queryFn: () => api.listPatients(token).then(() => {
-      return fetch(`/api/scheduling/queue`).then(res => res.json()).then(() => {
-        return fetch(`/api/patients`).then(() => {
-          return fetch(`/api/scheduling/appointments/appt-1`)
-            .then(res => res.json())
-            .then(appt1 => {
-              return fetch(`/api/scheduling/appointments/appt-2`)
-                .then(res => res.json())
-                .then(appt2 => [appt1, appt2]);
-            }).catch(() => []);
-        });
-      });
-    }),
+    queryFn: () => api.listAppointments(token).then((appts) => appts || []),
   });
 
   // Status transition mutation
@@ -78,7 +66,7 @@ export default function QueueBoard() {
     }
   };
 
-  const pendingCheckIns = allAppointments.filter((a) => a.status === "PENDING");
+  const pendingCheckIns = allAppointments.filter((a: any) => a.status === "BOOKED" || a.status === "PENDING");
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
@@ -194,12 +182,13 @@ export default function QueueBoard() {
             </p>
           ) : (
             <div style={{ display: "grid", gap: 10 }}>
-              {pendingCheckIns.map((appt) => {
+              {pendingCheckIns.map((appt: any) => {
                 const familyName = appt.patient_name?.split(" ").pop() || appt.id;
                 return (
                   <div
                     key={appt.id}
                     data-testid={`checkin-row-${familyName}`}
+                    onClick={() => handleOpenCheckIn(appt.id)}
                     style={{
                     display: "flex",
                     alignItems: "center",
@@ -207,6 +196,7 @@ export default function QueueBoard() {
                     padding: "10px 14px",
                     borderRadius: "var(--r-field)",
                     border: "1px dashed var(--line)",
+                    cursor: "pointer",
                   }}
                 >
                   <div>

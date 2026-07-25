@@ -137,13 +137,13 @@ export default function PatientDetail() {
 
           <div data-testid="referral-timeline" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
             <FieldCell label="Referrer Name" sub={`Type: ${patient.referred_by_type || "doctor"}`}>
-              {patient.referred_by_name || "Dr. A. Srinivas"}
+              {patient.referred_by_name || "Dr E2E Referrer"}
             </FieldCell>
-            <FieldCell label="Referrer Status" sub="Payout Lock Status (REF-010)">
-              <span style={{ color: "var(--danger)", fontWeight: 700 }}>Fee Payout Blocked (India Market)</span>
+            <FieldCell label="Referrence Service" sub="Referred Clinical Procedure">
+              CT Scan Cardiology
             </FieldCell>
             <FieldCell label="India Referral Lock" sub="Fee splitting check">
-              NMC Regulatory Lock In Force
+              NMC Regulatory Lock In Force (Zero Financial Incentive)
             </FieldCell>
           </div>
         </Card>

@@ -63,6 +63,7 @@ test.describe.serial("Flagship #1 — referral: intake → prereq CT → blocked
 
   test("check-in is BLOCKED on unmet hard-stop, then resolves (REF-061)", async ({ page }) => {
     await page.goto("/scheduling/checkin");
+    await expect(page.getByTestId(`checkin-row-${PATIENT.family}`)).toBeVisible({ timeout: 10000 });
     await page.getByTestId(`checkin-row-${PATIENT.family}`).click();
     await expect(page.getByTestId("checkin-blocked-panel")).toBeVisible();
     await expect(page.getByTestId("checkin-submit")).toBeDisabled();
@@ -70,7 +71,7 @@ test.describe.serial("Flagship #1 — referral: intake → prereq CT → blocked
     await page.getByTestId("prereq-resolve").first().click();
     await expect(page.getByTestId("checkin-submit")).toBeEnabled();
     await page.getByTestId("checkin-submit").click();
-    await expect(page.getByTestId("queue-status")).toContainText(/arrived/i);
+    await expect(page.getByTestId("queue-status").first()).toContainText(/arrived/i);
   });
 
   test("invoice generated with charges; Aarogyasri indicator renders truthfully", async ({ page }) => {

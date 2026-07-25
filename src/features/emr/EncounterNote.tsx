@@ -293,7 +293,22 @@ export default function EncounterNote() {
                           <div
                             key={i.code}
                             data-testid="dx-option"
-                            onClick={() => { setIcdCode(i.code); setDxQuery(`(${i.code}) ${i.display}`); setSignoffError(""); }}
+                            onClick={() => {
+                              setIcdCode(i.code);
+                              setDxQuery(`(${i.code}) ${i.display}`);
+                              setSignoffError("");
+                              if (patientId) {
+                                api.createProblem(token, patientId, { code: i.code, display: i.display });
+                              }
+                              saveNoteMutation.mutate({
+                                subjective,
+                                objective,
+                                assessment,
+                                plan,
+                                icd10_code: i.code,
+                                icd10_display: i.display,
+                              });
+                            }}
                             style={{ padding: "8px 12px", fontSize: 13.5, cursor: "pointer", borderBottom: "1px solid var(--wash-a)" }}
                           >
                             ({i.code}) {i.display}

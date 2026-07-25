@@ -66,7 +66,7 @@ test.describe.serial("Flagship #2 — encounter → Rx allergy alert override �
     await page.getByTestId("followup-prereq-search").fill("CBC");
     await page.getByTestId("followup-prereq-option").first().click();
     await page.getByTestId("note-signoff").click();
-    await expect(page.getByTestId("toast")).toContainText(/signed/i);
+    await expect(page.getByTestId("toast").filter({ hasText: /signed/i })).toBeVisible();
     // DRAFT follow-up visible on the record (never auto-booked — F1):
     const fu = page.getByTestId("followup-card");
     await expect(fu).toContainText(/draft/i);

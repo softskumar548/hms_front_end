@@ -7,22 +7,21 @@ import BookingModal from "./BookingModal";
 
 // Mock Practitioners & Rooms List
 const practitioners = [
-  { id: "doc-1", name: "Dr. Srinivas (Cardiology)", roomId: "room-101", roomName: "Room 101 - Cardiology OPD" },
-  { id: "doc-2", name: "Dr. Prasad (General)", roomId: "room-102", roomName: "Room 102 - General OPD" },
+  { id: "doc_apollo_1", name: "Dr. Rao (Cardiology)", roomId: "room_apollo_1", roomName: "Room 101 - Cardiology OPD" },
+  { id: "doc_apollo_2", name: "Dr. Lakshmi (General)", roomId: "room_apollo_2", roomName: "Room 102 - General OPD" },
 ];
 
 const services = [
-  { id: "service-1", name: "CT Scan Cardiology" },
-  { id: "service-2", name: "General Health Checkup" },
-  { id: "service-3", name: "Consultation Follow-up" },
+  { id: "svc_ct_apollo", name: "CT Scan Cardiology" },
+  { id: "svc_gp_apollo", name: "General Health Checkup" },
 ];
 
 export default function CalendarView() {
   const { token } = useAuth();
 
-  const [practitionerId, setPractitionerId] = useState("doc-1");
-  const [serviceId, setServiceId] = useState("service-1");
-  const [selectedDate, setSelectedDate] = useState("2026-07-21");
+  const [practitionerId, setPractitionerId] = useState("doc_apollo_1");
+  const [serviceId, setServiceId] = useState("svc_ct_apollo");
+  const [selectedDate, setSelectedDate] = useState("2026-09-15");
   const [patientSearch, setPatientSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState("");
 
@@ -71,14 +70,10 @@ export default function CalendarView() {
 
   // Calendar times slots definitions
   const slots = [
-    { label: "09:00 AM", time: "09:00:00" },
-    { label: "09:30 AM", time: "09:30:00" },
-    { label: "10:00 AM", time: "10:00:00" },
-    { label: "10:30 AM", time: "10:30:00" },
     { label: "11:00 AM", time: "11:00:00" },
     { label: "11:30 AM", time: "11:30:00" },
-    { label: "12:00 PM", time: "12:00:00" },
-    { label: "12:30 PM", time: "12:30:00" },
+    { label: "03:00 PM", time: "15:00:00" },
+    { label: "05:00 PM", time: "17:00:00" },
   ];
 
   return (
@@ -182,11 +177,11 @@ export default function CalendarView() {
               {slots.map((slot) => {
                 const slotIso = `${selectedDate}T${slot.time}`;
                 const booking = appointments.find((a) => {
-                  if (a.practitioner_id !== practitionerId) return false;
                   if (a.status === "CANCELLED") return false;
-                  const apptStart = new Date(a.start_time).toISOString().split(".")[0];
-                  const slotClean = new Date(slotIso).toISOString().split(".")[0];
-                  return apptStart === slotClean;
+                  if (a.practitioner_id !== practitionerId && a.room_id !== selectedPrac?.roomId) return false;
+                  const apptStartMs = new Date(a.start_time).getTime();
+                  const slotMs = new Date(slotIso).getTime();
+                  return Math.abs(apptStartMs - slotMs) < 1000 * 60 * 15;
                 });
 
                 const isScannedHighlight = scannedSlot === slotIso;

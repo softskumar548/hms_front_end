@@ -630,6 +630,12 @@ function App() {
             </RequireRole>
           } />
 
+          <Route path="/scheduling/checkin" element={
+            <RequireRole roles={["receptionist", "admin", "physician"]}>
+              <QueueBoard />
+            </RequireRole>
+          } />
+
           <Route path="/queue" element={
             <RequireRole roles={["receptionist", "admin", "physician"]}>
               <QueueBoard />
@@ -638,7 +644,7 @@ function App() {
 
           <Route path="/billing" element={
             <RequireRole roles={["receptionist", "admin", "billing"]}>
-              <BillingStub />
+              <InvoiceScreen />
             </RequireRole>
           } />
           
