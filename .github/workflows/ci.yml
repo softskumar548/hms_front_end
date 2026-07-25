@@ -43,13 +43,14 @@ jobs:
 
       - name: Start disposable backend stack
         env:
+          PGPASSWORD: postgres_change_me
           DATABASE_URL: postgresql+asyncpg://hms_app:app_password_change_me@localhost:5432/hms
           SEED_DATABASE_URL: postgresql+asyncpg://postgres:postgres_change_me@localhost:5432/hms
           PYTHONPATH: backend/libs:backend/services/plt
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
           psql -h localhost -U postgres -d hms -f backend/infra/postgres/init.sql
-          pip install -e "backend/services/plt[dev]"
+          pip install -e backend/libs/hms_tenancy -e backend/libs/hms_audit -e backend/libs/hms_auth -e "backend/services/plt[dev]"
           python -m app.seed
           nohup uvicorn app.main:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
           sleep 4
