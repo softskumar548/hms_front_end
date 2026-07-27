@@ -167,4 +167,6 @@ export const api = {
     request<any>(`/tenants/${id}/suspend`, token, { method: "POST", body: JSON.stringify(body) }),
   overrideTenant: (token: string | null, id: string, body: any) =>
     request<any>(`/tenants/${id}/override`, token, { method: "POST", body: JSON.stringify(body) }),
+  offboardTenant: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}`, token, { method: "DELETE" }),
 };

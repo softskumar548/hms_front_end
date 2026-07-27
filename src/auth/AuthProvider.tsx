@@ -126,8 +126,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setToken(data.access_token);
             localStorage.setItem("hms_token", data.access_token);
             sessionStorage.removeItem("pkce_verifier");
-            window.history.replaceState({}, document.title, "/patients");
-            window.location.href = "/patients";
+
+            const claims = parseJwt(data.access_token);
+            let targetPath = "/";
+            if (claims) {
+              const parsedTenant = claims["app"]?.["tenant_id"] || claims["app.tenant_id"] || claims["tenant_id"] || claims["tenant"] || "apollo";
+              const roles = claims["roles"] || claims["realm_access"]?.roles || [];
+              const knownRoles = ["doctor", "physician", "receptionist", "admin", "billing", "operator", "patient", "nurse"];
+              const rolesList = Array.isArray(roles) ? roles : [];
+              let parsedRole = rolesList.find((r: string) => knownRoles.includes(r)) || rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") || "receptionist";
+              if (parsedRole === "doctor") parsedRole = "physician";
+              setTenant(parsedTenant);
+              setRole(parsedRole);
+              localStorage.setItem("hms_tenant", parsedTenant);
+              localStorage.setItem("hms_role", parsedRole);
+
+              if (parsedRole === "operator") targetPath = "/tenants";
+              else if (parsedRole === "receptionist") targetPath = "/queue";
+              else if (parsedRole === "physician" || parsedRole === "nurse") targetPath = "/my-schedule";
+              else if (parsedRole === "billing") targetPath = "/billing";
+              else if (parsedRole === "admin") targetPath = "/dashboard";
+              else if (parsedRole === "patient") targetPath = "/portal";
+            }
+
+            window.history.replaceState({}, document.title, targetPath);
+            window.location.href = targetPath;
           }
         })
         .catch(err => console.error("PKCE Token Exchange Error:", err));
@@ -143,6 +166,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("hms_tenant", t);
     localStorage.setItem("hms_role", r);
     setSessionExpired(false);
+
+    let targetPath = "/";
+    if (r === "operator") targetPath = "/tenants";
+    else if (r === "receptionist") targetPath = "/queue";
+    else if (r === "physician" || r === "nurse" || r === "doctor") targetPath = "/my-schedule";
+    else if (r === "billing") targetPath = "/billing";
+    else if (r === "admin") targetPath = "/dashboard";
+    else if (r === "patient") targetPath = "/portal";
+
+    window.location.href = targetPath;
   };
 
   const loginWithOidc = async () => {
