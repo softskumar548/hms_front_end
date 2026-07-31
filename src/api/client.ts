@@ -51,6 +51,14 @@ export const api = {
     request<AllergyIntoleranceOut>(`/patients/${patientId}/allergies`, token, { method: "POST", body: JSON.stringify(body) }),
   listAppointments: (token: string | null, status?: string) =>
     request<AppointmentOut[]>(`/scheduling/appointments${status ? `?status=${status}` : ""}`, token),
+  listPractitioners: (token: string | null) =>
+    request<any[]>("/scheduling/practitioners", token),
+  listSites: (token: string | null) =>
+    request<any[]>("/scheduling/sites", token),
+  listRooms: (token: string | null) =>
+    request<any[]>("/scheduling/rooms", token),
+  listServices: (token: string | null) =>
+    request<any[]>("/scheduling/services", token),
   bookAppointment: (token: string | null, body: AppointmentCreate) =>
     request<AppointmentOut>("/scheduling/appointments", token, { method: "POST", body: JSON.stringify(body) }),
   getAppointment: (token: string | null, id: string) =>
@@ -141,6 +149,8 @@ export const api = {
     request<any>(`/tenants/${id}/status`, token, { method: "PATCH", body: JSON.stringify(body) }),
   configureSetupWizard: (token: string | null, id: string, body: any) =>
     request<any>(`/tenants/${id}/wizard/config`, token, { method: "POST", body: JSON.stringify(body) }),
+  getSetupWizardConfig: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}/wizard/config`, token),
   inviteStaff: (token: string | null, id: string, body: any) =>
     request<any>(`/tenants/${id}/invitations`, token, { method: "POST", body: JSON.stringify(body) }),
   stageMigration: (token: string | null, id: string, body: any) =>

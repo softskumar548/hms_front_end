@@ -305,7 +305,7 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
               {/* Action Buttons */}
               <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                 <button
-                  onClick={() => navigate("/onboarding")}
+                  onClick={() => navigate("/onboarding", { state: { tenantId: t.id } })}
                   style={{
                     flex: 1,
                     background: "var(--indigo-soft, #E4E9FF)",

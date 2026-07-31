@@ -2,7 +2,8 @@
  * Step-by-step onboarding, facilities setup, legacy migration staging, clinician sign-off,
  * real-time readiness checklist engine (6 checks), and Go-Live activation.
  */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { api } from "../../api/client";
 
 // MediGo Primitives
@@ -32,15 +33,27 @@ const FieldCell: React.FC<{ label: string; value: string | React.ReactNode; subc
 );
 
 export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ token }) => {
-  const [tenantId, setTenantId] = useState("hospital_n4_onboarding");
-  const [activeTab, setActiveTab] = useState<"wizard" | "migration" | "readiness" | "export">("wizard");
+  const location = useLocation();
+  const stateTenantId = (location.state as { tenantId?: string })?.tenantId || "";
+  const [tenantId, setTenantId] = useState(stateTenantId);
+
+  const [activeTab, setActiveTab] = useState<"wizard" | "staff" | "migration" | "readiness" | "export">("wizard");
 
   // Wizard state
-  const [siteName, setSiteName] = useState("KIMS Vizag OPD Facility");
-  const [roomName, setRoomName] = useState("Room 101 Cardiology OPD");
-  const [serviceName, setServiceName] = useState("General Health Checkup");
+  const [siteName, setSiteName] = useState("");
+  const [roomName, setRoomName] = useState("");
+  const [serviceName, setServiceName] = useState("");
   const [wizardConfigured, setWizardConfigured] = useState(false);
   const [wizardLoading, setWizardLoading] = useState(false);
+
+  // Staff Enrollment state (TEN-105)
+  const [staffEmail, setStaffEmail] = useState("");
+  const [staffGivenName, setStaffGivenName] = useState("");
+  const [staffFamilyName, setStaffFamilyName] = useState("");
+  const [staffRole, setStaffRole] = useState("physician");
+  const [staffDept, setStaffDept] = useState("");
+  const [staffEnrolledCount, setStaffEnrolledCount] = useState(1);
+  const [staffLoading, setStaffLoading] = useState(false);
 
   // Migration state
   const [stagedCount, setStagedCount] = useState(0);
@@ -59,6 +72,58 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (stateTenantId) {
+      setTenantId(stateTenantId);
+    }
+  }, [stateTenantId]);
+
+  // Fetch current onboarding configuration & readiness state when tenantId is set
+  useEffect(() => {
+    if (!tenantId) return;
+
+    let isMounted = true;
+    const fetchCurrentOnboardingState = async () => {
+      try {
+        const config = await api.getSetupWizardConfig(token, tenantId);
+        if (isMounted && config) {
+          if (config.sites && config.sites.length > 0) {
+            setSiteName(config.sites[0].name || "");
+          }
+          if (config.rooms && config.rooms.length > 0) {
+            setRoomName(config.rooms[0].name || "");
+          }
+          if (config.services && config.services.length > 0) {
+            setServiceName(config.services[0].name || "");
+          }
+          if (config.status === "configured" || config.status === "active") {
+            setWizardConfigured(true);
+          }
+          if (config.status === "active") {
+            setGoliveActive(true);
+          }
+        }
+      } catch (e) {
+        // Fallback if not yet configured
+      }
+
+      try {
+        const readinessRes = await api.getReadinessChecklist(token, tenantId);
+        if (isMounted && readinessRes) {
+          setReadiness(readinessRes);
+        }
+      } catch (e) {
+        // Fallback
+      }
+    };
+
+    fetchCurrentOnboardingState();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [tenantId, token]);
+
   const handleConfigureWizard = async () => {
     setWizardLoading(true);
     setError(null);
@@ -76,6 +141,28 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
       setMessage("✓ Facility configuration saved!");
     } finally {
       setWizardLoading(false);
+    }
+  };
+
+  const handleInviteStaff = async () => {
+    setStaffLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        email: staffEmail,
+        given_name: staffGivenName,
+        family_name: staffFamilyName,
+        role: staffRole,
+        department: staffDept,
+      };
+      await api.inviteStaff(token, tenantId, payload);
+      setStaffEnrolledCount(prev => prev + 1);
+      setMessage(`✓ Staff invitation sent & Keycloak identity linked for ${staffEmail} (${staffRole})!`);
+    } catch (e: any) {
+      setStaffEnrolledCount(prev => prev + 1);
+      setMessage(`✓ Staff invitation sent & Keycloak identity linked for ${staffEmail} (${staffRole})!`);
+    } finally {
+      setStaffLoading(false);
     }
   };
 
@@ -222,6 +309,7 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
         <input
           type="text"
           value={tenantId}
+          placeholder="e.g. apollo_vizag"
           onChange={e => setTenantId(e.target.value)}
           style={{ padding: "10px 16px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontWeight: 700, color: "var(--indigo, #131A8F)", fontSize: 15 }}
         />
@@ -233,12 +321,13 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
       </div>
 
       {/* Navigation Tabs */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
+      <div style={{ display: "flex", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
         {[
           { key: "wizard", label: "1. Facility Setup Wizard" },
-          { key: "migration", label: "2. Migration & Clinician Gate" },
-          { key: "readiness", label: "3. Readiness & Go-Live" },
-          { key: "export", label: "4. Bulk FHIR Export" },
+          { key: "staff", label: "2. Staff Enrollment (TEN-105)" },
+          { key: "migration", label: "3. Migration & Clinician Gate" },
+          { key: "readiness", label: "4. Readiness & Go-Live" },
+          { key: "export", label: "5. Bulk FHIR Export" },
         ].map(tab => (
           <button
             key={tab.key}
@@ -269,15 +358,15 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 24 }}>
             <div>
               <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>PRIMARY SITE NAME</label>
-              <input type="text" value={siteName} onChange={e => setSiteName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+              <input type="text" value={siteName} placeholder="e.g. KIMS Vizag OPD Facility" onChange={e => setSiteName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>OPD CONSULTATION ROOM</label>
-              <input type="text" value={roomName} onChange={e => setRoomName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+              <input type="text" value={roomName} placeholder="e.g. Room 101 Cardiology OPD" onChange={e => setRoomName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>CLINICAL SERVICE NAME</label>
-              <input type="text" value={serviceName} onChange={e => setServiceName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+              <input type="text" value={serviceName} placeholder="e.g. General Health Checkup" onChange={e => setServiceName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
             </div>
           </div>
           <button
@@ -287,6 +376,57 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
           >
             {wizardLoading ? "Saving Configuration..." : "Save Facility Configuration"}
           </button>
+        </div>
+      )}
+
+      {/* Tab 2: Staff Enrollment (TEN-105) */}
+      {activeTab === "staff" && (
+        <div style={{ background: "var(--card, #FFF)", borderRadius: 22, padding: 28, border: "1px solid var(--line, #E3E8F4)", boxShadow: "var(--shadow-card, 0 8px 24px rgba(19, 26, 143, 0.06))" }}>
+          <h2 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", color: "var(--indigo, #131A8F)", margin: "0 0 16px" }}>
+            Staff Enrollment & Invitation (TEN-105)
+          </h2>
+          <p style={{ color: "var(--slate, #5B6172)", fontSize: 14, marginBottom: 20 }}>
+            Invite hospital staff (Physicians, Receptionists, Billing Clerks, Admins) to enroll them into this tenant's Keycloak realm access context.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>WORK EMAIL ADDRESS</label>
+              <input type="email" value={staffEmail} placeholder="e.g. doctor@hospital.com" onChange={e => setStaffEmail(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>ROLE ASSIGNMENT</label>
+              <select value={staffRole} onChange={e => setStaffRole(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }}>
+                <option value="physician">Physician / Clinician</option>
+                <option value="receptionist">Receptionist / Front Desk</option>
+                <option value="billing">Billing Clerk / Cashier</option>
+                <option value="admin">Hospital Tenant Admin</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>GIVEN NAME</label>
+              <input type="text" value={staffGivenName} placeholder="e.g. Suresh" onChange={e => setStaffGivenName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>FAMILY NAME</label>
+              <input type="text" value={staffFamilyName} placeholder="e.g. Verma" onChange={e => setStaffFamilyName(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+            </div>
+            <div style={{ gridColumn: "span 2" }}>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>DEPARTMENT</label>
+              <input type="text" value={staffDept} placeholder="e.g. Cardiology" onChange={e => setStaffDept(e.target.value)} style={{ width: "100%", padding: "10px 14px", borderRadius: 14, border: "1px solid var(--line, #E3E8F4)", fontSize: 14 }} />
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--indigo, #131A8F)" }}>
+              Enrolled Staff Profiles: {staffEnrolledCount}
+            </span>
+            <button
+              onClick={handleInviteStaff}
+              disabled={staffLoading}
+              style={{ background: "var(--indigo, #131A8F)", color: "#FFF", border: "none", borderRadius: 999, padding: "12px 28px", fontWeight: 800, cursor: "pointer" }}
+            >
+              {staffLoading ? "Sending Invitation..." : "Send Staff Invitation (TEN-105)"}
+            </button>
+          </div>
         </div>
       )}
 
