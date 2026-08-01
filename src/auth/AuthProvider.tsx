@@ -141,7 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               localStorage.setItem("hms_tenant", parsedTenant);
               localStorage.setItem("hms_role", parsedRole);
 
-              if (parsedRole === "operator") targetPath = "/tenants";
+              if (parsedRole === "operator") targetPath = "/operator/dashboard";
               else if (parsedRole === "receptionist") targetPath = "/queue";
               else if (parsedRole === "physician" || parsedRole === "nurse") targetPath = "/my-schedule";
               else if (parsedRole === "billing") targetPath = "/billing";
@@ -168,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSessionExpired(false);
 
     let targetPath = "/";
-    if (r === "operator") targetPath = "/tenants";
+    if (r === "operator") targetPath = "/operator/dashboard";
     else if (r === "receptionist") targetPath = "/queue";
     else if (r === "physician" || r === "nurse" || r === "doctor") targetPath = "/my-schedule";
     else if (r === "billing") targetPath = "/billing";

@@ -33,7 +33,10 @@ const ReferralAnalytics = React.lazy(() => import("./features/reports/ReferralAn
 const TenantManagementScreen = React.lazy(() => import("./features/tenants/TenantManagementScreen").then(m => ({ default: m.TenantManagementScreen })));
 const OnboardingWizardScreen = React.lazy(() => import("./features/tenants/OnboardingWizardScreen").then(m => ({ default: m.OnboardingWizardScreen })));
 const OperationalControlScreen = React.lazy(() => import("./features/tenants/OperationalControlScreen").then(m => ({ default: m.OperationalControlScreen })));
+const OperatorDashboardScreen = React.lazy(() => import("./features/tenants/OperatorDashboardScreen").then(m => ({ default: m.OperatorDashboardScreen })));
+const OperatorInsightsScreen = React.lazy(() => import("./features/tenants/OperatorInsightsScreen").then(m => ({ default: m.OperatorInsightsScreen })));
 const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
+import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 
 function RoleHomeRedirect() {
   const { role } = useAuth();
@@ -41,7 +44,7 @@ function RoleHomeRedirect() {
   if (role === "physician" || role === "doctor" || role === "nurse") return <Navigate to="/my-schedule" replace />;
   if (role === "billing") return <Navigate to="/billing" replace />;
   if (role === "admin") return <Navigate to="/dashboard" replace />;
-  if (role === "operator") return <Navigate to="/tenants" replace />;
+  if (role === "operator") return <Navigate to="/operator/dashboard" replace />;
   if (role === "patient") return <Navigate to="/portal" replace />;
   return <Navigate to="/queue" replace />;
 }
@@ -56,6 +59,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   const isOperatorRoute = role === "operator" ||
+    location.pathname.startsWith("/operator") ||
     location.pathname.startsWith("/tenants") ||
     location.pathname.startsWith("/onboarding") ||
     location.pathname.startsWith("/ops-control");
@@ -79,18 +83,13 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <header style={{ background: "#fff", borderBottom: "1px solid var(--line)", padding: "12px 24px", display: "flex", alignItems: "center", gap: 18 }}>
-        <Link to="/" style={{ textDecoration: "none", fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, color: "var(--indigo)" }}>
-          {isOperatorRoute ? "MediGo Operator" : isPatientRoute ? "MediGo Portal" : "MediGo"}
+        <Link to={isOperatorRoute ? "/operator/dashboard" : "/"} style={{ textDecoration: "none", fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, color: "var(--indigo)" }}>
+          {isOperatorRoute ? "MediGo Operator Console" : isPatientRoute ? "MediGo Portal" : "MediGo"}
         </Link>
         <nav style={{ display: "flex", gap: 14, alignItems: "center" }}>
           {isOperatorRoute ? (
-            /* Operator Console Navigation (PHI-Free) */
-            <>
-              <Link to="/tenants" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_operator_tenants", "Tenants")}</Link>
-              <Link to="/onboarding" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_operator_onboarding", "Onboarding")}</Link>
-              <Link to="/ops-control" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_operator_ops", "Billing Ops")}</Link>
-              <Link to="/design" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_design")}</Link>
-            </>
+            /* Operator Console Sidebar replaces top-nav links */
+            <span style={{ fontSize: 13, color: "var(--slate)", fontWeight: 600 }}>PHI-Free Operator Session</span>
           ) : isPatientRoute ? (
             /* Patient Portal Navigation */
             <>
@@ -128,7 +127,14 @@ function Shell({ children }: { children: React.ReactNode }) {
         </span>
         <Button ghost type="button" data-testid="logout-btn" onClick={() => logout()}>{t("logout")}</Button>
       </header>
-      <main style={{ maxWidth: 1080, margin: "0 auto", padding: "26px 20px" }}>{children}</main>
+      {isOperatorRoute ? (
+        <div data-theme="trusted-clinical" style={{ display: "flex", minHeight: "calc(100vh - 65px)", background: "var(--wash-a, #F8FAFC)" }}>
+          <OperatorSidebar />
+          <main style={{ flex: 1, padding: "24px 28px", maxWidth: 1200 }}>{children}</main>
+        </div>
+      ) : (
+        <main style={{ maxWidth: 1080, margin: "0 auto", padding: "26px 20px" }}>{children}</main>
+      )}
     </div>
   );
 }
@@ -843,9 +849,37 @@ function App() {
             </RequireRole>
           } />
 
-          <Route path="/tenants" element={<TenantManagementScreen token={token} />} />
-          <Route path="/onboarding" element={<OnboardingWizardScreen token={token} />} />
-          <Route path="/ops-control" element={<OperationalControlScreen token={token} />} />
+          <Route path="/operator" element={<Navigate to="/operator/dashboard" replace />} />
+          <Route path="/operator/dashboard" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <OperatorDashboardScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/operator/insights" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <OperatorInsightsScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/tenants" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <TenantManagementScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/onboarding" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <OnboardingWizardScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/ops-control" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <OperationalControlScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/ops-control/suspend" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <OperationalControlScreen token={token} />
+            </RequireRole>
+          } />
 
           <Route path="/callback" element={<div style={{ padding: 40, textAlign: "center", color: "var(--indigo)", fontWeight: 700 }}>Completing Keycloak OIDC Authentication...</div>} />
           <Route path="/design" element={<DesignSystem />} />

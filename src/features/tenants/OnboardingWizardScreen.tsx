@@ -34,8 +34,10 @@ const FieldCell: React.FC<{ label: string; value: string | React.ReactNode; subc
 
 export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ token }) => {
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const queryTenantId = queryParams.get("tenant_id") || queryParams.get("tenantId") || "";
   const stateTenantId = (location.state as { tenantId?: string })?.tenantId || "";
-  const [tenantId, setTenantId] = useState(stateTenantId);
+  const [tenantId, setTenantId] = useState(queryTenantId || stateTenantId || "apollo");
 
   const [activeTab, setActiveTab] = useState<"wizard" | "staff" | "migration" | "readiness" | "export">("wizard");
 
@@ -73,10 +75,11 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (stateTenantId) {
-      setTenantId(stateTenantId);
+    const tid = queryTenantId || stateTenantId;
+    if (tid) {
+      setTenantId(tid);
     }
-  }, [stateTenantId]);
+  }, [queryTenantId, stateTenantId]);
 
   // Fetch current onboarding configuration & readiness state when tenantId is set
   useEffect(() => {

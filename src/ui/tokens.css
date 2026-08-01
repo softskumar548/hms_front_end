@@ -56,4 +56,28 @@ body {
   .skeleton-pulse { animation: none !important; }
 }
 
+/* Theme C: Trusted Enterprise Clinical Direction (Scoped for Operator Console) */
+[data-theme="trusted-clinical"] {
+  --indigo: #1E3A5F;
+  --indigo-deep: #0F233C;
+  --indigo-soft: #E8EEF5;
+  --ink: #1E293B;
+  --slate: #64748B;
+  --line: #E2E8F0;
+  --card: #FFFFFF;
+  --wash-a: #F8FAFC;
+  --wash-b: #F1F5F9;
+  --cyan: #0284C7;
+  --orange: #D97706;
+  --green: #16A34A;
+  --danger: #DC2626;
+  --r-card: 8px;
+  --r-field: 6px;
+  --r-pill: 6px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-pop: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
 
