@@ -107,6 +107,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if (code) {
+      const processedCodeKey = `processed_code_${code}`;
+      if (sessionStorage.getItem(processedCodeKey)) return;
+      sessionStorage.setItem(processedCodeKey, "true");
+
       const verifier = sessionStorage.getItem("pkce_verifier") || "";
       const redirectUri = window.location.origin + "/callback";
       const tokenUrl = `${OIDC_AUTHORITY}/protocol/openid-connect/token`;
@@ -127,7 +131,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .then(res => res.json())
         .then(data => {
           if (data.access_token) {
-            setToken(data.access_token);
             localStorage.setItem("hms_token", data.access_token);
             sessionStorage.removeItem("pkce_verifier");
 
@@ -153,8 +156,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               else if (parsedRole === "patient") targetPath = "/portal";
             }
 
+            setToken(data.access_token);
             window.history.replaceState({}, document.title, targetPath);
-            window.location.href = targetPath;
+            if (window.location.pathname !== targetPath) {
+              window.location.href = targetPath;
+            }
           }
         })
         .catch(err => console.error("PKCE Token Exchange Error:", err));
