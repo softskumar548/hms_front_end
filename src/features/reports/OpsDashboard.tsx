@@ -79,55 +79,25 @@ export default function OpsDashboard() {
             Hospital operations are active. Monitor live wait times, queue tokens, and daily consultation aggregates.
           </p>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <span style={{ background: "rgba(255,255,255,0.15)", padding: "6px 14px", borderRadius: "var(--r-pill, 999px)", fontSize: 12, fontWeight: 700, backdropFilter: "blur(4px)" }}>
-            🏥 {currentTenantName}
-          </span>
-          <span style={{ background: "rgba(28, 154, 78, 0.25)", border: "1px solid #1C9A4E", color: "#A7F3D0", padding: "6px 14px", borderRadius: "var(--r-pill, 999px)", fontSize: 12, fontWeight: 800 }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <Select
+            value={selectedSite}
+            onChange={(e) => setSelectedSite(e.target.value)}
+            style={{ width: 220, background: "#ffffff", color: "var(--indigo)", fontWeight: 700 }}
+          >
+            <option value="main">{currentTenantName} — Main Facility</option>
+            <option value="opd-1">{currentTenantName} — OPD Block</option>
+          </Select>
+
+          <Button ghost style={{ fontSize: 12, padding: "8px 16px", background: "#ffffff", color: "var(--indigo)", border: "none", fontWeight: 700 }} onClick={handleManualRefresh}>
+            🔄 Refresh ({formatFreshness()})
+          </Button>
+
+          <span style={{ background: "rgba(28, 154, 78, 0.35)", border: "1px solid #1C9A4E", color: "#A7F3D0", padding: "6px 14px", borderRadius: "var(--r-pill, 999px)", fontSize: 12, fontWeight: 800 }}>
             ● LIVE & OPERATIONAL
           </span>
         </div>
       </div>
-
-      {/* Upper header controls */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-        <div>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--indigo)", margin: 0 }}>
-            Daily Operations & Till Overview
-          </h2>
-          <span style={{ fontSize: 13, color: "var(--slate)" }}>
-            Real-time consult statistics, queue length wait times, and cash collection aggregates.
-          </span>
-        </div>
-
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          {/* Freshness timer counter badge */}
-          <span
-            style={{
-              fontSize: 12,
-              background: "var(--wash-b)",
-              color: "var(--indigo)",
-              padding: "6px 12px",
-              borderRadius: "var(--r-pill)",
-              fontWeight: 700,
-            }}
-          >
-            🔄 Updated {formatFreshness()}
-          </span>
-          
-          <Button ghost style={{ fontSize: 12, padding: "6px 14px" }} onClick={handleManualRefresh}>
-            Refresh
-          </Button>
-
-          <Select value={selectedSite} onChange={(e) => setSelectedSite(e.target.value)} style={{ width: 220 }}>
-            <option value="main">{currentTenantName} — Main Facility</option>
-            <option value="opd-1">{currentTenantName} — OPD Block</option>
-          </Select>
-        </div>
-      </div>
-
-      {/* Seeded onboarding tour checklist */}
-      <OnboardingChecklist />
 
       {/* Metrics Tiles Row Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
