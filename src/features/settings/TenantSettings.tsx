@@ -245,34 +245,6 @@ export default function TenantSettings() {
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* Header Tabs */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", borderBottom: "1px solid var(--line)", paddingBottom: 12 }}>
-        {tabList.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => handleTabChange(tab.key)}
-              style={{
-                background: isActive ? "var(--indigo)" : "#ffffff",
-                color: isActive ? "#ffffff" : "var(--slate)",
-                border: isActive ? "1px solid var(--indigo)" : "1px solid var(--line)",
-                padding: "8px 16px",
-                borderRadius: "var(--r-pill, 999px)",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                boxShadow: isActive ? "0 4px 12px rgba(19, 26, 143, 0.2)" : "none",
-                transition: "all 0.15s ease",
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
       {/* TAB 1: CONFIGURATION (Dropdown-driven Configuration Master) */}
       {activeTab === "config" && (
         <div style={{ display: "grid", gap: 18 }}>
