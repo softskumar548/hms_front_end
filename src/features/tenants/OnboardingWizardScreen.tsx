@@ -212,11 +212,7 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
       setMessage(`🎉 Tenant '${orgName}' provisioned successfully! Tenant Admin account created.`);
       setCurrentStage(2);
     } catch (e: any) {
-      setProvisioned(true);
-      const generatedPass = `Hms${tenantId.charAt(0).toUpperCase() + tenantId.slice(1)}#2026!`;
-      setTempPasscode(generatedPass);
-      setMessage(`🎉 Tenant '${orgName}' provisioned successfully! Tenant Admin account created.`);
-      setCurrentStage(2);
+      setError(e.response?.data?.detail || e.message || "Failed to provision tenant");
     } finally {
       setProvisioningLoading(false);
     }
