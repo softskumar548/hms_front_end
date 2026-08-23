@@ -53,11 +53,47 @@ export default function OpsDashboard() {
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
+      {/* Welcome Admin & Clinic Banner */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #131A8F 0%, #1E3A8A 100%)",
+          borderRadius: "var(--r-card, 18px)",
+          padding: "20px 24px",
+          color: "#ffffff",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 8px 24px rgba(19, 26, 143, 0.2)",
+          flexWrap: "wrap",
+          gap: 14,
+        }}
+      >
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--cyan, #5FC6E9)", marginBottom: 4 }}>
+            Tenant Administration Console
+          </div>
+          <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, margin: "0 0 6px", color: "#ffffff" }}>
+            Welcome, Dr. K R Murali (Dean) · {currentTenantName}
+          </h1>
+          <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.85)" }}>
+            Hospital operations are active. Monitor live wait times, queue tokens, and daily consultation aggregates.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <span style={{ background: "rgba(255,255,255,0.15)", padding: "6px 14px", borderRadius: "var(--r-pill, 999px)", fontSize: 12, fontWeight: 700, backdropFilter: "blur(4px)" }}>
+            🏥 {currentTenantName}
+          </span>
+          <span style={{ background: "rgba(28, 154, 78, 0.25)", border: "1px solid #1C9A4E", color: "#A7F3D0", padding: "6px 14px", borderRadius: "var(--r-pill, 999px)", fontSize: 12, fontWeight: 800 }}>
+            ● LIVE & OPERATIONAL
+          </span>
+        </div>
+      </div>
+
       {/* Upper header controls */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 24, color: "var(--indigo)", margin: 0 }}>
-            Clinic Operations Live Dashboard (UI-603)
+          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--indigo)", margin: 0 }}>
+            Daily Operations & Till Overview
           </h2>
           <span style={{ fontSize: 13, color: "var(--slate)" }}>
             Real-time consult statistics, queue length wait times, and cash collection aggregates.

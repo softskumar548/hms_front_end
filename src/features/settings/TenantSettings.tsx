@@ -14,7 +14,7 @@ export default function TenantSettings() {
   const qc = useQueryClient();
 
   const searchParams = new URLSearchParams(location.search);
-  const activeTab = searchParams.get("tab") || "brand";
+  const activeTab = searchParams.get("tab") || "config";
 
   const [toastMessage, setToastMessage] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
@@ -24,6 +24,94 @@ export default function TenantSettings() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("doctor");
   const [inviteName, setInviteName] = useState("");
+
+  // Configuration Master Category selection
+  const [selectedConfigType, setSelectedConfigType] = useState("payment_type");
+  const [configSearch, setConfigSearch] = useState("");
+  const [showAddConfigModal, setShowAddConfigModal] = useState(false);
+  const [newConfigCode, setNewConfigCode] = useState("");
+  const [newConfigName, setNewConfigName] = useState("");
+  const [newConfigDesc, setNewConfigDesc] = useState("");
+
+  const configCategories = [
+    { key: "payment_type", label: "Payment Type", desc: "Patient payment collection methods & cashier rails" },
+    { key: "visit_type", label: "Visit Type", desc: "Clinical appointment and consultation categories" },
+    { key: "order_status", label: "Order Status", desc: "Diagnostic lab and prescription order states" },
+    { key: "clinic_type", label: "Clinic Type", desc: "Healthcare delivery facility and unit classification" },
+    { key: "specialization", label: "Specialization", desc: "Medical specialty branches and doctor clinical fields" },
+    { key: "room_type", label: "Room Type", desc: "Consultation chambers, procedure rooms, and exam bays" },
+    { key: "floor_type", label: "Floor Type", desc: "Building levels, floor master, and wing sections" },
+    { key: "bed_category", label: "Bed Category", desc: "Inpatient admission beds, ICU, and daycare recliners" },
+    { key: "expense_category", label: "Expense Category", desc: "Operational expenditures and clinic expense heads" },
+  ];
+
+  // Default master datasets
+  const [configData, setConfigData] = useState<Record<string, Array<{ id: string; code: string; name: string; description: string; active: boolean }>>>({
+    payment_type: [
+      { id: "1", code: "UPI", name: "UPI QR / Direct Transfer", description: "Real-time dynamic UPI QR collection", active: true },
+      { id: "2", code: "CASH", name: "Cash Drawer Collection", description: "Physical cash till reconciliation", active: true },
+      { id: "3", code: "CARD", name: "Credit / Debit Card (POS)", description: "Point of sale terminal card swipe", active: true },
+      { id: "4", code: "PMJAY", name: "Aarogyasri / PMJAY 100% Cashless", description: "Government cashless scheme split", active: true },
+      { id: "5", code: "INSURANCE", name: "Private TPA Insurance", description: "Third-party administrator cashless pre-auth", active: true },
+    ],
+    visit_type: [
+      { id: "1", code: "NEW_OPD", name: "New Consultation Visit", description: "First-time outpatient consultation", active: true },
+      { id: "2", code: "FOLLOW_UP", name: "Follow-up Visit", description: "Review consultation within validity window", active: true },
+      { id: "3", code: "EMERGENCY", name: "Emergency / Triage", description: "Priority acute care consultation", active: true },
+      { id: "4", code: "TELEHEALTH", name: "Telehealth Video Consult", description: "Remote telemedicine appointment", active: true },
+      { id: "5", code: "ROUTINE_CHECKUP", name: "Preventive Health Check", description: "Executive comprehensive health screening", active: true },
+    ],
+    order_status: [
+      { id: "1", code: "DRAFT", name: "Draft Order", description: "Clinical prescription order being drafted", active: true },
+      { id: "2", code: "PENDING", name: "Pending Sample Collection", description: "Awaiting phlebotomy or imaging token", active: true },
+      { id: "3", code: "IN_PROGRESS", name: "In Diagnostic Analysis", description: "Specimen under laboratory analyzer", active: true },
+      { id: "4", code: "COMPLETED", name: "Resulted & Signed Off", description: "Verified diagnostic report generated", active: true },
+      { id: "5", code: "CANCELLED", name: "Order Cancelled", description: "Voided or cancelled diagnostic test", active: true },
+    ],
+    clinic_type: [
+      { id: "1", code: "OPD_GENERAL", name: "General Outpatient Clinic", description: "Primary care walk-in OPD", active: true },
+      { id: "2", code: "OPD_SPECIALIST", name: "Super Specialty Clinic", description: "Specialized clinical consultation suites", active: true },
+      { id: "3", code: "DIAGNOSTIC_LAB", name: "Diagnostic & Pathology Lab", description: "Clinical biochemistry and imaging lab", active: true },
+      { id: "4", code: "PHARMACY_RETAIL", name: "Hospital Pharmacy", description: "Dispensing pharmacy and medical store", active: true },
+      { id: "5", code: "DAY_CARE", name: "Daycare Chemotherapy / Infusion", description: "Short-stay ambulatory treatment unit", active: true },
+    ],
+    specialization: [
+      { id: "1", code: "GEN_MED", name: "General Medicine", description: "Internal medicine & chronic illness care", active: true },
+      { id: "2", code: "CARDIO", name: "Cardiology", description: "Heart disease, ECG, and echocardiography", active: true },
+      { id: "3", code: "ORTHO", name: "Orthopedics & Joint Care", description: "Bone, joint, and musculoskeletal trauma", active: true },
+      { id: "4", code: "PEDIA", name: "Pediatrics & Neonatology", description: "Child healthcare & immunization", active: true },
+      { id: "5", code: "GYNAEC", name: "Obstetrics & Gynecology", description: "Women's reproductive & maternity care", active: true },
+      { id: "6", code: "DERMA", name: "Dermatology", description: "Skin, hair, and laser aesthetic therapy", active: true },
+      { id: "7", code: "OPHTHAL", name: "Ophthalmology", description: "Eye examination & vision diagnostics", active: true },
+    ],
+    room_type: [
+      { id: "1", code: "CONSULT_ROOM", name: "Doctor Consultation Room", description: "Private physician examination chamber", active: true },
+      { id: "2", code: "TRIAGE_BAY", name: "Nurse Triage & Vitals Bay", description: "Blood pressure, SpO2, and vitals recording", active: true },
+      { id: "3", code: "MINOR_OT", name: "Minor Procedure Room", description: "Dressing, suturing, and minor surgical room", active: true },
+      { id: "4", code: "XRAY_ROOM", name: "Radiology / X-Ray Suite", description: "Lead-shielded digital radiography room", active: true },
+      { id: "5", code: "SAMPLE_BOOTH", name: "Phlebotomy Collection Booth", description: "Blood and urine sample collection cubicle", active: true },
+    ],
+    floor_type: [
+      { id: "1", code: "GROUND", name: "Ground Floor", description: "Main Reception, Emergency, and Registration", active: true },
+      { id: "2", code: "FIRST", name: "First Floor", description: "Physician Consultation Chambers & Minor OT", active: true },
+      { id: "3", code: "SECOND", name: "Second Floor", description: "Diagnostic Laboratories & Ultrasound Room", active: true },
+      { id: "4", code: "BASEMENT", name: "Basement Level", description: "Medical Records & Pharmacy Storage", active: true },
+    ],
+    bed_category: [
+      { id: "1", code: "GEN_WARD", name: "General Ward Bed", description: "Multi-occupancy inpatient recovery bed", active: true },
+      { id: "2", code: "SEMI_PVT", name: "Semi-Private Room Bed", description: "Two-sharing air-conditioned room", active: true },
+      { id: "3", code: "PVT_DELUXE", name: "Private Deluxe Room", description: "Single patient private luxury suite", active: true },
+      { id: "4", code: "ICU_BED", name: "Intensive Care Unit (ICU)", description: "High-dependency motorized bed with ventilator", active: true },
+      { id: "5", code: "DAYCARE_REC", name: "Daycare Infusion Recliner", description: "Comfortable ergonomic chemotherapy recliner", active: true },
+    ],
+    expense_category: [
+      { id: "1", code: "MED_STOCK", name: "Pharmacy & Surgical Consumables", description: "Procurement of medicines and clinical gloves", active: true },
+      { id: "2", code: "LAB_REAGENT", name: "Diagnostic Reagents & Kits", description: "Biochemistry reagents, test tubes, and vacutainers", active: true },
+      { id: "3", code: "FACILITY_UTIL", name: "Electricity & Biomedical Waste", description: "Power backup, biomedical disposal, and water", active: true },
+      { id: "4", code: "STAFF_SALARY", name: "Staff Payroll & Honorarium", description: "Doctor consultation revenue split & staff wages", active: true },
+      { id: "5", code: "IT_SOFTWARE", name: "SaaS & Compliance Subscriptions", description: "Hospital Management System and cloud hosting", active: true },
+    ],
+  });
 
   // Safe editable state (locale preferences)
   const [dateFormat, setDateFormat] = useState(
@@ -78,24 +166,49 @@ export default function TenantSettings() {
     triggerToast("Branding settings updated successfully!");
   };
 
+  const handleToggleActive = (type: string, id: string) => {
+    setConfigData((prev) => {
+      const items = prev[type] || [];
+      const updated = items.map((item) => (item.id === id ? { ...item, active: !item.active } : item));
+      return { ...prev, [type]: updated };
+    });
+    triggerToast("Item status updated!");
+  };
+
+  const handleAddConfigItem = () => {
+    if (!newConfigName) return;
+    const newItem = {
+      id: String(Date.now()),
+      code: newConfigCode.toUpperCase() || newConfigName.replace(/\s+/g, "_").toUpperCase(),
+      name: newConfigName,
+      description: newConfigDesc || "Configured master item",
+      active: true,
+    };
+    setConfigData((prev) => ({
+      ...prev,
+      [selectedConfigType]: [...(prev[selectedConfigType] || []), newItem],
+    }));
+    setShowAddConfigModal(false);
+    setNewConfigCode("");
+    setNewConfigName("");
+    setNewConfigDesc("");
+    triggerToast("New configuration item added!");
+  };
+
   const handleTabChange = (tabKey: string) => {
     navigate(`/settings?tab=${tabKey}`);
   };
 
-  // Fetch practitioners & sites for Configuration/Users tab
+  const currentCategoryInfo = configCategories.find((c) => c.key === selectedConfigType) || configCategories[0];
+  const currentItems = (configData[selectedConfigType] || []).filter((item) => {
+    const q = configSearch.toLowerCase();
+    return item.name.toLowerCase().includes(q) || item.code.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+  });
+
+  // Fetch practitioners & sites for Users tab
   const { data: practitioners = [] } = useQuery({
     queryKey: ["practitioners", tenant],
     queryFn: () => api.listPractitioners(token),
-  });
-
-  const { data: sites = [] } = useQuery({
-    queryKey: ["sites", tenant],
-    queryFn: () => api.listSites(token),
-  });
-
-  const { data: services = [] } = useQuery({
-    queryKey: ["services", tenant],
-    queryFn: () => api.listServices(token),
   });
 
   const inviteStaffMutation = useMutation({
@@ -119,30 +232,20 @@ export default function TenantSettings() {
   });
 
   const tabList = [
-    { key: "brand", label: "🎨 Brand Related" },
-    { key: "print", label: "🖨️ Print Settings" },
     { key: "config", label: "⚙️ Configuration" },
     { key: "account", label: "🏢 Account Settings" },
     { key: "auth", label: "🔐 User Authentication" },
     { key: "users", label: "👥 Users & Staff" },
     { key: "payment", label: "💳 Payment Settings" },
     { key: "online", label: "🌐 Online Services" },
+    { key: "brand", label: "🎨 Brand Related" },
+    { key: "print", label: "🖨️ Print Settings" },
     { key: "regional", label: "🌍 Regional Preferences" },
   ];
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* Header */}
-      <div>
-        <h1 style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 700, color: "var(--indigo)", margin: "0 0 4px" }}>
-          Clinic Administration & Settings
-        </h1>
-        <p style={{ color: "var(--slate)", fontSize: 13.5, margin: 0 }}>
-          Manage your hospital brand identity, print templates, staff access, and integration parameters.
-        </p>
-      </div>
-
-      {/* Tab Navigation Chips */}
+      {/* Header Tabs */}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", borderBottom: "1px solid var(--line)", paddingBottom: 12 }}>
         {tabList.map((tab) => {
           const isActive = activeTab === tab.key;
@@ -170,7 +273,197 @@ export default function TenantSettings() {
         })}
       </div>
 
-      {/* TAB 1: BRAND SETTINGS */}
+      {/* TAB 1: CONFIGURATION (Dropdown-driven Configuration Master) */}
+      {activeTab === "config" && (
+        <div style={{ display: "grid", gap: 18 }}>
+          {/* Top Cyan / Brand Breadcrumb Banner */}
+          <div
+            style={{
+              background: "#00BCD4",
+              borderRadius: "14px 14px 0 0",
+              padding: "12px 20px",
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 15,
+              fontWeight: 700,
+            }}
+          >
+            <span style={{ fontSize: 16 }}>Configuration</span>
+            <span style={{ fontSize: 13, opacity: 0.8 }}>🏠 Configuration</span>
+          </div>
+
+          {/* Configuration Selection Card */}
+          <Card style={{ marginTop: -14, borderRadius: "0 0 18px 18px", borderTop: "none" }}>
+            <div style={{ display: "grid", gap: 16 }}>
+              {/* Dropdown Selector */}
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
+                  Select Master Configuration
+                </label>
+                <div style={{ position: "relative" }}>
+                  <select
+                    value={selectedConfigType}
+                    onChange={(e) => setSelectedConfigType(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px",
+                      borderRadius: "var(--r-field, 12px)",
+                      border: "2px solid #5B6172",
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: "var(--ink, #23263B)",
+                      background: "#ffffff",
+                      cursor: "pointer",
+                      outline: "none",
+                      appearance: "none",
+                    }}
+                  >
+                    {configCategories.map((c) => (
+                      <option key={c.key} value={c.key}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                  <span
+                    style={{
+                      position: "absolute",
+                      right: 16,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      pointerEvents: "none",
+                      color: "var(--slate)",
+                      fontWeight: 800,
+                    }}
+                  >
+                    ▼
+                  </span>
+                </div>
+              </div>
+
+              {/* Category Header & Actions */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--line)", paddingTop: 16, flexWrap: "wrap", gap: 12 }}>
+                <div>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: "0 0 2px" }}>
+                    {currentCategoryInfo.label} Master
+                  </h3>
+                  <span style={{ fontSize: 12.5, color: "var(--slate)" }}>{currentCategoryInfo.desc}</span>
+                </div>
+
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <Input
+                    placeholder="Search items..."
+                    value={configSearch}
+                    onChange={(e) => setConfigSearch(e.target.value)}
+                    style={{ width: 220 }}
+                  />
+                  <Button onClick={() => setShowAddConfigModal(true)}>+ Add {currentCategoryInfo.label}</Button>
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+                  <thead>
+                    <tr style={{ background: "var(--wash-a)", borderBottom: "2px solid var(--line)" }}>
+                      <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Code</th>
+                      <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Name / Label</th>
+                      <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Description</th>
+                      <th style={{ textAlign: "center", padding: "10px 14px", color: "var(--slate)" }}>Status</th>
+                      <th style={{ textAlign: "right", padding: "10px 14px", color: "var(--slate)" }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.map((item) => (
+                      <tr key={item.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "12px 14px", fontWeight: 700, color: "var(--indigo)" }}>
+                          <span style={{ background: "var(--wash-b)", padding: "4px 8px", borderRadius: 6 }}>
+                            {item.code}
+                          </span>
+                        </td>
+                        <td style={{ padding: "12px 14px", fontWeight: 600 }}>{item.name}</td>
+                        <td style={{ padding: "12px 14px", color: "var(--slate)" }}>{item.description}</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                          <StatusPill kind={item.active ? "success" : "danger"}>
+                            {item.active ? "ACTIVE" : "INACTIVE"}
+                          </StatusPill>
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleActive(selectedConfigType, item.id)}
+                            style={{
+                              background: "none",
+                              border: "1px solid var(--line)",
+                              borderRadius: "var(--r-pill)",
+                              padding: "4px 10px",
+                              fontSize: 12,
+                              fontWeight: 700,
+                              color: item.active ? "var(--danger)" : "var(--green)",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {item.active ? "Deactivate" : "Activate"}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {currentItems.length === 0 && (
+                      <tr>
+                        <td colSpan={5} style={{ padding: 24, textAlign: "center", color: "var(--slate)" }}>
+                          No configuration items found for {currentCategoryInfo.label}.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </Card>
+
+          {/* Add Configuration Modal */}
+          {showAddConfigModal && (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "grid", placeItems: "center", zIndex: 99999 }}>
+              <Card style={{ width: "100%", maxWidth: 460, padding: 24, borderRadius: 20 }}>
+                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: "0 0 16px" }}>
+                  Add New {currentCategoryInfo.label}
+                </h3>
+                <div style={{ display: "grid", gap: 14 }}>
+                  <div>
+                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
+                      Code / Key
+                    </label>
+                    <Input placeholder="e.g. UPI_SPECIAL" value={newConfigCode} onChange={(e) => setNewConfigCode(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
+                      Display Name
+                    </label>
+                    <Input placeholder="e.g. VIP Consultation" value={newConfigName} onChange={(e) => setNewConfigName(e.target.value)} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
+                      Description
+                    </label>
+                    <Input placeholder="Description of this configuration" value={newConfigDesc} onChange={(e) => setNewConfigDesc(e.target.value)} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 10 }}>
+                    <Button ghost type="button" onClick={() => setShowAddConfigModal(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="button" disabled={!newConfigName} onClick={handleAddConfigItem}>
+                      Save Item
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 2: BRAND SETTINGS */}
       {activeTab === "brand" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <Card>
@@ -242,7 +535,7 @@ export default function TenantSettings() {
         </div>
       )}
 
-      {/* TAB 2: PRINT SETTINGS */}
+      {/* TAB 3: PRINT SETTINGS */}
       {activeTab === "print" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <Card>
@@ -305,60 +598,6 @@ export default function TenantSettings() {
                   ||| ||||| |||| |||||| |||| |||
                 </div>
               )}
-            </div>
-          </Card>
-        </div>
-      )}
-
-      {/* TAB 3: CONFIGURATION (Sites, Rooms, Services) */}
-      {activeTab === "config" && (
-        <div style={{ display: "grid", gap: 20 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-            <Card>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <strong style={{ color: "var(--indigo)" }}>Facility Sites</strong>
-                <StatusPill kind="info">{sites.length || 1} Active</StatusPill>
-              </div>
-              <p style={{ fontSize: 12.5, color: "var(--slate)" }}>Main clinic facility and outpatient satellite campuses.</p>
-              <div style={{ fontWeight: 700, fontSize: 14, color: "var(--ink)", marginTop: 8 }}>
-                📍 {tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "ZEN CLINIC"} Main Campus
-              </div>
-            </Card>
-
-            <Card>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <strong style={{ color: "var(--indigo)" }}>Consultation Rooms</strong>
-                <StatusPill kind="info">OPD Ready</StatusPill>
-              </div>
-              <p style={{ fontSize: 12.5, color: "var(--slate)" }}>Consulting chambers and diagnostic examination cubicles.</p>
-              <div style={{ fontWeight: 700, fontSize: 14, color: "var(--ink)", marginTop: 8 }}>
-                🚪 Room 101 (General OPD), Room 102 (Specialist)
-              </div>
-            </Card>
-
-            <Card>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <strong style={{ color: "var(--indigo)" }}>Services Master</strong>
-                <StatusPill kind="success">{services.length || 4} Configured</StatusPill>
-              </div>
-              <p style={{ fontSize: 12.5, color: "var(--slate)" }}>Consultation charge master and diagnostic test catalog.</p>
-              <div style={{ fontWeight: 700, fontSize: 14, color: "var(--ink)", marginTop: 8 }}>
-                📋 General Consult, Specialist Consult, Health Check
-              </div>
-            </Card>
-          </div>
-
-          <Card>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 4px" }}>
-                  Setup Readiness & Go-Live Verification
-                </h3>
-                <span style={{ fontSize: 13, color: "var(--slate)" }}>
-                  Evaluates all 6 setup readiness checks (Facility sites, consultation rooms, practitioners, charge master, and security).
-                </span>
-              </div>
-              <Button ghost onClick={() => navigate("/onboarding")}>Open Onboarding Setup →</Button>
             </div>
           </Card>
         </div>
