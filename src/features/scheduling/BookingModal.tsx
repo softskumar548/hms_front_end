@@ -95,7 +95,7 @@ export default function BookingModal({
     const endTime = new Date(startTime.getTime() + 1000 * 60 * 30); // 30 mins slot
 
     const activeTenant = tenant || "apollo";
-    const prereqList = showPrereqs ? [`prq_fasting_${activeTenant}`, `prq_creat_${activeTenant}`] : undefined;
+    const prereqList = showPrereqs ? [`prq_fasting_${activeTenant}`, `prq_water_${activeTenant}`] : undefined;
 
     bookMutation.mutate({
       patient_id: selectedPatientId,
