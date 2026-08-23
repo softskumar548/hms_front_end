@@ -66,3 +66,30 @@ jobs:
           VITE_USE_MOCKS: "false"
           VITE_API_TARGET: "http://127.0.0.1:8000"
         run: npm run e2e
+
+  deploy-staging:
+    name: Deploy Frontend to Staging VPS
+    needs: [build]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Remote Execute & Deploy Frontend
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            if [ -d "/opt/hms-web" ]; then
+              cd /opt/hms-web && git pull origin main
+            else
+              git clone https://github.com/softskumar548/hms_front_end.git /opt/hms-web
+              cd /opt/hms-web
+            fi
+            docker build -t hms-web:latest .
+            if [ -d "/opt/hms" ]; then
+              cd /opt/hms && docker compose restart nginx
+            fi
+

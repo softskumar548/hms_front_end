@@ -14,6 +14,7 @@ interface BookingModalProps {
   selectedServiceName: string;
   selectedRoomId: string;
   selectedRoomName: string;
+  selectedSiteId?: string;
   initialPatientId?: string;
 }
 
@@ -27,6 +28,7 @@ export default function BookingModal({
   selectedServiceName,
   selectedRoomId,
   selectedRoomName,
+  selectedSiteId,
   initialPatientId,
 }: BookingModalProps) {
   const { token } = useAuth();
@@ -93,12 +95,12 @@ export default function BookingModal({
     bookMutation.mutate({
       patient_id: selectedPatientId,
       practitioner_id: selectedPractitionerId,
-      site_id: "site_apollo_main",
+      site_id: selectedSiteId || "site_vizag_1",
       room_id: selectedRoomId,
       service_id: selectedServiceId,
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
-      prerequisites: showPrereqs ? ["prq_fasting_apollo"] : undefined,
+      prerequisites: undefined,
     });
   };
 

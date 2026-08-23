@@ -22,13 +22,12 @@ test.afterAll(async () => {
 
 const PATIENT = { given: "E2E", family: `Referral${Date.now()}` };
 
+import { loginViaOIDC } from "./helpers/oidc-auth";
+
 test.describe.serial("Flagship #1 — referral: intake → prereq CT → blocked check-in → resolve → invoice → timeline", () => {
-  test("dev login as receptionist (apollo)", async ({ page }) => {
-    await page.goto("/");
-    // Dev-stub login; replace with OIDC helper when N2 lands.
-    await page.getByTestId("login-tenant").selectOption("apollo");
-    await page.getByTestId("login-role").selectOption("receptionist");
-    await page.getByTestId("login-continue").click();
+  test("login as receptionist via Keycloak OIDC helper (apollo)", async ({ page }) => {
+    await loginViaOIDC(page, "receptionist@apollo.com", "Password123!", "apollo", "receptionist");
+    await page.goto("/patients");
     await expect(page.getByTestId("shell-tenant-indicator")).toContainText("apollo");
   });
 

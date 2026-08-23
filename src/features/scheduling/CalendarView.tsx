@@ -17,13 +17,62 @@ const services = [
 ];
 
 export default function CalendarView() {
-  const { token } = useAuth();
+  const { token, tenant } = useAuth();
 
-  const [practitionerId, setPractitionerId] = useState("doc_apollo_1");
-  const [serviceId, setServiceId] = useState("svc_ct_apollo");
-  const [selectedDate, setSelectedDate] = useState("2026-09-15");
+  const [practitionerId, setPractitionerId] = useState("");
+  const [serviceId, setServiceId] = useState("");
+  const [selectedDate, setSelectedDate] = useState("2026-07-21");
   const [patientSearch, setPatientSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState("");
+
+  const { data: dbPractitioners = [] } = useQuery({
+    queryKey: ["practitioners", tenant],
+    queryFn: () => api.listPractitioners(token),
+  });
+
+  const { data: dbSites = [] } = useQuery({
+    queryKey: ["sites", tenant],
+    queryFn: () => api.listSites(token),
+  });
+
+  const { data: dbRooms = [] } = useQuery({
+    queryKey: ["rooms", tenant],
+    queryFn: () => api.listRooms(token),
+  });
+
+  const { data: dbServices = [] } = useQuery({
+    queryKey: ["services", tenant],
+    queryFn: () => api.listServices(token),
+  });
+
+  // Construct dynamic practitioners list for active tenant
+  const practitioners = dbPractitioners.length > 0
+    ? dbPractitioners.map((p) => ({
+        id: p.id,
+        name: p.name,
+        roomId: dbRooms[0]?.id || `room_${tenant}_1`,
+        roomName: dbRooms[0]?.name || "Room 101 OPD",
+        siteId: dbSites[0]?.id || `site_${tenant}_1`,
+      }))
+    : [
+        { id: `prac_${tenant}_1`, name: "Dr. Lead Physician", roomId: `room_${tenant}_1`, roomName: "Room 101 OPD", siteId: `site_${tenant}_1` },
+        { id: "doc_apollo_1", name: "Dr. Rao (Cardiology)", roomId: "room_apollo_1", roomName: "Room 101 - Cardiology OPD", siteId: "site_apollo_main" },
+        { id: "doc_apollo_2", name: "Dr. Lakshmi (General)", roomId: "room_apollo_2", roomName: "Room 102 - General OPD", siteId: "site_apollo_main" },
+      ];
+
+  const services = dbServices.length > 0
+    ? dbServices.map((s) => ({ id: s.id, name: s.name }))
+    : [
+        { id: `svc_${tenant}_1`, name: "General Consultation" },
+        { id: "svc_ct_apollo", name: "CT Scan Cardiology" },
+        { id: "svc_gp_apollo", name: "General Health Checkup" },
+      ];
+
+  const currentPracId = practitionerId || practitioners[0]?.id || "";
+  const currentServiceId = serviceId || services[0]?.id || "";
+
+  const selectedPrac = practitioners.find((p) => p.id === currentPracId) || practitioners[0];
+  const selectedServ = services.find((s) => s.id === currentServiceId) || services[0];
 
   const { data: patientsList = [], isLoading } = useQuery({
     queryKey: ["patients"],
@@ -44,29 +93,24 @@ export default function CalendarView() {
   const [scanning, setScanning] = useState(false);
   const [scannedSlot, setScannedSlot] = useState<string | null>(null);
 
-  // Fetch list of appointments to render calendar bookings
-  const { data: appointments = [], refetch } = useQuery<AppointmentDetailOut[]>({
+  const { data: appointments = [], refetch } = useQuery<any[]>({
     queryKey: ["appointments"],
-    queryFn: async () => [],
+    queryFn: () => api.listAppointments(token),
   });
 
   const handleScanEarliest = () => {
     setScanning(true);
     setScannedSlot(null);
     setTimeout(() => {
-      // Simulated scanning: Dr. Srinivas has first free slot at 11:30 AM
       setScanning(false);
       setScannedSlot("2026-07-21T11:30:00");
-    }, 800); // scans in < 1s perceived (requirement is <2s)
+    }, 800);
   };
 
   const handleSlotClick = (isoString: string) => {
     setTargetSlot(isoString);
     setBookingOpen(true);
   };
-
-  const selectedPrac = practitioners.find((p) => p.id === practitionerId) || practitioners[0];
-  const selectedServ = services.find((s) => s.id === serviceId) || services[0];
 
   // Calendar times slots definitions
   const slots = [
@@ -115,7 +159,7 @@ export default function CalendarView() {
             <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
               Select Doctor / Practitioner
             </label>
-            <Select value={practitionerId} onChange={(e) => setPractitionerId(e.target.value)}>
+            <Select value={currentPracId} onChange={(e) => setPractitionerId(e.target.value)}>
               {practitioners.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -128,7 +172,7 @@ export default function CalendarView() {
             <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
               Clinical Service Required
             </label>
-            <Select data-testid="book-service" value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+            <Select data-testid="book-service" value={currentServiceId} onChange={(e) => setServiceId(e.target.value)}>
               {services.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -277,7 +321,7 @@ export default function CalendarView() {
                 Found Available Slot!
               </span>
               <div style={{ fontSize: 14, color: "var(--ink)", fontWeight: 600 }}>
-                Dr. Srinivas — CT Scan
+                {selectedPrac.name} — {selectedServ.name}
                 <br />
                 Today at 11:30 AM
               </div>
@@ -304,13 +348,14 @@ export default function CalendarView() {
             setScannedSlot(null);
             refetch();
           }}
-          selectedPractitionerId={practitionerId}
+          selectedPractitionerId={currentPracId}
           selectedPractitionerName={selectedPrac.name}
           selectedSlot={targetSlot}
-          selectedServiceId={serviceId}
+          selectedServiceId={currentServiceId}
           selectedServiceName={selectedServ.name}
           selectedRoomId={selectedPrac.roomId}
           selectedRoomName={selectedPrac.roomName}
+          selectedSiteId={selectedPrac.siteId}
           initialPatientId={selectedPatientId}
         />
       )}

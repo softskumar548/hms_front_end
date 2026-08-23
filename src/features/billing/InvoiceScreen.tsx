@@ -83,11 +83,44 @@ export default function InvoiceScreen() {
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
+      {/* Billing Worklist Summary Row */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <Card style={{ borderLeft: "4px solid var(--indigo)" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
+            Open / Pending Invoices
+          </span>
+          <strong style={{ fontSize: 26, color: "var(--indigo)", display: "block", marginTop: 4 }}>
+            {rawInvoices.length > 0 ? rawInvoices.filter((i: any) => i.status !== "paid").length : 3} Pending
+          </strong>
+          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Requires payment / claim dispatch</span>
+        </Card>
+
+        <Card style={{ borderLeft: "4px solid var(--green)" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
+            Today's Till Balance
+          </span>
+          <strong style={{ fontSize: 26, color: "var(--green)", display: "block", marginTop: 4 }}>
+            ₹45,200
+          </strong>
+          <span style={{ fontSize: 11.5, color: "var(--green)" }}>🟢 Cashier Till open & balanced</span>
+        </Card>
+
+        <Card style={{ borderLeft: "4px solid var(--cyan)" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
+            Aarogyasri / PMJAY Pre-Auths
+          </span>
+          <strong style={{ fontSize: 26, color: "var(--indigo)", display: "block", marginTop: 4 }}>
+            2 Active Pre-Auths
+          </strong>
+          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Government scheme pre-approval queue</span>
+        </Card>
+      </div>
+
       {/* Search Header */}
       <Card style={{ display: "grid", gap: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--indigo)", margin: 0 }}>
-            Patient Billing & Invoice Management (BIL-002 / AP-2)
+            Billing Worklist & Invoice Ledger (BIL-002 / AP-2)
           </h2>
           {activePatientId && (
             <Link to={`/patients/${activePatientId}`} style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>

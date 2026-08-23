@@ -20,16 +20,15 @@ test.afterAll(async () => {
 
 const PATIENT = { family: `RxFlow${Date.now()}` };
 
+import { loginViaOIDC } from "./helpers/oidc-auth";
+
 test.describe.serial("Flagship #2 — encounter → Rx allergy alert override → next-visit DRAFT with prereqs", () => {
-  test("login as physician and open a patient with a penicillin allergy", async ({ page }) => {
-    await page.goto("/");
-    await page.getByTestId("login-tenant").selectOption("apollo");
-    await page.getByTestId("login-role").selectOption("physician");
-    await page.getByTestId("login-continue").click();
-    // Use a seeded patient with a recorded penicillin allergy.
+  test("login as physician via Keycloak OIDC helper and open a patient with a penicillin allergy", async ({ page }) => {
+    await loginViaOIDC(page, "dr.smith@apollo.com", "Password123!", "apollo", "physician");
     await page.goto("/patients");
     await page.getByTestId("patients-search").fill("Penicillin");
     await page.getByTestId("patient-row").first().click();
+
     // Allergy banner is persistent (EMR-005):
     await expect(page.getByTestId("allergy-banner")).toContainText(/penicillin/i);
   });
