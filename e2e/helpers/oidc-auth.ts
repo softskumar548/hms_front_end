@@ -20,18 +20,22 @@ export async function loginViaOIDC(
 
   let token = `dev.${tenant}.${role}`;
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const response = await fetch(KEYCLOAK_TOKEN_URL, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params,
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (response.ok) {
       const data = await response.json();
       token = data.access_token;
     }
-  } catch (err) {
-    console.warn("Keycloak OIDC login helper error:", err);
+  } catch (_err) {
+    console.log(`[OIDC Helper] Keycloak unreachable at ${KEYCLOAK_TOKEN_URL}; using fallback dev token '${token}'`);
   }
 
   await page.goto("/");
