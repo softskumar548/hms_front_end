@@ -48,6 +48,7 @@ jobs:
           PGPASSWORD: postgres_change_me
           DATABASE_URL: postgresql+asyncpg://hms_app:app_password_change_me@localhost:5432/hms
           SEED_DATABASE_URL: postgresql+asyncpg://postgres:postgres_change_me@localhost:5432/hms
+          ALLOW_DEV_TOKENS: "true"
           PYTHONPATH: libs:services/plt
         working-directory: backend
         run: |
