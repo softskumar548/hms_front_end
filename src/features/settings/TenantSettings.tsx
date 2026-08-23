@@ -33,6 +33,34 @@ export default function TenantSettings() {
   const [newConfigName, setNewConfigName] = useState("");
   const [newConfigDesc, setNewConfigDesc] = useState("");
 
+  // Account Settings Sub-tabs & Fields (Matching Screenshot)
+  const defaultOrgName = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "ZEN CLINIC";
+  const [accountSubTab, setAccountSubTab] = useState("general");
+  const [projectName, setProjectName] = useState(
+    localStorage.getItem(`project-name-${tenant}`) || defaultOrgName
+  );
+  const [adminName, setAdminName] = useState(
+    localStorage.getItem(`admin-name-${tenant}`) || "DR K R MURALI"
+  );
+  const [adminPhone, setAdminPhone] = useState(
+    localStorage.getItem(`admin-phone-${tenant}`) || "9100242466"
+  );
+  const [adminEmail, setAdminEmail] = useState(
+    localStorage.getItem(`admin-email-${tenant}`) || "drkrmurali9090@yopmail.com"
+  );
+  const [addressStreet, setAddressStreet] = useState(
+    localStorage.getItem(`address-street-${tenant}`) || "srinivasa Nagar"
+  );
+  const [addressCity, setAddressCity] = useState(
+    localStorage.getItem(`address-city-${tenant}`) || "Nandyal"
+  );
+  const [addressState, setAddressState] = useState(
+    localStorage.getItem(`address-state-${tenant}`) || "Andhra Pradesh"
+  );
+  const [slotDuration, setSlotDuration] = useState("15");
+  const [opdPrefix, setOpdPrefix] = useState("OPD-");
+  const [lowStockThreshold, setLowStockThreshold] = useState("20");
+
   const configCategories = [
     { key: "payment_type", label: "Payment Type", desc: "Patient payment collection methods & cashier rails" },
     { key: "visit_type", label: "Visit Type", desc: "Clinical appointment and consultation categories" },
@@ -131,7 +159,6 @@ export default function TenantSettings() {
   const [includeBarcode, setIncludeBarcode] = useState(true);
 
   // Brand config
-  const defaultOrgName = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "ZEN CLINIC";
   const [brandName, setBrandName] = useState(
     localStorage.getItem(`brand-name-${tenant}`) || defaultOrgName
   );
@@ -166,6 +193,17 @@ export default function TenantSettings() {
     triggerToast("Branding settings updated successfully!");
   };
 
+  const handleSaveGeneral = () => {
+    localStorage.setItem(`project-name-${tenant}`, projectName);
+    localStorage.setItem(`admin-name-${tenant}`, adminName);
+    localStorage.setItem(`admin-phone-${tenant}`, adminPhone);
+    localStorage.setItem(`admin-email-${tenant}`, adminEmail);
+    localStorage.setItem(`address-street-${tenant}`, addressStreet);
+    localStorage.setItem(`address-city-${tenant}`, addressCity);
+    localStorage.setItem(`address-state-${tenant}`, addressState);
+    triggerToast("General account information updated successfully!");
+  };
+
   const handleToggleActive = (type: string, id: string) => {
     setConfigData((prev) => {
       const items = prev[type] || [];
@@ -195,17 +233,13 @@ export default function TenantSettings() {
     triggerToast("New configuration item added!");
   };
 
-  const handleTabChange = (tabKey: string) => {
-    navigate(`/settings?tab=${tabKey}`);
-  };
-
   const currentCategoryInfo = configCategories.find((c) => c.key === selectedConfigType) || configCategories[0];
   const currentItems = (configData[selectedConfigType] || []).filter((item) => {
     const q = configSearch.toLowerCase();
     return item.name.toLowerCase().includes(q) || item.code.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
   });
 
-  // Fetch practitioners & sites for Users tab
+  // Fetch practitioners for Users tab
   const { data: practitioners = [] } = useQuery({
     queryKey: ["practitioners", tenant],
     queryFn: () => api.listPractitioners(token),
@@ -230,18 +264,6 @@ export default function TenantSettings() {
       triggerToast(err.message || "Failed to dispatch staff invitation.");
     },
   });
-
-  const tabList = [
-    { key: "config", label: "⚙️ Configuration" },
-    { key: "account", label: "🏢 Account Settings" },
-    { key: "auth", label: "🔐 User Authentication" },
-    { key: "users", label: "👥 Users & Staff" },
-    { key: "payment", label: "💳 Payment Settings" },
-    { key: "online", label: "🌐 Online Services" },
-    { key: "brand", label: "🎨 Brand Related" },
-    { key: "print", label: "🖨️ Print Settings" },
-    { key: "regional", label: "🌍 Regional Preferences" },
-  ];
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
@@ -575,35 +597,343 @@ export default function TenantSettings() {
         </div>
       )}
 
-      {/* TAB 4: ACCOUNT SETTINGS */}
+      {/* TAB 4: ACCOUNT SETTINGS (Detailed Split Layout Matching User Screenshot) */}
       {activeTab === "account" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-          <Card>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 16px", color: "var(--indigo)" }}>
-              Tenant Subscription & Legal Entity
-            </h2>
-            <div style={{ display: "grid", gap: 14 }}>
-              <FieldCell label="Subscribed Tenant ID" sub="Unique SaaS identifier">{tenant || "zen_clinic"}</FieldCell>
-              <FieldCell label="Designated Tenant Administrator" sub="Medical Director / Dean">DR K R MURALI (DEAN)</FieldCell>
-              <FieldCell label="Admin Contact Email" sub="Identity login email">drkrmurali9090@yopmail.com</FieldCell>
-              <FieldCell label="Admin Contact Phone" sub="SMS alert dispatch">+91 91002 42466</FieldCell>
-            </div>
-          </Card>
+        <div style={{ display: "grid", gap: 16 }}>
+          {/* Top Cyan Breadcrumb Banner */}
+          <div
+            style={{
+              background: "#00BCD4",
+              borderRadius: "14px 14px 0 0",
+              padding: "12px 20px",
+              color: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 15,
+              fontWeight: 700,
+            }}
+          >
+            <span style={{ fontSize: 16 }}>Settings</span>
+            <span style={{ fontSize: 13, opacity: 0.85 }}>🏠 Account Setting Details</span>
+          </div>
 
-          <Card>
-            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 16px", color: "var(--indigo)" }}>
-              Contract & Compliance Attestation
-            </h2>
-            <div style={{ display: "grid", gap: 14 }}>
-              <FieldCell label="Contract Signatory" sub="Designation: DEAN">DR K R MURALI</FieldCell>
-              <FieldCell label="Attestation Document" sub="Verified digital agreement">signed_terms_contract.pdf</FieldCell>
-              <FieldCell label="Deployment Region" sub="Data residency policy">Andhra Pradesh (India VPS)</FieldCell>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 8 }}>
-                <span>Account Status:</span>
-                <StatusPill kind="success">PROVISIONED & ACTIVE</StatusPill>
+          {/* Subscription Package Summary Card */}
+          <Card style={{ marginTop: -12, borderRadius: "0 0 16px 16px", borderTop: "none" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, fontSize: 13, lineHeight: 1.8 }}>
+              {/* Left Column Info */}
+              <div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--ink)", width: 130 }}>Package Name :</strong>
+                  <span style={{ color: "var(--indigo)", fontWeight: 700 }}>HMS Basic Subscription Annual</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 130 }}>Expiry Date :</strong>
+                  <span>25/07/2026</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 130 }}>Admins :</strong>
+                  <span>1</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 130 }}>Staff :</strong>
+                  <span>3</span>
+                </div>
+              </div>
+
+              {/* Right Column Info */}
+              <div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Beds Limit :</strong>
+                  <span>15</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Doctors Limit :</strong>
+                  <span>5</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>SMS Count :</strong>
+                  <span>200</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Email Count :</strong>
+                  <span>500</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Whatsapp Count :</strong>
+                  <span>1000</span>
+                </div>
               </div>
             </div>
           </Card>
+
+          {/* Split View: Left Sub-Tabs Navigation & Right Form Content */}
+          <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 20, alignItems: "start" }}>
+            {/* Left Sub-tabs List */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {[
+                { key: "general", label: "General Settings" },
+                { key: "schedule", label: "Schedule Settings" },
+                { key: "print", label: "Print Settings" },
+                { key: "op", label: "OP Settings" },
+                { key: "ip", label: "IP Settings" },
+                { key: "lab", label: "Lab Settings" },
+                { key: "pharmacy", label: "Pharmacy Settings" },
+                { key: "radiology", label: "Radiology Settings" },
+                { key: "lis", label: "LIS Configuration" },
+                { key: "attendance", label: "Attendance Settings" },
+              ].map((tab) => {
+                const isActive = accountSubTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    type="button"
+                    onClick={() => setAccountSubTab(tab.key)}
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 16px",
+                      borderRadius: 10,
+                      background: isActive ? "#5C6BC0" : "#ffffff",
+                      color: isActive ? "#ffffff" : "var(--slate)",
+                      border: "1px solid var(--line)",
+                      fontWeight: isActive ? 800 : 600,
+                      fontSize: 13.5,
+                      cursor: "pointer",
+                      boxShadow: isActive ? "0 4px 12px rgba(92, 107, 192, 0.3)" : "none",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Settings Panel */}
+            <Card style={{ padding: 24 }}>
+              {accountSubTab === "general" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    GENERAL INFORMATION
+                  </h3>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Project Name</label>
+                    <Input value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Name</label>
+                    <Input value={adminName} onChange={(e) => setAdminName(e.target.value)} />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Phone</label>
+                    <Input value={adminPhone} onChange={(e) => setAdminPhone(e.target.value)} />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Email</label>
+                    <Input value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", alignItems: "start", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)", paddingTop: 10 }}>Address</label>
+                    <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 10 }}>
+                      <Input placeholder="Street / Area" value={addressStreet} onChange={(e) => setAddressStreet(e.target.value)} />
+                      <Input placeholder="City / District" value={addressCity} onChange={(e) => setAddressCity(e.target.value)} />
+                      <Select value={addressState} onChange={(e) => setAddressState(e.target.value)}>
+                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", alignItems: "start", gap: 16, marginTop: 6 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)", paddingTop: 10 }}>Logo</label>
+                    <div
+                      style={{
+                        border: "2px dashed var(--line)",
+                        borderRadius: "var(--r-field, 12px)",
+                        padding: "24px 20px",
+                        textAlign: "center",
+                        background: "var(--wash-a)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div style={{ fontSize: 24, marginBottom: 4 }}>📁</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--indigo)" }}>
+                        Drop files here to upload
+                      </div>
+                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>PNG, JPG, SVG up to 2MB</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={handleSaveGeneral}>Save General Information</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "schedule" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    SCHEDULE CONFIGURATION
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Consultation Slot Duration</label>
+                    <Select value={slotDuration} onChange={(e) => setSlotDuration(e.target.value)}>
+                      <option value="15">15 Minutes (Standard OPD)</option>
+                      <option value="20">20 Minutes (Specialist OPD)</option>
+                      <option value="30">30 Minutes (Comprehensive Review)</option>
+                    </Select>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Daily Overbooking Buffer</label>
+                    <Input defaultValue="5 emergency walk-in tokens" />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("Schedule parameters saved!")}>Save Schedule Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "print" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    PRINT & RECEIPT TEMPLATES
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Letterhead Header Line</label>
+                    <Input value={printHeader} onChange={(e) => setPrintHeader(e.target.value)} />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Receipt Contact Phone</label>
+                    <Input value={printPhone} onChange={(e) => setPrintPhone(e.target.value)} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={handleSavePrint}>Save Print Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "op" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    OUTPATIENT (OPD) PARAMETERS
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>OPD Token Prefix</label>
+                    <Input value={opdPrefix} onChange={(e) => setOpdPrefix(e.target.value)} />
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Follow-up Free Validity</label>
+                    <Select defaultValue="7">
+                      <option value="7">7 Days window</option>
+                      <option value="14">14 Days window</option>
+                      <option value="30">30 Days window</option>
+                    </Select>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("OPD parameters saved!")}>Save OP Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "ip" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    INPATIENT (IPD) PARAMETERS
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Admission Initial Deposit</label>
+                    <Input defaultValue="₹5,000.00" />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("IPD admission parameters saved!")}>Save IP Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "lab" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    LABORATORY & PATHOLOGY SETTINGS
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Specimen Barcode Prefix</label>
+                    <Input defaultValue="LAB-" />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("Lab parameters saved!")}>Save Lab Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "pharmacy" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    PHARMACY & DRUG DISPENSING SETTINGS
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Low Stock Threshold</label>
+                    <Input value={lowStockThreshold} onChange={(e) => setLowStockThreshold(e.target.value)} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("Pharmacy parameters saved!")}>Save Pharmacy Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "radiology" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    RADIOLOGY & PACS SETTINGS
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>PACS DICOM Server URL</label>
+                    <Input defaultValue="pacs.zensynq.com:11112" />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("Radiology parameters saved!")}>Save Radiology Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "lis" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    LIS (LAB INFORMATION SYSTEM) BRIDGE
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>HL7 / FHIR Interface Port</label>
+                    <Input defaultValue="8443" />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("LIS parameters saved!")}>Save LIS Settings</Button>
+                  </div>
+                </div>
+              )}
+
+              {accountSubTab === "attendance" && (
+                <div style={{ display: "grid", gap: 16 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--indigo)", letterSpacing: "0.05em", margin: "0 0 10px", textTransform: "uppercase" }}>
+                    STAFF BIOMETRIC & ATTENDANCE SETTINGS
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", alignItems: "center", gap: 16 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Biometric Device IP</label>
+                    <Input defaultValue="192.168.1.240" />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                    <Button onClick={() => triggerToast("Attendance parameters saved!")}>Save Attendance Settings</Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          </div>
         </div>
       )}
 
