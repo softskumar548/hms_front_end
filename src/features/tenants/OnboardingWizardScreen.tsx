@@ -47,7 +47,7 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
   const [provisioned, setProvisioned] = useState<boolean>(false);
 
   // Stage 1: Organization Profile & Infrastructure
-  const [orgName, setOrgName] = useState(queryOrgName || (queryTenantId ? queryTenantId.toUpperCase().replace(/_/g, " ") : ""));
+  const [orgName, setOrgName] = useState(queryOrgName || (queryTenantId ? queryTenantId.toUpperCase().replace(/[_|-]/g, " ") : ""));
   const [customUrl, setCustomUrl] = useState(queryTenantId ? `${queryTenantId}.hms.zensynq.com` : "");
   const [website, setWebsite] = useState("");
   const [address, setAddress] = useState("");
@@ -99,7 +99,7 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
 
   const handleOrgNameChange = (val: string) => {
     setOrgName(val);
-    const slug = val.toLowerCase().replace(/[^a-z0-9]/g, "_");
+    const slug = val.toLowerCase().replace(/[^a-z0-9]/g, "");
     if (!queryTenantId) {
       setTenantId(slug);
       setCustomUrl(`${slug}.hms.zensynq.com`);
@@ -384,10 +384,10 @@ Initial Temporary Passcode: ${tempPasscode}`;
                 <label style={{ display: "block", fontSize: 11.5, fontWeight: 700, color: "var(--slate, #5B6172)", marginBottom: 4 }}>TENANT IDENTIFIER (SLUG) *</label>
                 <input
                   type="text"
-                  placeholder="e.g. apollo_vizag"
+                  placeholder="e.g. apollovizag"
                   value={tenantId}
                   onChange={e => {
-                    const slug = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+                    const slug = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, "");
                     setTenantId(slug);
                     setCustomUrl(`${slug}.hms.zensynq.com`);
                   }}
