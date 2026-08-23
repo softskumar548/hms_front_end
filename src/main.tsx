@@ -302,7 +302,6 @@ function Login() {
             )}
           </div>
         )}
->>>>>>> test/ci-gate-verification
       </Card>
     </div>
   );
