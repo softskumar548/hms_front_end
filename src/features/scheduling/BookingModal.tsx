@@ -31,7 +31,7 @@ export default function BookingModal({
   selectedSiteId,
   initialPatientId,
 }: BookingModalProps) {
-  const { token } = useAuth();
+  const { token, tenant } = useAuth();
   const qc = useQueryClient();
 
   const [selectedPatientId, setSelectedPatientId] = useState(initialPatientId || "");
@@ -50,8 +50,10 @@ export default function BookingModal({
   React.useEffect(() => {
     if (initialPatientId) {
       setSelectedPatientId(initialPatientId);
-      const p = (patients || []).find((pt) => pt.id === initialPatientId);
-      if (p) setPatientSearch(`${p.given_name} ${p.family_name}`);
+      const match = patients.find((p) => p.id === initialPatientId);
+      if (match) {
+        setPatientSearch(`${match.given_name} ${match.family_name}`);
+      }
     }
   }, [initialPatientId, patients]);
 
@@ -92,6 +94,9 @@ export default function BookingModal({
     const startTime = new Date(selectedSlot);
     const endTime = new Date(startTime.getTime() + 1000 * 60 * 30); // 30 mins slot
 
+    const activeTenant = tenant || "apollo";
+    const prereqList = showPrereqs ? [`prq_fasting_${activeTenant}`, `prq_creat_${activeTenant}`] : undefined;
+
     bookMutation.mutate({
       patient_id: selectedPatientId,
       practitioner_id: selectedPractitionerId,
@@ -100,7 +105,7 @@ export default function BookingModal({
       service_id: selectedServiceId,
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
-      prerequisites: undefined,
+      prerequisites: prereqList,
     });
   };
 
