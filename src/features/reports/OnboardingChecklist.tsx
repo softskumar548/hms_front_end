@@ -30,10 +30,10 @@ export default function OnboardingChecklist() {
     {
       key: "register",
       title: "1. Register First Patient (వ్యక్తిగత నమోదు)",
-      desc: "Go to Patient Registry form and assert custom Apollo cashless identifiers.",
+      desc: "Go to Patient Registry form to enroll your clinic's first patient.",
       status: hasPatient,
       link: "/patients/new",
-      tip: "Apollo requires National ID; KIMS requires ABDM ABHA. Check settings to verify rules.",
+      tip: "Captures National ID (Aadhaar) and ABDM ABHA cashless eligibility identifiers.",
     },
     {
       key: "appointment",
@@ -46,15 +46,15 @@ export default function OnboardingChecklist() {
     {
       key: "emr",
       title: "3. Complete EMR SOAP check (వైద్య నివేదిక)",
-      desc: "Document clinical diagnosis assertations and penicillin safety drug overrides.",
+      desc: "Document clinical diagnosis assertations and drug allergy safety overrides.",
       status: hasEncounter,
       link: "/emr",
-      tip: "SOAP saves debounces drafts. ICD-10 is mandatory to authorize and sign off clinical notes.",
+      tip: "SOAP saves debounced drafts. ICD-10 is mandatory to authorize and sign off clinical notes.",
     },
     {
       key: "billing",
       title: "4. Settle cashless invoices (బిల్లు చెల్లింపు)",
-      desc: "Verify 100% cashless PMJAY splits and cashier daily till reconciliation counters.",
+      desc: "Verify cashless PMJAY / insurance splits and cashier daily till reconciliation counters.",
       status: hasPayments,
       link: "/billing",
       tip: "Cashier payments till tracks partial collections and expected drawer balances discrepancies.",

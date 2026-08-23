@@ -10,7 +10,8 @@ interface PaymentTillProps {
 }
 
 export default function PaymentTill({ invoice, onClose }: PaymentTillProps) {
-  const { token } = useAuth();
+  const { token, tenant } = useAuth();
+  const facilityTitle = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "HEALTHCARE CLINIC";
   const qc = useQueryClient();
 
   const [toastMessage, setToastMessage] = useState("");
@@ -150,7 +151,7 @@ export default function PaymentTill({ invoice, onClose }: PaymentTillProps) {
                 >
                   {/* Perforated design header */}
                   <div style={{ textAlign: "center", borderBottom: "1px dashed #000", paddingBottom: 10, marginBottom: 14 }}>
-                    <strong style={{ fontSize: 16 }}>APOLLO VISAKHAPATNAM</strong>
+                    <strong style={{ fontSize: 16 }}>{facilityTitle}</strong>
                     <div style={{ fontSize: 11 }}>OFFICIAL PAYMENT RECEIPT</div>
                   </div>
 

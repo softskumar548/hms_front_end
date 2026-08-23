@@ -6,10 +6,11 @@ import { Card, Select, Skeleton } from "../../ui/components";
 import OnboardingChecklist from "./OnboardingChecklist";
 
 export default function OpsDashboard() {
-  const { token } = useAuth();
+  const { token, tenant } = useAuth();
+  const currentTenantName = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "CLINIC";
 
   // Site selection filter
-  const [selectedSite, setSelectedSite] = useState("site-1");
+  const [selectedSite, setSelectedSite] = useState("main");
 
   // Freshness timer tracker in seconds
   const [freshnessSeconds, setFreshnessSeconds] = useState(0);
@@ -83,8 +84,8 @@ export default function OpsDashboard() {
           </Button>
 
           <Select value={selectedSite} onChange={(e) => setSelectedSite(e.target.value)} style={{ width: 220 }}>
-            <option value="site-1">Apollo Visakhapatnam</option>
-            <option value="site-2">KIMS Nellore</option>
+            <option value="main">{currentTenantName} — Main Facility</option>
+            <option value="opd-1">{currentTenantName} — OPD Block</option>
           </Select>
         </div>
       </div>
