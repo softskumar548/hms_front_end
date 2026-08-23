@@ -17,7 +17,11 @@ export interface AuthState {
 
 const AuthCtx = createContext<AuthState | null>(null);
 
-const OIDC_AUTHORITY = import.meta.env.VITE_OIDC_AUTHORITY || "http://localhost:8080/realms/hms";
+const OIDC_AUTHORITY = import.meta.env.VITE_OIDC_AUTHORITY || (
+  typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1"
+    ? `${window.location.origin}/auth/realms/hms`
+    : "http://localhost:8080/realms/hms"
+);
 const OIDC_CLIENT_ID = import.meta.env.VITE_OIDC_CLIENT_ID || "hms-web";
 
 function parseJwt(token: string) {
