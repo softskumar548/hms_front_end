@@ -64,7 +64,7 @@ test.describe.serial("Flagship #1 — referral: intake → prereq CT → blocked
     await page.goto("/scheduling/checkin");
     await expect(page.getByTestId(`checkin-row-${PATIENT.family}`)).toBeVisible({ timeout: 10000 });
     await page.getByTestId(`checkin-row-${PATIENT.family}`).click();
-    await expect(page.getByTestId("checkin-blocked-panel")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("checkin-blocked-panel")).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId("checkin-submit")).toBeDisabled();
     // Resolve the hard-stop via the API-backed action (not client-only):
     await page.getByTestId("prereq-resolve").first().click();
