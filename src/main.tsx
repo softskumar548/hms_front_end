@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -37,6 +37,7 @@ const OperatorDashboardScreen = React.lazy(() => import("./features/tenants/Oper
 const OperatorInsightsScreen = React.lazy(() => import("./features/tenants/OperatorInsightsScreen").then(m => ({ default: m.OperatorInsightsScreen })));
 const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
+import { AppSidebar } from "./ui/AppSidebar";
 
 function RoleHomeRedirect() {
   const { role } = useAuth();
@@ -49,8 +50,21 @@ function RoleHomeRedirect() {
   return <Navigate to="/queue" replace />;
 }
 
+function formatHeaderDateTime(d: Date): string {
+  const day = String(d.getDate()).padStart(2, "0");
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[d.getMonth()];
+  const year = d.getFullYear();
 
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const hoursStr = String(hours).padStart(2, "0");
 
+  return `${day} ${month} ${year} - ${hoursStr}:${minutes} ${ampm}`;
+}
 
 /* ---------- Shell ---------- */
 function Shell({ children }: { children: React.ReactNode }) {
@@ -58,7 +72,30 @@ function Shell({ children }: { children: React.ReactNode }) {
   const { tenant, role, logout } = useAuth();
   const location = useLocation();
 
-  const isOperatorRoute = role === "operator" ||
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem("hms_sidebar_collapsed") === "true";
+  });
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("hms_sidebar_collapsed", String(next));
+      return next;
+    });
+  };
+
+  const isOperatorRoute =
+    role === "operator" ||
     location.pathname.startsWith("/operator") ||
     location.pathname.startsWith("/tenants") ||
     location.pathname.startsWith("/onboarding") ||
@@ -66,74 +103,266 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   const isPatientRoute = role === "patient" || location.pathname.startsWith("/portal");
 
-  const isPhysician = role === "physician" || role === "doctor" || role === "nurse";
-
-  const showBilling = role === "receptionist" || role === "admin" || role === "billing";
-  const showEMR = isPhysician || role === "admin";
-  const showSettings = role === "admin";
-  const showScheduling = role === "receptionist" || role === "admin" || isPhysician;
-  const showQueue = role === "receptionist" || role === "admin" || isPhysician;
-  const showReferrals = role === "receptionist" || isPhysician || role === "admin" || role === "billing";
-  const showDashboard = role === "admin" || role === "receptionist";
-
   const handleLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);
   };
 
   return (
-    <div>
-      <header style={{ background: "#fff", borderBottom: "1px solid var(--line)", padding: "12px 24px", display: "flex", alignItems: "center", gap: 18 }}>
-        <Link to={isOperatorRoute ? "/operator/dashboard" : "/"} style={{ textDecoration: "none", fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, color: "var(--indigo)" }}>
-          {isOperatorRoute ? "MediGo Operator Console" : isPatientRoute ? "MediGo Portal" : "MediGo"}
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--wash-a, #F8FAFC)" }}>
+      {/* Sticky Top Header */}
+      <header
+        style={{
+          background: "#fff",
+          borderBottom: "1px solid var(--line, #E2E8F0)",
+          padding: "12px 24px",
+          display: "flex",
+          alignItems: "center",
+          gap: 18,
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.03)",
+        }}
+      >
+        <Link
+          to={isOperatorRoute ? "/operator/dashboard" : "/"}
+          style={{
+            textDecoration: "none",
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: 24,
+            color: "var(--indigo)",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <span style={{ background: "var(--indigo)", color: "#fff", padding: "4px 10px", borderRadius: 8, fontSize: 16 }}>
+            MediGo
+          </span>
+          <span>{isOperatorRoute ? "Operator Console" : isPatientRoute ? "Patient Portal" : "MediGo HMS"}</span>
         </Link>
-        <nav style={{ display: "flex", gap: 14, alignItems: "center" }}>
-          {isOperatorRoute ? (
-            /* Operator Console Sidebar replaces top-nav links */
-            <span style={{ fontSize: 13, color: "var(--slate)", fontWeight: 600 }}>PHI-Free Operator Session</span>
-          ) : isPatientRoute ? (
-            /* Patient Portal Navigation */
-            <>
-              <Link to="/portal" style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>{t("nav_home", "Home")}</Link>
-              <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Appointments</Link>
-              <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>My Records</Link>
-              <Link to="/portal" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Billing</Link>
-            </>
-          ) : (
-            /* Clinic Staff Navigation (5-7 visible items max per role) */
-            <>
-              <Link to="/" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_home", "Home")}</Link>
-              <Link to="/patients" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_patients")}</Link>
-              {isPhysician && <Link to="/my-schedule" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_my_schedule", "My Schedule")}</Link>}
-              {showScheduling && <Link to="/scheduling" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_scheduling")}</Link>}
-              {showQueue && <Link to="/queue" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_queue")}</Link>}
-              {showEMR && <Link to="/emr" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_emr")}</Link>}
-              {isPhysician && <Link to="/results" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>Results Inbox</Link>}
-              {showBilling && <Link to="/billing" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_billing")}</Link>}
-              {showReferrals && <Link to="/reports/referrals" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_referrals")}</Link>}
-              {showDashboard && <Link to="/dashboard" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_reports")}</Link>}
-              {showSettings && <Link to="/settings" style={{ textDecoration: "none", color: "var(--ink)", fontWeight: 600 }}>{t("nav_settings")}</Link>}
-            </>
-          )}
-        </nav>
-        <span data-testid="shell-tenant-indicator" style={{ marginLeft: "auto", fontSize: 13, color: "var(--slate)", display: "flex", alignItems: "center", gap: 12 }}>
-          <span>{formatIndianDate(new Date())}</span>
-          <span style={{ height: 12, width: 1, background: "var(--line)" }}></span>
-          <span>{tenant} · {role}</span>
-          <span style={{ height: 12, width: 1, background: "var(--line)" }}></span>
-          <select value={i18n.language} onChange={handleLangChange} style={{ border: "1px solid var(--line)", borderRadius: 6, padding: "2px 6px", fontSize: 12, fontWeight: 600, background: "#fff", color: "var(--indigo)", cursor: "pointer" }} aria-label="Select language">
+
+        {isOperatorRoute && (
+          <span style={{ fontSize: 13, color: "var(--slate)", fontWeight: 600 }}>PHI-Free Operator Session</span>
+        )}
+
+        {/* Right side controls */}
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Live Date & Time: DD MMM YYYY - HH:MM AM/PM */}
+          <span
+            data-testid="header-live-clock"
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              color: "var(--slate, #5B6172)",
+              fontFamily: "monospace",
+              background: "var(--wash-a, #F6FAFF)",
+              padding: "5px 12px",
+              borderRadius: "var(--r-pill, 999px)",
+              border: "1px solid var(--line, #E2E8F0)",
+            }}
+          >
+            🕒 {formatHeaderDateTime(currentDateTime)}
+          </span>
+
+          <span style={{ height: 16, width: 1, background: "var(--line)" }}></span>
+
+          {/* Tenant and Role info */}
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--indigo)" }}>
+            {tenant} · {role}
+          </span>
+
+          <span style={{ height: 16, width: 1, background: "var(--line)" }}></span>
+
+          {/* Language Selector preserved */}
+          <select
+            value={i18n.language}
+            onChange={handleLangChange}
+            style={{
+              border: "1px solid var(--line)",
+              borderRadius: 6,
+              padding: "4px 8px",
+              fontSize: 12,
+              fontWeight: 700,
+              background: "#fff",
+              color: "var(--indigo)",
+              cursor: "pointer",
+            }}
+            aria-label="Select language"
+          >
             <option value="en">EN</option>
             <option value="te">TE</option>
           </select>
-        </span>
-        <Button ghost type="button" data-testid="logout-btn" onClick={() => logout()}>{t("logout")}</Button>
+
+          <span style={{ height: 16, width: 1, background: "var(--line)" }}></span>
+
+          {/* Profile Icon with Dropdown Menu */}
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              data-testid="profile-dropdown-btn"
+              onClick={() => setProfileOpen(!profileOpen)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                background: "var(--indigo, #131A8F)",
+                color: "#ffffff",
+                border: "2px solid var(--indigo-soft, #E4E9FF)",
+                display: "grid",
+                placeItems: "center",
+                fontWeight: 800,
+                fontSize: 15,
+                cursor: "pointer",
+                boxShadow: "0 2px 8px rgba(19, 26, 143, 0.25)",
+              }}
+              title="User Profile & Settings"
+            >
+              👤
+            </button>
+
+            {profileOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 10px)",
+                  right: 0,
+                  background: "#ffffff",
+                  borderRadius: "var(--r-card, 16px)",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                  border: "1px solid var(--line, #E2E8F0)",
+                  width: 270,
+                  padding: 16,
+                  zIndex: 99999,
+                  display: "grid",
+                  gap: 12,
+                }}
+              >
+                {/* User Info Header */}
+                <div style={{ borderBottom: "1px solid var(--line, #E2E8F0)", paddingBottom: 10 }}>
+                  <strong style={{ fontSize: 14.5, color: "var(--indigo, #131A8F)", display: "block" }}>
+                    {role === "admin" ? "DR K R MURALI (Dean)" : `${role?.toUpperCase()} USER`}
+                  </strong>
+                  <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
+                    {role === "admin" ? "drkrmurali9090@yopmail.com" : `${role}@${tenant}.com`}
+                  </span>
+                  <div style={{ marginTop: 8 }}>
+                    <StatusPill kind="brand">{tenant} · {role}</StatusPill>
+                  </div>
+                </div>
+
+                {/* Profile Links */}
+                <div style={{ display: "grid", gap: 4 }}>
+                  <Link
+                    to="/settings?tab=account"
+                    onClick={() => setProfileOpen(false)}
+                    style={{
+                      textDecoration: "none",
+                      color: "var(--ink)",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      padding: "8px 10px",
+                      borderRadius: 8,
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span>🏢</span> Account Settings
+                  </Link>
+
+                  <Link
+                    to="/settings?tab=brand"
+                    onClick={() => setProfileOpen(false)}
+                    style={{
+                      textDecoration: "none",
+                      color: "var(--ink)",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      padding: "8px 10px",
+                      borderRadius: 8,
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span>🎨</span> Brand Settings
+                  </Link>
+
+                  <Link
+                    to="/settings?tab=print"
+                    onClick={() => setProfileOpen(false)}
+                    style={{
+                      textDecoration: "none",
+                      color: "var(--ink)",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      padding: "8px 10px",
+                      borderRadius: 8,
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span>🖨️</span> Print Settings
+                  </Link>
+                </div>
+
+                <div style={{ borderTop: "1px solid var(--line, #E2E8F0)", paddingTop: 10 }}>
+                  <button
+                    type="button"
+                    data-testid="logout-btn"
+                    onClick={() => {
+                      setProfileOpen(false);
+                      logout();
+                    }}
+                    style={{
+                      width: "100%",
+                      background: "#FEE2E2",
+                      color: "#B91C1C",
+                      border: "none",
+                      borderRadius: "var(--r-pill, 999px)",
+                      padding: "8px 14px",
+                      fontWeight: 800,
+                      fontSize: 13,
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    🚪 {t("logout")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </header>
+
+      {/* Main Body Layout */}
       {isOperatorRoute ? (
-        <div data-theme="trusted-clinical" style={{ display: "flex", minHeight: "calc(100vh - 65px)", background: "var(--wash-a, #F8FAFC)" }}>
+        <div data-theme="trusted-clinical" style={{ display: "flex", flex: 1, minHeight: "calc(100vh - 65px)", background: "var(--wash-a, #F8FAFC)" }}>
           <OperatorSidebar />
           <main style={{ flex: 1, padding: "24px 28px", maxWidth: 1200 }}>{children}</main>
         </div>
+      ) : isPatientRoute ? (
+        <div style={{ flex: 1, maxWidth: 1080, margin: "0 auto", padding: "26px 20px", width: "100%" }}>
+          <main>{children}</main>
+        </div>
       ) : (
-        <main style={{ maxWidth: 1080, margin: "0 auto", padding: "26px 20px" }}>{children}</main>
+        <div style={{ display: "flex", flex: 1, minHeight: "calc(100vh - 65px)", background: "var(--wash-a, #F8FAFC)" }}>
+          <AppSidebar collapsed={sidebarCollapsed} onToggleCollapse={handleToggleSidebar} />
+          <main style={{ flex: 1, padding: "24px 28px", maxWidth: 1160, overflowX: "hidden" }}>{children}</main>
+        </div>
       )}
     </div>
   );
