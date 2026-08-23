@@ -213,7 +213,7 @@ export default function QueueBoard() {
                     </span>
                   </div>
 
-                  <Button type="button" ghost style={{ fontSize: 12, padding: "4px 12px" }} onClick={() => handleOpenCheckIn(appt.id)}>
+                  <Button type="button" ghost style={{ fontSize: 12, padding: "4px 12px" }} onClick={(e) => { e.stopPropagation(); handleOpenCheckIn(appt.id); }}>
                     Initiate Check-In
                   </Button>
                 </div>
