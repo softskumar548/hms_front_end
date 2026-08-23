@@ -32,7 +32,6 @@ export const OperatorDashboardScreen: React.FC<{ token: string | null }> = ({ to
         }));
         setTenants(items);
 
-        // B1: Calculate ALL KPIs dynamically from the EXACT same source of truth as the table
         const activeCount = items.filter((i) => i.status === "active").length;
         const pendingCount = items.filter((i) => i.status === "provisioned" || i.status === "configured").length;
         const patientSum = items.reduce((acc, i) => acc + (i.patient_count || 0), 0);
@@ -41,13 +40,12 @@ export const OperatorDashboardScreen: React.FC<{ token: string | null }> = ({ to
         setKpis({
           activeTenants: activeCount,
           totalTenants: items.length,
-          totalPatients: patientSum, // Dynamic sum matching tenant table patient_count
+          totalPatients: patientSum,
           mtdRevenue: calculatedRevenue,
           pendingOnboarding: pendingCount,
         });
       }
     } catch (err: any) {
-      // Fallback mock data if server error or offline
       const mockItems: TenantTableItem[] = [
         { id: "apollo", name: "Apollo Clinic", status: "active", patient_count: 850, site_count: 4, is_synthetic: false },
         { id: "kims", name: "KIMS Hospital", status: "active", patient_count: 570, site_count: 3, is_synthetic: false },
@@ -92,137 +90,76 @@ export const OperatorDashboardScreen: React.FC<{ token: string | null }> = ({ to
       {/* Corporate Navy Header Banner */}
       <div
         style={{
-          background: "var(--indigo, #1E3A5F)",
+          background: "linear-gradient(135deg, var(--indigo-deep, #0A1166) 0%, var(--indigo, #131A8F) 100%)",
           color: "#FFFFFF",
-          borderRadius: "var(--r-card, 8px)",
-          padding: "24px 28px",
+          borderRadius: 22,
+          padding: "26px 32px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "var(--shadow-card)",
+          boxShadow: "var(--shadow-pop, 0 10px 30px rgba(19, 26, 143, 0.15))",
         }}
       >
         <div>
-          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--cyan, #0284C7)", letterSpacing: "0.08em" }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--cyan, #5FC6E9)", letterSpacing: "0.08em" }}>
             PLATFORM CONTROL CENTER
           </div>
-          <h1 style={{ margin: "4px 0 0", fontSize: 26, fontWeight: 700 }}>
+          <h1 style={{ margin: "4px 0 0", fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display, 'Baloo 2', sans-serif)" }}>
             Executive Operations Dashboard
           </h1>
-          <p style={{ margin: "4px 0 0", color: "var(--indigo-soft, #E8EEF5)", fontSize: 13.5 }}>
+          <p style={{ margin: "4px 0 0", color: "var(--indigo-soft, #E4E9FF)", fontSize: 14 }}>
             Real-time SaaS tenant growth, aggregate patient volume, and platform health metrics.
           </p>
         </div>
-
-        <button
-          onClick={() => navigate("/onboarding?action=provision")}
-          style={{
-            background: "var(--cyan, #0284C7)",
-            color: "#FFFFFF",
-            border: "none",
-            borderRadius: "var(--r-pill, 6px)",
-            padding: "10px 20px",
-            fontWeight: 700,
-            cursor: "pointer",
-            fontSize: 14,
-            transition: "all 0.15s ease",
-          }}
-        >
-          + Provision New Tenant
-        </button>
       </div>
 
-      {/* KPI Tiles Section (B1: Sourced directly from dynamic patient_count sum) */}
+      {/* KPI Tiles Section */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-        {/* KPI 1: Active Tenants */}
-        <div
-          style={{
-            background: "#FFFFFF",
-            borderRadius: "var(--r-card, 8px)",
-            padding: "18px 20px",
-            border: "1px solid var(--line, #E2E8F0)",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        <div style={{ background: "#FFFFFF", borderRadius: 18, padding: "18px 20px", border: "1px solid var(--line, #E3E8F4)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
             Active Tenants (LIVE)
           </div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--indigo)", margin: "4px 0" }}>
-            {kpis.activeTenants} <span style={{ fontSize: 14, color: "var(--slate)", fontWeight: 500 }}>/ {kpis.totalTenants} total</span>
+          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--indigo)", fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: "4px 0" }}>
+            {kpis.activeTenants}
           </div>
-          <div style={{ fontSize: 12, color: "var(--green)", fontWeight: 700 }}>● 100% Regional Uptime</div>
+          <div style={{ fontSize: 12, color: "var(--green)", fontWeight: 700 }}>✓ RLS Protected</div>
         </div>
 
-        {/* KPI 2: Total Patients (B1 Fix: Exact sum of tenant table patient_count) */}
-        <div
-          style={{
-            background: "#FFFFFF",
-            borderRadius: "var(--r-card, 8px)",
-            padding: "18px 20px",
-            border: "1px solid var(--line, #E2E8F0)",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Total Patients Served
+        <div style={{ background: "#FFFFFF", borderRadius: 18, padding: "18px 20px", border: "1px solid var(--line, #E3E8F4)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
+            Aggregate Patients
           </div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--indigo)", margin: "4px 0" }}>
-            {kpis.totalPatients.toLocaleString("en-IN")}
+          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--indigo)", fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: "4px 0" }}>
+            {kpis.totalPatients}
           </div>
-          <div style={{ fontSize: 12, color: "var(--slate)", fontWeight: 500 }}>Summed across active facilities</div>
+          <div style={{ fontSize: 12, color: "var(--indigo)", fontWeight: 700 }}>Across {kpis.totalTenants} organizations</div>
         </div>
 
-        {/* KPI 3: MTD Revenue */}
-        <div
-          style={{
-            background: "#FFFFFF",
-            borderRadius: "var(--r-card, 8px)",
-            padding: "18px 20px",
-            border: "1px solid var(--line, #E2E8F0)",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        <div style={{ background: "#FFFFFF", borderRadius: 18, padding: "18px 20px", border: "1px solid var(--line, #E3E8F4)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
             MTD Subscription Revenue
           </div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--green)", margin: "4px 0" }}>
+          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--green)", fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: "4px 0" }}>
             ₹{(kpis.mtdRevenue / 100000).toFixed(2)} Lakhs
           </div>
           <div style={{ fontSize: 12, color: "var(--green)", fontWeight: 700 }}>↑ Subscribed SaaS Tier A</div>
         </div>
 
-        {/* KPI 4: Pending Onboarding */}
-        <div
-          style={{
-            background: "#FFFFFF",
-            borderRadius: "var(--r-card, 8px)",
-            padding: "18px 20px",
-            border: "1px solid var(--line, #E2E8F0)",
-            boxShadow: "var(--shadow-card)",
-          }}
-        >
-          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        <div style={{ background: "#FFFFFF", borderRadius: 18, padding: "18px 20px", border: "1px solid var(--line, #E3E8F4)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
             Pending Onboardings
           </div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--orange)", margin: "4px 0" }}>
+          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--orange)", fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: "4px 0" }}>
             {kpis.pendingOnboarding}
           </div>
           <div style={{ fontSize: 12, color: "var(--orange)", fontWeight: 700 }}>In setup / readiness state</div>
         </div>
       </div>
 
-      {/* Tenant Growth Trend Chart Section (OC-03 Mathematically Proportional) */}
-      <div
-        style={{
-          background: "#FFFFFF",
-          borderRadius: "var(--r-card, 8px)",
-          padding: "20px 24px",
-          border: "1px solid var(--line, #E2E8F0)",
-          boxShadow: "var(--shadow-card)",
-        }}
-      >
+      {/* Tenant Growth Trend Chart Section */}
+      <div style={{ background: "#FFFFFF", borderRadius: 18, padding: "20px 24px", border: "1px solid var(--line, #E3E8F4)" }}>
         <div style={{ marginBottom: 16 }}>
-          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--indigo)" }}>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--indigo)", fontFamily: "var(--font-display, 'Baloo 2', sans-serif)" }}>
             Tenant Growth & Subscription Trend (6 Months)
           </h3>
           <p style={{ margin: "2px 0 0", fontSize: 13, color: "var(--slate)" }}>
@@ -230,7 +167,6 @@ export const OperatorDashboardScreen: React.FC<{ token: string | null }> = ({ to
           </p>
         </div>
 
-        {/* Mathematically Proportional Bar Graph */}
         <div style={{ display: "flex", alignItems: "flex-end", gap: 20, height: 130, paddingTop: 16, paddingBottom: 10, borderBottom: "1px solid var(--line)" }}>
           {growthData.map((d, idx) => {
             const barHeightPct = Math.round((d.tenants / maxTenants) * 100);
@@ -255,10 +191,10 @@ export const OperatorDashboardScreen: React.FC<{ token: string | null }> = ({ to
         </div>
       </div>
 
-      {/* Shared TenantDataTable Component */}
+      {/* Subscribed Tenant Roster Data Table */}
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--indigo)" }}>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "var(--indigo)", fontFamily: "var(--font-display, 'Baloo 2', sans-serif)" }}>
             Subscribed Hospital Tenants
           </h3>
           <span style={{ fontSize: 13, color: "var(--slate)", fontWeight: 500 }}>

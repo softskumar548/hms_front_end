@@ -310,36 +310,20 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                       <button
                         onClick={() => navigate(`/onboarding?tenant_id=${item.id}`)}
                         style={{
-                          background: "var(--indigo-soft)",
-                          color: "var(--indigo)",
-                          border: "1px solid var(--indigo)",
+                          background: item.status === "provisioned" ? "var(--cyan, #5FC6E9)" : "var(--indigo-soft)",
+                          color: item.status === "provisioned" ? "#04364A" : "var(--indigo)",
+                          border: item.status === "provisioned" ? "none" : "1px solid var(--line, #E3E8F4)",
                           borderRadius: "var(--r-pill, 6px)",
-                          padding: "5px 12px",
+                          padding: "5px 14px",
                           fontSize: 12,
-                          fontWeight: 700,
+                          fontWeight: 800,
                           cursor: "pointer",
                         }}
                       >
-                        Wizard
+                        {item.status === "provisioned" ? "⚡ Complete Setup →" : "Onboarding Setup"}
                       </button>
 
-                      {onInviteStaff && (
-                        <button
-                          onClick={() => onInviteStaff(item.id)}
-                          style={{
-                            background: "#FFF",
-                            color: "var(--ink)",
-                            border: "1px solid var(--line)",
-                            borderRadius: "var(--r-pill, 6px)",
-                            padding: "5px 12px",
-                            fontSize: 12,
-                            fontWeight: 700,
-                            cursor: "pointer",
-                          }}
-                        >
-                          + Staff
-                        </button>
-                      )}
+
 
                       <button
                         onClick={() => {
