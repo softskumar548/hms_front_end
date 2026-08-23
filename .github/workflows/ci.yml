@@ -93,6 +93,6 @@ jobs:
             fi
             docker build -t hms-web:latest .
             if [ -d "/opt/hms" ]; then
-              cd /opt/hms && docker compose restart nginx
+              cd /opt/hms && docker compose up -d web && docker compose restart nginx
             fi
 
