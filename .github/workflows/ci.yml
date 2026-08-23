@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
@@ -58,7 +58,7 @@ jobs:
           curl -f http://127.0.0.1:8000/health || cat uvicorn.log
 
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
+        with: { node-version: 22 }
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Run E2E Playwright tests against Live Disposable Stack
