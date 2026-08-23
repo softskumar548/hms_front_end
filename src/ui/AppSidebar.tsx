@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 
@@ -12,7 +12,6 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
   const { role } = useAuth();
 
   const [adminOpen, setAdminOpen] = useState(true);
-  const [settingsOpen, setSettingsOpen] = useState(true);
 
   const searchParams = new URLSearchParams(location.search);
   const currentTab = searchParams.get("tab") || "";
@@ -35,14 +34,15 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     return location.pathname.startsWith(path);
   };
 
-  const coreNavItems = [
-    { label: "Dashboard", path: "/dashboard", icon: "📊", show: isAdmin || isReceptionist },
-    { label: "Patients", path: "/patients", icon: "👥", show: true },
-    { label: "Scheduling", path: "/scheduling", icon: "🗓️", show: isReceptionist || isAdmin || isPhysician },
-    { label: "Queue Board", path: "/queue", icon: "📋", show: isReceptionist || isAdmin || isPhysician },
-    { label: "EMR / Clinical", path: "/emr", icon: "🩺", show: isPhysician || isAdmin },
-    { label: "Billing", path: "/billing", icon: "💳", show: isBiller || isReceptionist || isAdmin },
-    { label: "Referrals", path: "/reports/referrals", icon: "🔄", show: isAdmin || isPhysician || isBiller },
+  // Operations specific to non-admin clinical staff
+  const staffNavItems = [
+    { label: "Patients", path: "/patients", icon: "👥", show: !isAdmin },
+    { label: "My Schedule", path: "/my-schedule", icon: "🩺", show: isPhysician },
+    { label: "Scheduling", path: "/scheduling", icon: "🗓️", show: isReceptionist },
+    { label: "Queue Board", path: "/queue", icon: "📋", show: isReceptionist || isPhysician },
+    { label: "EMR / Clinical", path: "/emr", icon: "📑", show: isPhysician },
+    { label: "Billing", path: "/billing", icon: "💳", show: isBiller },
+    { label: "Referrals", path: "/reports/referrals", icon: "🔄", show: isBiller || isPhysician },
   ].filter((item) => item.show);
 
   const adminSubItems = [
@@ -52,12 +52,6 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     { label: "Users", path: "/settings?tab=users", tab: "users", icon: "👥" },
     { label: "Payment", path: "/settings?tab=payment", tab: "payment", icon: "💳" },
     { label: "Online Services", path: "/settings?tab=online", tab: "online", icon: "🌐" },
-  ];
-
-  const settingsSubItems = [
-    { label: "Brand Related", path: "/settings?tab=brand", tab: "brand", icon: "🎨" },
-    { label: "Print Settings", path: "/settings?tab=print", tab: "print", icon: "🖨️" },
-    { label: "Reminders", path: "/settings/reminders", icon: "🔔" },
   ];
 
   return (
@@ -122,25 +116,36 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* SECTION 1: Core Operations */}
+        {/* Top Item: Dashboard (for Admin or Overview) */}
         <div>
-          {!collapsed && (
-            <div
-              style={{
-                fontSize: 10.5,
-                fontWeight: 800,
-                color: "var(--slate)",
-                letterSpacing: "0.08em",
-                marginBottom: 6,
-                padding: "0 8px",
-                textTransform: "uppercase",
-              }}
-            >
-              Operations
-            </div>
-          )}
+          <Link
+            to="/dashboard"
+            title={collapsed ? "Dashboard" : undefined}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: collapsed ? "9px 0" : "9px 12px",
+              justifyContent: collapsed ? "center" : "flex-start",
+              borderRadius: 10,
+              textDecoration: "none",
+              background: isCurrent("/dashboard") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
+              color: isCurrent("/dashboard") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+              fontWeight: isCurrent("/dashboard") ? 800 : 600,
+              fontSize: 13.5,
+              borderLeft: isCurrent("/dashboard") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+              transition: "all 0.15s ease",
+            }}
+          >
+            <span style={{ fontSize: 16 }}>📊</span>
+            {!collapsed && <span>Dashboard</span>}
+          </Link>
+        </div>
+
+        {/* Clinical Staff Navigation (only shown for non-admin staff) */}
+        {!isAdmin && staffNavItems.length > 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {coreNavItems.map((item) => {
+            {staffNavItems.map((item) => {
               const active = isCurrent(item.path);
               return (
                 <Link
@@ -169,9 +174,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
               );
             })}
           </div>
-        </div>
+        )}
 
-        {/* SECTION 2: Admin Accordion Menu (from user's design) */}
+        {/* Admin Menu (Expandable Accordion matching image specification) */}
         {isAdmin && (
           <div>
             {!collapsed ? (
@@ -183,13 +188,13 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "6px 8px",
+                  padding: "8px 10px",
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
                   color: "var(--indigo, #131A8F)",
                   fontWeight: 800,
-                  fontSize: 13.5,
+                  fontSize: 14,
                   borderRadius: 8,
                 }}
               >
@@ -200,7 +205,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                 <span style={{ fontSize: 11, color: "var(--slate)" }}>{adminOpen ? "▲" : "▼"}</span>
               </button>
             ) : (
-              <div style={{ textAlign: "center", padding: "6px 0", fontSize: 14, color: "var(--green)" }} title="Admin Menu">
+              <div style={{ textAlign: "center", padding: "6px 0", fontSize: 16, color: "var(--green)" }} title="Admin Menu">
                 👥
               </div>
             )}
@@ -210,8 +215,8 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 2,
-                  marginTop: 3,
+                  gap: 3,
+                  marginTop: 4,
                   paddingLeft: collapsed ? 0 : 12,
                   borderLeft: collapsed ? "none" : "2px solid var(--wash-b, #DDEBFC)",
                   marginLeft: collapsed ? 0 : 10,
@@ -228,92 +233,14 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                         display: "flex",
                         alignItems: "center",
                         gap: 8,
-                        padding: collapsed ? "8px 0" : "7px 10px",
+                        padding: collapsed ? "8px 0" : "8px 10px",
                         justifyContent: collapsed ? "center" : "flex-start",
                         borderRadius: 8,
                         textDecoration: "none",
                         background: active ? "var(--indigo-soft, #E4E9FF)" : "transparent",
                         color: active ? "var(--indigo, #131A8F)" : "var(--slate, #5B6172)",
                         fontWeight: active ? 800 : 600,
-                        fontSize: 12.5,
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      <span style={{ fontSize: 14 }}>{sub.icon}</span>
-                      {!collapsed && <span>{sub.label}</span>}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* SECTION 3: Settings Accordion Menu (Brand, Print, Reminders) */}
-        {isAdmin && (
-          <div>
-            {!collapsed ? (
-              <button
-                type="button"
-                onClick={() => setSettingsOpen(!settingsOpen)}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--indigo, #131A8F)",
-                  fontWeight: 800,
-                  fontSize: 13.5,
-                  borderRadius: 8,
-                }}
-              >
-                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 16 }}>⚙️</span>
-                  <span>Settings</span>
-                </span>
-                <span style={{ fontSize: 11, color: "var(--slate)" }}>{settingsOpen ? "▲" : "▼"}</span>
-              </button>
-            ) : (
-              <div style={{ textAlign: "center", padding: "6px 0", fontSize: 14 }} title="Settings">
-                ⚙️
-              </div>
-            )}
-
-            {(settingsOpen || collapsed) && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  marginTop: 3,
-                  paddingLeft: collapsed ? 0 : 12,
-                  borderLeft: collapsed ? "none" : "2px solid var(--wash-b, #DDEBFC)",
-                  marginLeft: collapsed ? 0 : 10,
-                }}
-              >
-                {settingsSubItems.map((sub) => {
-                  const active = isCurrent(sub.path, sub.tab);
-                  return (
-                    <Link
-                      key={sub.path}
-                      to={sub.path}
-                      title={collapsed ? sub.label : undefined}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: collapsed ? "8px 0" : "7px 10px",
-                        justifyContent: collapsed ? "center" : "flex-start",
-                        borderRadius: 8,
-                        textDecoration: "none",
-                        background: active ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                        color: active ? "var(--indigo, #131A8F)" : "var(--slate, #5B6172)",
-                        fontWeight: active ? 800 : 600,
-                        fontSize: 12.5,
+                        fontSize: 13,
                         transition: "all 0.15s ease",
                       }}
                     >
