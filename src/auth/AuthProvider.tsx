@@ -157,10 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             setToken(data.access_token);
-            window.history.replaceState({}, document.title, targetPath);
-            if (window.location.pathname !== targetPath) {
-              window.location.href = targetPath;
-            }
+            window.location.href = targetPath;
           }
         })
         .catch(err => console.error("PKCE Token Exchange Error:", err));
