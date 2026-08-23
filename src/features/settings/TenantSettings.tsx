@@ -19,11 +19,56 @@ export default function TenantSettings() {
   const [toastMessage, setToastMessage] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
 
-  // Invite staff modal state
+  // Invite staff modal state (for Users tab)
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("doctor");
   const [inviteName, setInviteName] = useState("");
+
+  // User Authentication tab state (Matching exact screenshots)
+  const defaultAuthUsers = [
+    {
+      id: "1",
+      name: "Mr. Dhanunjay yadav",
+      phone: "9908030705",
+      email: "dhanunjay.dhoni@gmail.com",
+      role: "SUPER_ADMINISTRATOR",
+    },
+    {
+      id: "2",
+      name: "Dr. SATHVIK NANDAN",
+      phone: "8884242466",
+      email: "",
+      role: "DOCTOR",
+    },
+  ];
+  const [authUsers, setAuthUsers] = useState(() => {
+    const saved = localStorage.getItem(`auth-users-${tenant}`);
+    return saved ? JSON.parse(saved) : defaultAuthUsers;
+  });
+  const [authSearch, setAuthSearch] = useState("");
+  const [showAddAuthModal, setShowAddAuthModal] = useState(false);
+  const [selectedStaffForAuth, setSelectedStaffForAuth] = useState("Dr. SATHVIK NANDAN");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authConfirmPassword, setAuthConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [changingUser, setChangingUser] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+
+  const availableEmployees = [
+    { name: "Dr. SATHVIK NANDAN", role: "DOCTOR", phone: "8884242466", email: "" },
+    { name: "DR K R MURALI (Dean)", role: "SUPER_ADMINISTRATOR", phone: "9100242466", email: "drkrmurali9090@yopmail.com" },
+    { name: "Dr. A. Sharma", role: "DOCTOR", phone: "9876543210", email: "dr.sharma@zenclinic.com" },
+    { name: "Nurse Anjali", role: "NURSE", phone: "9845123456", email: "nurse.anjali@zenclinic.com" },
+    { name: "Rajesh (Receptionist)", role: "RECEPTIONIST", phone: "9123456780", email: "reception@zenclinic.com" },
+    { name: "Suresh (Biller)", role: "BILLING", phone: "9988776655", email: "billing@zenclinic.com" },
+  ];
 
   // Configuration Master Category selection
   const [selectedConfigType, setSelectedConfigType] = useState("payment_type");
@@ -204,6 +249,51 @@ export default function TenantSettings() {
     triggerToast("General account information updated successfully!");
   };
 
+  const handleSaveAuthUser = () => {
+    if (!authPassword || authPassword !== authConfirmPassword) {
+      triggerToast("Passwords do not match or are empty!");
+      return;
+    }
+    const emp = availableEmployees.find((e) => e.name === selectedStaffForAuth) || {
+      name: selectedStaffForAuth,
+      role: "DOCTOR",
+      phone: "8884242466",
+      email: "",
+    };
+    const newUser = {
+      id: String(Date.now()),
+      name: emp.name,
+      phone: emp.phone,
+      email: emp.email,
+      role: emp.role,
+    };
+    const updated = [...authUsers, newUser];
+    setAuthUsers(updated);
+    localStorage.setItem(`auth-users-${tenant}`, JSON.stringify(updated));
+    setShowAddAuthModal(false);
+    setAuthPassword("");
+    setAuthConfirmPassword("");
+    triggerToast(`Authentication access granted to ${emp.name}!`);
+  };
+
+  const handleSaveChangedPassword = () => {
+    if (!newPassword || newPassword !== confirmNewPassword) {
+      triggerToast("Passwords do not match or are empty!");
+      return;
+    }
+    setShowChangePasswordModal(false);
+    setNewPassword("");
+    setConfirmNewPassword("");
+    triggerToast(`Password changed successfully for ${changingUser?.name}!`);
+  };
+
+  const handleRemoveAuthUser = (id: string, name: string) => {
+    const updated = authUsers.filter((u: any) => u.id !== id);
+    setAuthUsers(updated);
+    localStorage.setItem(`auth-users-${tenant}`, JSON.stringify(updated));
+    triggerToast(`Access removed for ${name}`);
+  };
+
   const handleToggleActive = (type: string, id: string) => {
     setConfigData((prev) => {
       const items = prev[type] || [];
@@ -237,6 +327,16 @@ export default function TenantSettings() {
   const currentItems = (configData[selectedConfigType] || []).filter((item) => {
     const q = configSearch.toLowerCase();
     return item.name.toLowerCase().includes(q) || item.code.toLowerCase().includes(q) || item.description.toLowerCase().includes(q);
+  });
+
+  const filteredAuthUsers = authUsers.filter((u: any) => {
+    const q = authSearch.toLowerCase();
+    return (
+      u.name.toLowerCase().includes(q) ||
+      u.phone.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      u.role.toLowerCase().includes(q)
+    );
   });
 
   // Fetch practitioners for Users tab
@@ -937,52 +1037,418 @@ export default function TenantSettings() {
         </div>
       )}
 
-      {/* TAB 5: USER AUTHENTICATION */}
+      {/* TAB 5: USER AUTHENTICATION (Matching User's Exact Screenshots) */}
       {activeTab === "auth" && (
-        <Card>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 16px", color: "var(--indigo)" }}>
-            Identity & Authentication Security (Keycloak OIDC)
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            <div style={{ display: "grid", gap: 14 }}>
-              <FieldCell label="Authentication Authority" sub="OIDC RS256 Provider">
-                https://stage.zensynq.com/auth/realms/hms
-              </FieldCell>
-              <FieldCell label="Client Identity" sub="SPA PKCE S256 Protocol">
-                hms-web
-              </FieldCell>
-              <FieldCell label="Single Sign-On Scope" sub="Granted token claims">
-                openid, profile, email, app.tenant_id
-              </FieldCell>
+        <div style={{ display: "grid", gap: 16 }}>
+          {/* Top Cyan Breadcrumb Bar with Add button */}
+          <div
+            style={{
+              background: "#00BCD4",
+              borderRadius: "14px 14px 0 0",
+              padding: "12px 20px",
+              color: "#ffffff",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700 }}>
+              <span style={{ fontSize: 16 }}>User Authentication</span>
+              <span style={{ fontSize: 13, opacity: 0.85 }}>🏠 User Details</span>
             </div>
 
-            <div style={{ display: "grid", gap: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--line)", paddingBottom: 10 }}>
-                <div>
-                  <strong>Declarative User Profile</strong>
-                  <div style={{ fontSize: 12, color: "var(--slate)" }}>Tenant claim mapped to app.tenant_id</div>
-                </div>
-                <StatusPill kind="success">ACTIVE</StatusPill>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--line)", paddingBottom: 10 }}>
-                <div>
-                  <strong>Multi-Factor Authentication (MFA)</strong>
-                  <div style={{ fontSize: 12, color: "var(--slate)" }}>OTP verification for clinical roles</div>
-                </div>
-                <StatusPill kind="brand">OPTIONAL</StatusPill>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <strong>Session Security Policy</strong>
-                  <div style={{ fontSize: 12, color: "var(--slate)" }}>Token expiry: 30 minutes with silent refresh</div>
-                </div>
-                <StatusPill kind="info">ENFORCED</StatusPill>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedStaffForAuth(availableEmployees[0].name);
+                setAuthPassword("");
+                setAuthConfirmPassword("");
+                setShowAddAuthModal(true);
+              }}
+              style={{
+                background: "#ffffff",
+                color: "#00BCD4",
+                border: "none",
+                borderRadius: 6,
+                padding: "6px 18px",
+                fontWeight: 800,
+                fontSize: 13.5,
+                cursor: "pointer",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+              }}
+            >
+              Add
+            </button>
           </div>
-        </Card>
+
+          {/* Search Card Container */}
+          <Card style={{ marginTop: -14, borderRadius: "0 0 16px 16px", borderTop: "none", padding: "16px 20px" }}>
+            <div style={{ display: "flex", width: "100%", maxWidth: 360, marginBottom: 16 }}>
+              <input
+                placeholder="Search"
+                value={authSearch}
+                onChange={(e) => setAuthSearch(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: "8px 14px",
+                  border: "1px solid #d1d5db",
+                  borderRight: "none",
+                  borderRadius: "6px 0 0 6px",
+                  outline: "none",
+                  fontSize: 13.5,
+                }}
+              />
+              <button
+                type="button"
+                style={{
+                  background: "#5C6BC0",
+                  color: "#ffffff",
+                  border: "none",
+                  padding: "0 14px",
+                  borderRadius: "0 6px 6px 0",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                🔍
+              </button>
+            </div>
+
+            {/* Table with Blue Header */}
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+                <thead>
+                  <tr style={{ background: "#5C6BC0", color: "#ffffff" }}>
+                    <th style={{ textAlign: "left", padding: "10px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em" }}>NAME</th>
+                    <th style={{ textAlign: "left", padding: "10px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em" }}>PHONE NO</th>
+                    <th style={{ textAlign: "left", padding: "10px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em" }}>EMAIL</th>
+                    <th style={{ textAlign: "left", padding: "10px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em" }}>ROLE</th>
+                    <th style={{ textAlign: "center", padding: "10px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.05em" }}>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAuthUsers.map((user: any) => (
+                    <tr key={user.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 16px", fontWeight: 600, color: "var(--ink)" }}>{user.name}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--slate)" }}>{user.phone}</td>
+                      <td style={{ padding: "12px 16px", color: "var(--slate)" }}>{user.email || "-"}</td>
+                      <td style={{ padding: "12px 16px", fontWeight: 700, color: "var(--indigo)" }}>{user.role}</td>
+                      <td style={{ padding: "12px 16px", textAlign: "center" }}>
+                        <div style={{ display: "inline-flex", gap: 8 }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setChangingUser(user);
+                              setNewPassword("");
+                              setConfirmNewPassword("");
+                              setShowChangePasswordModal(true);
+                            }}
+                            style={{
+                              background: "#5C6BC0",
+                              color: "#ffffff",
+                              border: "none",
+                              borderRadius: 6,
+                              padding: "6px 12px",
+                              fontSize: 12,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                            }}
+                          >
+                            Change Password
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveAuthUser(user.id, user.name)}
+                            style={{
+                              background: "#E53935",
+                              color: "#ffffff",
+                              border: "none",
+                              borderRadius: 6,
+                              padding: "6px 12px",
+                              fontSize: 12,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                            }}
+                          >
+                            Remove Access
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredAuthUsers.length === 0 && (
+                    <tr>
+                      <td colSpan={5} style={{ padding: 24, textAlign: "center", color: "var(--slate)" }}>
+                        No authenticated users found. Click &quot;Add&quot; to provision login credentials.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Add User Authentication Modal (Exact from Screenshot 2) */}
+          {showAddAuthModal && (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 99999 }}>
+              <div style={{ background: "#ffffff", width: "100%", maxWidth: 440, borderRadius: 12, padding: "24px 28px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Add User Authentication</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddAuthModal(false)}
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div style={{ display: "grid", gap: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                      Employee Name <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <Select
+                      value={selectedStaffForAuth}
+                      onChange={(e) => setSelectedStaffForAuth(e.target.value)}
+                    >
+                      {availableEmployees.map((emp) => (
+                        <option key={emp.name} value={emp.name}>
+                          {emp.name} ({emp.role})
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                      Password <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 38px 10px 14px",
+                          borderRadius: 8,
+                          border: "1px solid #d1d5db",
+                          outline: "none",
+                          fontSize: 13.5,
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: "absolute",
+                          right: 10,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 15,
+                          color: "var(--slate)",
+                        }}
+                      >
+                        {showPassword ? "👁️" : "🙈"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                      Confirm Password <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={authConfirmPassword}
+                        onChange={(e) => setAuthConfirmPassword(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 38px 10px 14px",
+                          borderRadius: 8,
+                          border: "1px solid #d1d5db",
+                          outline: "none",
+                          fontSize: 13.5,
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{
+                          position: "absolute",
+                          right: 10,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 15,
+                          color: "var(--slate)",
+                        }}
+                      >
+                        {showConfirmPassword ? "👁️" : "🙈"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8 }}>
+                    <button
+                      type="button"
+                      onClick={handleSaveAuthUser}
+                      disabled={!authPassword || !authConfirmPassword}
+                      style={{
+                        background: "#5C6BC0",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "10px 24px",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Change Password Modal */}
+          {showChangePasswordModal && (
+            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 99999 }}>
+              <div style={{ background: "#ffffff", width: "100%", maxWidth: 440, borderRadius: 12, padding: "24px 28px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Change Password</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowChangePasswordModal(false)}
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div style={{ fontSize: 13, color: "var(--slate)", marginBottom: 14 }}>
+                  Changing password for: <strong style={{ color: "var(--indigo)" }}>{changingUser?.name}</strong>
+                </div>
+
+                <div style={{ display: "grid", gap: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                      New Password <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 38px 10px 14px",
+                          borderRadius: 8,
+                          border: "1px solid #d1d5db",
+                          outline: "none",
+                          fontSize: 13.5,
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        style={{
+                          position: "absolute",
+                          right: 10,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 15,
+                          color: "var(--slate)",
+                        }}
+                      >
+                        {showNewPassword ? "👁️" : "🙈"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                      Confirm New Password <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type={showConfirmNewPassword ? "text" : "password"}
+                        placeholder="Confirm New Password"
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 38px 10px 14px",
+                          borderRadius: 8,
+                          border: "1px solid #d1d5db",
+                          outline: "none",
+                          fontSize: 13.5,
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                        style={{
+                          position: "absolute",
+                          right: 10,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 15,
+                          color: "var(--slate)",
+                        }}
+                      >
+                        {showConfirmNewPassword ? "👁️" : "🙈"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
+                    <Button ghost type="button" onClick={() => setShowChangePasswordModal(false)}>
+                      Cancel
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={handleSaveChangedPassword}
+                      disabled={!newPassword || !confirmNewPassword}
+                      style={{
+                        background: "#5C6BC0",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: 6,
+                        padding: "10px 24px",
+                        fontSize: 14,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* TAB 6: USERS & STAFF */}
