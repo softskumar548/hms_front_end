@@ -880,6 +880,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
       {/* 2-Step Indicator - Minimal */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
         <div
+          data-testid="stage-1-indicator"
           style={{
             background: currentStage === 1 ? "#F8FAFC" : "#FFF",
             borderRadius: 8,
@@ -900,6 +901,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
         </div>
 
         <div
+          data-testid="stage-2-indicator"
           style={{
             background: currentStage === 2 ? "#F8FAFC" : "#FFF",
             borderRadius: 8,

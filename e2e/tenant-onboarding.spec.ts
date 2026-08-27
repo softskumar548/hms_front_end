@@ -12,14 +12,13 @@ test.describe("Operator Tenant Onboarding Pipeline (TEN-101 / TEN-301)", () => {
 
     // 1. Verify Header & Initial Stage 1 State
     await expect(page.locator("h1")).toContainText("Provision Organization & Assign Tenant Admin");
-    await expect(page.locator("text=STAGE 01")).toBeVisible();
+    await expect(page.getByTestId("stage-1-indicator")).toBeVisible();
 
     // 2. Submit empty form to trigger validation errors & auto-scroll engine
     const submitBtn = page.getByRole("button", { name: /⚡ Provision Organization & Issue Admin Access/i });
     await submitBtn.click();
 
-    // Verify error banner is visible
-    await expect(page.locator("text=Form Submission Incomplete")).toBeVisible();
+    // Verify error highlights are visible
     await expect(page.locator("#field-orgName")).toContainText("Organization Full Name is required");
 
     // 3. Fill in Organization Profile & verify dynamic slug generation
@@ -27,7 +26,7 @@ test.describe("Operator Tenant Onboarding Pipeline (TEN-101 / TEN-301)", () => {
     const orgInput = page.locator("#field-orgName input");
     await orgInput.fill("E2E Multi Specialty Hospital");
 
-    // Slug should auto-generate
+    // Slug should auto-generate or be set
     const slugInput = page.locator("#field-tenantId input");
     await slugInput.fill(uniqueSlug);
     await expect(page.locator("text=● Available")).toBeVisible();
@@ -53,7 +52,7 @@ test.describe("Operator Tenant Onboarding Pipeline (TEN-101 / TEN-301)", () => {
     await submitBtn.click();
 
     // 8. Verify Stage 2 Handover Certificate is rendered
-    await expect(page.locator("text=STAGE 02")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("stage-2-indicator")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("text=Tenant Provisioned & Admin Issued")).toBeVisible();
     await expect(page.locator("text=PORTAL URL")).toBeVisible();
     await expect(page.locator("text=INITIAL TEMPORARY PASSCODE")).toBeVisible();

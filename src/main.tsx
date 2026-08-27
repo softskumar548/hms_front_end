@@ -196,7 +196,10 @@ function Shell({ children }: { children: React.ReactNode }) {
           <span style={{ height: 16, width: 1, background: "var(--line)" }}></span>
 
           {/* Tenant and Role info */}
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--indigo)" }}>
+          <span
+            data-testid="shell-tenant-indicator"
+            style={{ fontSize: 12.5, fontWeight: 700, color: "var(--indigo)" }}
+          >
             {tenant} · {role}
           </span>
 
