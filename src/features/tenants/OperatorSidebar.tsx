@@ -14,6 +14,12 @@ export function OperatorSidebar() {
     if (path === "/ops-control#suspend" || path === "/ops-control/suspend") {
       return location.pathname === "/ops-control/suspend" || (location.pathname === "/ops-control" && location.hash === "#suspend");
     }
+    if (path.startsWith("/operator/profile")) {
+      const searchParams = new URLSearchParams(location.search);
+      const currentTab = searchParams.get("tab") || "profile";
+      const targetTab = new URLSearchParams(path.split("?")[1] || "").get("tab") || "profile";
+      return location.pathname === "/operator/profile" && currentTab === targetTab;
+    }
     return location.pathname.startsWith(path);
   };
 
@@ -37,6 +43,13 @@ export function OperatorSidebar() {
       items: [
         { label: "Billing & Ops", path: "/ops-control", icon: "💳" },
         { label: "Suspend & Override", path: "/ops-control#suspend", icon: "🛡️" },
+      ],
+    },
+    {
+      title: "PROFILE & SECURITY",
+      items: [
+        { label: "Profile", path: "/operator/profile?tab=profile", icon: "👤" },
+        { label: "Password Reset", path: "/operator/profile?tab=security", icon: "🔑" },
       ],
     },
     {

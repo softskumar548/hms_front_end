@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/client";
 
@@ -79,6 +79,20 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
   const [offboardTargetId, setOffboardTargetId] = useState("");
   const [offboardConfirmId, setOffboardConfirmId] = useState("");
   const [offboardError, setOffboardError] = useState<string | null>(null);
+
+  // Close offboard modal on Escape key press
+  useEffect(() => {
+    if (!showOffboardModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setShowOffboardModal(false);
+        setOffboardConfirmId("");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showOffboardModal]);
 
   const handleOffboardTenant = async () => {
     if (offboardConfirmId !== offboardTargetId) return;
@@ -368,12 +382,33 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,
+            padding: 20,
+          }}
+          onClick={() => {
+            setShowOffboardModal(false);
+            setOffboardConfirmId("");
           }}
         >
-          <div style={{ background: "#FFF", borderRadius: "var(--r-card, 8px)", padding: 28, width: 480, boxShadow: "var(--shadow-pop)" }}>
-            <h2 style={{ color: "var(--danger, #DC2626)", margin: "0 0 12px", fontSize: 20, fontWeight: 700 }}>
-              ⚠️ Confirm Irreversible Tenant Offboarding
-            </h2>
+          <div
+            style={{ background: "#FFF", borderRadius: "var(--r-card, 8px)", padding: 28, width: 480, boxShadow: "var(--shadow-pop)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <h2 style={{ color: "var(--danger, #DC2626)", margin: 0, fontSize: 20, fontWeight: 700 }}>
+                ⚠️ Confirm Irreversible Tenant Offboarding
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowOffboardModal(false);
+                  setOffboardConfirmId("");
+                }}
+                aria-label="Close modal"
+                style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+              >
+                ✕
+              </button>
+            </div>
             <p style={{ fontSize: 14, color: "var(--ink)", marginBottom: 12 }}>
               Are you sure you want to offboard and <b>cascade-delete</b> tenant <code>{offboardTargetId}</code>?
             </p>
@@ -393,10 +428,14 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                 TO CONFIRM, TYPE TENANT ID <code>{offboardTargetId}</code> BELOW:
               </label>
               <input
+                autoFocus
                 type="text"
                 placeholder={`Type '${offboardTargetId}' to unlock delete button`}
                 value={offboardConfirmId}
                 onChange={(e) => setOffboardConfirmId(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && offboardConfirmId === offboardTargetId) handleOffboardTenant();
+                }}
                 style={{ width: "100%", padding: "8px 12px", borderRadius: 6, border: "1px solid var(--line)", fontSize: 14 }}
               />
             </div>

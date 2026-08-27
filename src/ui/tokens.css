@@ -30,7 +30,23 @@ body {
   background: linear-gradient(180deg, var(--wash-a), var(--wash-b));
   min-height: 100vh;
 }
-:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; border-radius: 6px; }
+:focus-visible {
+  outline: 1.5px solid #64748B;
+  outline-offset: 1px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1px #6366F1 !important;
+}
+[data-theme="trusted-clinical"] input:focus,
+[data-theme="trusted-clinical"] select:focus,
+[data-theme="trusted-clinical"] textarea:focus {
+  outline: none !important;
+  border-color: #0284C7 !important;
+  box-shadow: 0 0 0 1px #0284C7 !important;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 0.6; }
   50% { opacity: 0.3; }

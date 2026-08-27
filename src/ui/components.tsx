@@ -25,8 +25,8 @@ export function Button({ ghost, disabled, ...rest }: React.ButtonHTMLAttributes<
   return <button style={style} disabled={disabled} {...rest} />;
 }
 
-export function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return <div style={{ ...s.card, ...style }}>{children}</div>;
+export function Card({ children, style, ...rest }: React.HTMLAttributes<HTMLDivElement> & { children: React.ReactNode; style?: React.CSSProperties }) {
+  return <div style={{ ...s.card, ...style }} {...rest}>{children}</div>;
 }
 
 /** Airline-style field cell: tiny gray label over bold indigo value. */
@@ -197,17 +197,68 @@ export function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; o
   const modalRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (isOpen) {
-      const focusables = modalRef.current?.querySelectorAll('button, [href], input, select, textarea, [tabindex="0"]');
-      if (focusables && focusables.length > 0) {
-        (focusables[0] as HTMLElement).focus();
+    if (!isOpen) return;
+
+    // Handle Escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+        return;
       }
-      document.body.style.overflow = "hidden";
-    } else {
+
+      // Focus trap for heavy data entry tab navigation
+      if (e.key === "Tab" && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length > 0) {
+          const firstElem = focusables[0];
+          const lastElem = focusables[focusables.length - 1];
+
+          if (e.shiftKey) {
+            if (document.activeElement === firstElem) {
+              e.preventDefault();
+              lastElem.focus();
+            }
+          } else {
+            if (document.activeElement === lastElem) {
+              e.preventDefault();
+              firstElem.focus();
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Auto-focus priority: first editable input/select/textarea, or first interactive element
+    const timer = setTimeout(() => {
+      if (modalRef.current) {
+        const firstInput = modalRef.current.querySelector<HTMLElement>(
+          'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+        );
+        if (firstInput) {
+          firstInput.focus();
+        } else {
+          const firstFocusable = modalRef.current.querySelector<HTMLElement>(
+            'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+          );
+          if (firstFocusable) firstFocusable.focus();
+        }
+      }
+    }, 40);
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      clearTimeout(timer);
       document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [isOpen]);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -257,17 +308,58 @@ export function Drawer({ isOpen, onClose, title, children }: { isOpen: boolean; 
   const drawerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (isOpen) {
-      const focusables = drawerRef.current?.querySelectorAll('button, [href], input, select, textarea, [tabindex="0"]');
-      if (focusables && focusables.length > 0) {
-        (focusables[0] as HTMLElement).focus();
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+        return;
       }
-      document.body.style.overflow = "hidden";
-    } else {
+
+      if (e.key === "Tab" && drawerRef.current) {
+        const focusables = drawerRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length > 0) {
+          const firstElem = focusables[0];
+          const lastElem = focusables[focusables.length - 1];
+
+          if (e.shiftKey) {
+            if (document.activeElement === firstElem) {
+              e.preventDefault();
+              lastElem.focus();
+            }
+          } else {
+            if (document.activeElement === lastElem) {
+              e.preventDefault();
+              firstElem.focus();
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    const timer = setTimeout(() => {
+      if (drawerRef.current) {
+        const firstFocusable = drawerRef.current.querySelector<HTMLElement>(
+          'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])'
+        );
+        if (firstFocusable) firstFocusable.focus();
+      }
+    }, 40);
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      clearTimeout(timer);
       document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [isOpen]);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

@@ -78,20 +78,21 @@ export default function TenantSettings() {
   const [newConfigName, setNewConfigName] = useState("");
   const [newConfigDesc, setNewConfigDesc] = useState("");
 
-  // Account Settings Sub-tabs & Fields (Matching Screenshot)
-  const defaultOrgName = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "ZEN CLINIC";
+  // Account Settings Sub-tabs & Fields (Matching Screenshot & Operator aware)
+  const isOperator = role === "operator";
+  const defaultOrgName = isOperator ? "ZEN SAAS PLATFORM" : (tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "ZEN CLINIC");
   const [accountSubTab, setAccountSubTab] = useState("general");
   const [projectName, setProjectName] = useState(
     localStorage.getItem(`project-name-${tenant}`) || defaultOrgName
   );
   const [adminName, setAdminName] = useState(
-    localStorage.getItem(`admin-name-${tenant}`) || "DR K R MURALI"
+    localStorage.getItem(`admin-name-${tenant}`) || (isOperator ? "PLATFORM OPERATOR" : "DR K R MURALI")
   );
   const [adminPhone, setAdminPhone] = useState(
     localStorage.getItem(`admin-phone-${tenant}`) || "9100242466"
   );
   const [adminEmail, setAdminEmail] = useState(
-    localStorage.getItem(`admin-email-${tenant}`) || "drkrmurali9090@yopmail.com"
+    localStorage.getItem(`admin-email-${tenant}`) || (isOperator ? "operator@zensynq.com" : "drkrmurali9090@yopmail.com")
   );
   const [addressStreet, setAddressStreet] = useState(
     localStorage.getItem(`address-street-${tenant}`) || "srinivasa Nagar"
@@ -339,10 +340,34 @@ export default function TenantSettings() {
     );
   });
 
-  // Fetch practitioners for Users tab
+  // Close any active modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (showAddConfigModal) {
+          setShowAddConfigModal(false);
+          e.preventDefault();
+        } else if (showAddAuthModal) {
+          setShowAddAuthModal(false);
+          e.preventDefault();
+        } else if (showChangePasswordModal) {
+          setShowChangePasswordModal(false);
+          e.preventDefault();
+        } else if (showInviteModal) {
+          setShowInviteModal(false);
+          e.preventDefault();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showAddConfigModal, showAddAuthModal, showChangePasswordModal, showInviteModal]);
+
+  // Fetch practitioners for Users tab (safely handles operator tenant)
   const { data: practitioners = [] } = useQuery({
     queryKey: ["practitioners", tenant],
-    queryFn: () => api.listPractitioners(token),
+    queryFn: () => (tenant && tenant !== "__operator__" ? api.listPractitioners(token) : Promise.resolve([])),
+    retry: false,
   });
 
   const inviteStaffMutation = useMutation({
@@ -518,29 +543,67 @@ export default function TenantSettings() {
 
           {/* Add Configuration Modal */}
           {showAddConfigModal && (
-            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "grid", placeItems: "center", zIndex: 99999 }}>
-              <Card style={{ width: "100%", maxWidth: 460, padding: 24, borderRadius: 20 }}>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: "0 0 16px" }}>
-                  Add New {currentCategoryInfo.label}
-                </h3>
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowAddConfigModal(false)}
+            >
+              <Card
+                style={{ width: "100%", maxWidth: 460, padding: 24, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: 0 }}>
+                    Add New {currentCategoryInfo.label}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddConfigModal(false)}
+                    aria-label="Close modal"
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
                 <div style={{ display: "grid", gap: 14 }}>
                   <div>
                     <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
                       Code / Key
                     </label>
-                    <Input placeholder="e.g. UPI_SPECIAL" value={newConfigCode} onChange={(e) => setNewConfigCode(e.target.value)} />
+                    <Input
+                      autoFocus
+                      placeholder="e.g. UPI_SPECIAL"
+                      value={newConfigCode}
+                      onChange={(e) => setNewConfigCode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newConfigName) handleAddConfigItem();
+                      }}
+                    />
                   </div>
                   <div>
                     <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
-                      Display Name
+                      Display Name <span style={{ color: "var(--danger)" }}>*</span>
                     </label>
-                    <Input placeholder="e.g. VIP Consultation" value={newConfigName} onChange={(e) => setNewConfigName(e.target.value)} />
+                    <Input
+                      placeholder="e.g. VIP Consultation"
+                      value={newConfigName}
+                      onChange={(e) => setNewConfigName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newConfigName) handleAddConfigItem();
+                      }}
+                    />
                   </div>
                   <div>
                     <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
                       Description
                     </label>
-                    <Input placeholder="Description of this configuration" value={newConfigDesc} onChange={(e) => setNewConfigDesc(e.target.value)} />
+                    <Input
+                      placeholder="Description of this configuration"
+                      value={newConfigDesc}
+                      onChange={(e) => setNewConfigDesc(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newConfigName) handleAddConfigItem();
+                      }}
+                    />
                   </div>
                   <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 10 }}>
                     <Button ghost type="button" onClick={() => setShowAddConfigModal(false)}>
@@ -1192,13 +1255,20 @@ export default function TenantSettings() {
 
           {/* Add User Authentication Modal (Exact from Screenshot 2) */}
           {showAddAuthModal && (
-            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 99999 }}>
-              <div style={{ background: "#ffffff", width: "100%", maxWidth: 440, borderRadius: 12, padding: "24px 28px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowAddAuthModal(false)}
+            >
+              <div
+                style={{ background: "#ffffff", width: "100%", maxWidth: 440, borderRadius: 12, padding: "24px 28px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Add User Authentication</h3>
                   <button
                     type="button"
                     onClick={() => setShowAddAuthModal(false)}
+                    aria-label="Close modal"
                     style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
                   >
                     ✕
@@ -1228,10 +1298,14 @@ export default function TenantSettings() {
                     </label>
                     <div style={{ position: "relative" }}>
                       <input
+                        autoFocus
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
                         value={authPassword}
                         onChange={(e) => setAuthPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && authPassword && authConfirmPassword) handleSaveAuthUser();
+                        }}
                         style={{
                           width: "100%",
                           padding: "10px 38px 10px 14px",
@@ -1268,9 +1342,12 @@ export default function TenantSettings() {
                     <div style={{ position: "relative" }}>
                       <input
                         type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Password"
+                        placeholder="Confirm Password"
                         value={authConfirmPassword}
                         onChange={(e) => setAuthConfirmPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && authPassword && authConfirmPassword) handleSaveAuthUser();
+                        }}
                         style={{
                           width: "100%",
                           padding: "10px 38px 10px 14px",
@@ -1326,13 +1403,20 @@ export default function TenantSettings() {
 
           {/* Change Password Modal */}
           {showChangePasswordModal && (
-            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 99999 }}>
-              <div style={{ background: "#ffffff", width: "100%", maxWidth: 440, borderRadius: 12, padding: "24px 28px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}>
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowChangePasswordModal(false)}
+            >
+              <div
+                style={{ background: "#ffffff", width: "100%", maxWidth: 440, borderRadius: 12, padding: "24px 28px", boxShadow: "0 10px 30px rgba(0,0,0,0.2)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "var(--ink)" }}>Change Password</h3>
                   <button
                     type="button"
                     onClick={() => setShowChangePasswordModal(false)}
+                    aria-label="Close modal"
                     style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
                   >
                     ✕
@@ -1350,10 +1434,14 @@ export default function TenantSettings() {
                     </label>
                     <div style={{ position: "relative" }}>
                       <input
+                        autoFocus
                         type={showNewPassword ? "text" : "password"}
                         placeholder="New Password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newPassword && confirmNewPassword) handleSaveChangedPassword();
+                        }}
                         style={{
                           width: "100%",
                           padding: "10px 38px 10px 14px",
@@ -1393,6 +1481,9 @@ export default function TenantSettings() {
                         placeholder="Confirm New Password"
                         value={confirmNewPassword}
                         onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && newPassword && confirmNewPassword) handleSaveChangedPassword();
+                        }}
                         style={{
                           width: "100%",
                           padding: "10px 38px 10px 14px",
@@ -1441,7 +1532,7 @@ export default function TenantSettings() {
                         cursor: "pointer",
                       }}
                     >
-                      Save
+                      Update Password
                     </button>
                   </div>
                 </div>
@@ -1495,19 +1586,51 @@ export default function TenantSettings() {
 
           {/* Staff Invite Modal */}
           {showInviteModal && (
-            <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 9999 }}>
-              <Card style={{ width: "100%", maxWidth: 440, padding: 24, borderRadius: 20 }}>
-                <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: "0 0 16px" }}>
-                  Invite Hospital Staff
-                </h3>
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 9999, padding: 20 }}
+              onClick={() => setShowInviteModal(false)}
+            >
+              <Card
+                style={{ width: "100%", maxWidth: 440, padding: 24, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: 0 }}>
+                    Invite Hospital Staff
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteModal(false)}
+                    aria-label="Close modal"
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
                 <div style={{ display: "grid", gap: 14 }}>
                   <div>
                     <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Full Name</label>
-                    <Input placeholder="e.g. Dr. A. Sharma" value={inviteName} onChange={(e) => setInviteName(e.target.value)} />
+                    <Input
+                      autoFocus
+                      placeholder="e.g. Dr. A. Sharma"
+                      value={inviteName}
+                      onChange={(e) => setInviteName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && inviteEmail && !inviteStaffMutation.isPending) inviteStaffMutation.mutate();
+                      }}
+                    />
                   </div>
                   <div>
-                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Email Address</label>
-                    <Input placeholder="e.g. doctor@zen_clinic.com" type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
+                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Email Address <span style={{ color: "var(--danger)" }}>*</span></label>
+                    <Input
+                      placeholder="e.g. doctor@zen_clinic.com"
+                      type="email"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && inviteEmail && !inviteStaffMutation.isPending) inviteStaffMutation.mutate();
+                      }}
+                    />
                   </div>
                   <div>
                     <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Role Assignment</label>

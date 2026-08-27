@@ -35,6 +35,7 @@ const OnboardingWizardScreen = React.lazy(() => import("./features/tenants/Onboa
 const OperationalControlScreen = React.lazy(() => import("./features/tenants/OperationalControlScreen").then(m => ({ default: m.OperationalControlScreen })));
 const OperatorDashboardScreen = React.lazy(() => import("./features/tenants/OperatorDashboardScreen").then(m => ({ default: m.OperatorDashboardScreen })));
 const OperatorInsightsScreen = React.lazy(() => import("./features/tenants/OperatorInsightsScreen").then(m => ({ default: m.OperatorInsightsScreen })));
+const OperatorProfileScreen = React.lazy(() => import("./features/tenants/OperatorProfileScreen").then(m => ({ default: m.OperatorProfileScreen })));
 const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
@@ -77,6 +78,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   });
 
   const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = React.useRef<HTMLDivElement>(null);
   const [currentDateTime, setCurrentDateTime] = useState(() => new Date());
 
   useEffect(() => {
@@ -85,6 +87,31 @@ function Shell({ children }: { children: React.ReactNode }) {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Universal dismissal of Profile Menu on Escape key or Click Outside
+  useEffect(() => {
+    if (!profileOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setProfileOpen(false);
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profileOpen]);
 
   const handleToggleSidebar = () => {
     setSidebarCollapsed((prev) => {
@@ -198,7 +225,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           <span style={{ height: 16, width: 1, background: "var(--line)" }}></span>
 
           {/* Profile Icon with Dropdown Menu */}
-          <div style={{ position: "relative" }}>
+          <div ref={profileRef} style={{ position: "relative" }}>
             <button
               type="button"
               data-testid="profile-dropdown-btn"
@@ -254,65 +281,131 @@ function Shell({ children }: { children: React.ReactNode }) {
 
                 {/* Profile Links */}
                 <div style={{ display: "grid", gap: 4 }}>
-                  <Link
-                    to="/settings?tab=account"
-                    onClick={() => setProfileOpen(false)}
-                    style={{
-                      textDecoration: "none",
-                      color: "var(--ink)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      padding: "8px 10px",
-                      borderRadius: 8,
-                      display: "flex",
-                      gap: 8,
-                      alignItems: "center",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <span>🏢</span> Account Settings
-                  </Link>
+                  {role === "operator" ? (
+                    <>
+                      <Link
+                        to="/operator/profile?tab=profile"
+                        onClick={() => setProfileOpen(false)}
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--ink)",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span>👤</span> Profile
+                      </Link>
 
-                  <Link
-                    to="/settings?tab=brand"
-                    onClick={() => setProfileOpen(false)}
-                    style={{
-                      textDecoration: "none",
-                      color: "var(--ink)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      padding: "8px 10px",
-                      borderRadius: 8,
-                      display: "flex",
-                      gap: 8,
-                      alignItems: "center",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <span>🎨</span> Brand Settings
-                  </Link>
+                      <Link
+                        to="/operator/profile?tab=security"
+                        onClick={() => setProfileOpen(false)}
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--ink)",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span>🔑</span> Password Reset
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/settings?tab=account"
+                        onClick={() => setProfileOpen(false)}
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--ink)",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span>👤</span> Profile
+                      </Link>
 
-                  <Link
-                    to="/settings?tab=print"
-                    onClick={() => setProfileOpen(false)}
-                    style={{
-                      textDecoration: "none",
-                      color: "var(--ink)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      padding: "8px 10px",
-                      borderRadius: 8,
-                      display: "flex",
-                      gap: 8,
-                      alignItems: "center",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                  >
-                    <span>🖨️</span> Print Settings
-                  </Link>
+                      <Link
+                        to="/settings?tab=auth"
+                        onClick={() => setProfileOpen(false)}
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--ink)",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span>🔑</span> Password Reset
+                      </Link>
+
+                      <Link
+                        to="/settings?tab=brand"
+                        onClick={() => setProfileOpen(false)}
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--ink)",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span>🎨</span> Brand Settings
+                      </Link>
+
+                      <Link
+                        to="/settings?tab=print"
+                        onClick={() => setProfileOpen(false)}
+                        style={{
+                          textDecoration: "none",
+                          color: "var(--ink)",
+                          fontSize: 13,
+                          fontWeight: 600,
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--wash-a)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span>🖨️</span> Print Settings
+                      </Link>
+                    </>
+                  )}
                 </div>
 
                 <div style={{ borderTop: "1px solid var(--line, #E2E8F0)", paddingTop: 10 }}>
@@ -1082,6 +1175,11 @@ function App() {
           <Route path="/operator/dashboard" element={
             <RequireRole roles={["operator", "admin"]}>
               <OperatorDashboardScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/operator/profile" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <OperatorProfileScreen token={token} />
             </RequireRole>
           } />
           <Route path="/operator/insights" element={
