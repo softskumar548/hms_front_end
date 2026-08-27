@@ -97,13 +97,15 @@ const DesignationCombobox: React.FC<{
   return (
     <div ref={containerRef} style={{ position: "relative", width: "100%" }}>
       <div
+        className="input-field-group"
         style={{
           display: "flex",
           alignItems: "center",
           borderRadius: 8,
           border: `1px solid ${hasError ? "#EF4444" : isOpen ? "#6366F1" : "#CBD5E1"}`,
+          boxShadow: isOpen ? "0 0 0 1.5px #6366F1" : "none",
           background: "#FFF",
-          transition: "border-color 0.15s ease",
+          transition: "border-color 0.15s ease, box-shadow 0.15s ease",
         }}
       >
         <input
@@ -129,15 +131,14 @@ const DesignationCombobox: React.FC<{
               setIsOpen(false);
               return;
             }
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              setIsOpen(true);
-              setHighlightIndex((prev) => Math.min(prev + 1, (isNewEntry ? 1 : 0) + filteredOptions.length - 1));
-            } else if (e.key === "ArrowUp") {
-              e.preventDefault();
-              setHighlightIndex((prev) => Math.max(prev - 1, 0));
-            } else if (e.key === "Enter") {
-              if (isOpen) {
+            if (isOpen) {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setHighlightIndex((prev) => Math.min(prev + 1, (isNewEntry ? 1 : 0) + filteredOptions.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setHighlightIndex((prev) => Math.max(prev - 1, 0));
+              } else if (e.key === "Enter") {
                 e.preventDefault();
                 e.stopPropagation();
                 if (isNewEntry && highlightIndex === 0) {
@@ -570,32 +571,221 @@ export const OnboardingWizardScreen: React.FC<{ token: string | null }> = ({ tok
     }
   };
 
+  const validateSingleField = (key: string) => {
+    let err: string | undefined = undefined;
+    switch (key) {
+      case "orgName":
+        if (!orgName.trim()) {
+          err = "Organization Full Name is required.";
+        } else if (orgName.trim().length < 3) {
+          err = "Organization Name must be at least 3 characters.";
+        }
+        break;
+      case "tenantId":
+        if (!tenantId.trim()) {
+          err = "Tenant Identifier (Slug) is required.";
+        } else if (slugCheck.status === "taken") {
+          err = `Subdomain '${tenantId}' is already registered.`;
+        } else if (slugCheck.status === "reserved") {
+          err = `Slug '${tenantId}' is reserved.`;
+        } else if (slugCheck.status === "invalid") {
+          err = "Slug must be at least 3 alphanumeric characters.";
+        }
+        break;
+      case "addressLine1":
+        if (!addressLine1.trim()) {
+          err = "Address Line 1 is required.";
+        }
+        break;
+      case "city":
+        if (!city.trim()) {
+          err = "City / Town is required.";
+        }
+        break;
+      case "pinCode":
+        if (!pinCode.trim()) {
+          err = "Postal PIN Code is required.";
+        } else if (!isValidPinCode(pinCode)) {
+          err = "Postal PIN Code must be exactly 6 digits.";
+        }
+        break;
+      case "orgMobile":
+        if (orgMobileDigits && !isValidIndianMobile(orgMobileDigits)) {
+          err = "Must be 10 digits starting with 6, 7, 8, or 9.";
+        }
+        break;
+      case "primName":
+        if (!primName.trim()) {
+          err = "Primary Contact Full Name is required.";
+        }
+        break;
+      case "primAadhaar":
+        if (primAadhaar && !isValidAadhaar(primAadhaar)) {
+          err = "Aadhaar number must be 12 digits.";
+        }
+        break;
+      case "primPhone":
+        if (!primPhoneDigits.trim()) {
+          err = "Primary Contact Mobile Number is required.";
+        } else if (!isValidIndianMobile(primPhoneDigits)) {
+          err = "Mobile must be 10 digits starting with 6-9.";
+        }
+        break;
+      case "primEmail":
+        if (!primEmail.trim()) {
+          err = "Primary Contact Work Email is required.";
+        } else if (!isValidEmail(primEmail)) {
+          err = "Please enter a valid work email address.";
+        }
+        break;
+      case "secAadhaar":
+        if (secAadhaar && !isValidAadhaar(secAadhaar)) {
+          err = "Aadhaar number must be 12 digits.";
+        }
+        break;
+      case "secPhone":
+        if (secPhoneDigits && !isValidIndianMobile(secPhoneDigits)) {
+          err = "Mobile must be 10 digits starting with 6-9.";
+        }
+        break;
+      case "secEmail":
+        if (secEmail && !isValidEmail(secEmail)) {
+          err = "Please enter a valid work email.";
+        }
+        break;
+      case "sigAadhaar":
+        if (sigAadhaar && !isValidAadhaar(sigAadhaar)) {
+          err = "Aadhaar number must be 12 digits.";
+        }
+        break;
+      case "sigPhone":
+        if (sigPhoneDigits && !isValidIndianMobile(sigPhoneDigits)) {
+          err = "Mobile must be 10 digits starting with 6-9.";
+        }
+        break;
+      case "sigEmail":
+        if (sigEmail && !isValidEmail(sigEmail)) {
+          err = "Please enter a valid email.";
+        }
+        break;
+      case "signatoryMismatch":
+        if ((sigName || sigEmail || sigPhoneDigits || sigAadhaar) && !validateSignatoryMatch()) {
+          err = "Signatory must match Primary or Secondary contact.";
+          setSignatoryError("⚠️ Contract signatory details must match either Primary Contact or Secondary Contact!");
+        } else {
+          setSignatoryError(null);
+        }
+        break;
+      default:
+        break;
+    }
+
+    setFieldErrors((prev) => {
+      const copy = { ...prev };
+      if (err) {
+        copy[key] = err;
+      } else {
+        delete copy[key];
+      }
+      return copy;
+    });
+  };
+
+  const navigateFields = (direction: "next" | "prev", currentTarget?: HTMLElement | null) => {
+    const form = document.querySelector("form");
+    if (!form) return;
+
+    const focusables = Array.from(
+      form.querySelectorAll<HTMLElement>(
+        'input:not([disabled]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), button[type="submit"]:not([disabled])'
+      )
+    ).filter((el) => el.offsetParent !== null);
+
+    if (focusables.length === 0) return;
+
+    const activeEl = (currentTarget || document.activeElement) as HTMLElement | null;
+    const index = activeEl ? focusables.indexOf(activeEl) : -1;
+
+    let nextTarget: HTMLElement;
+    if (index === -1) {
+      nextTarget = direction === "next" ? focusables[0] : focusables[focusables.length - 1];
+    } else {
+      if (direction === "next") {
+        nextTarget = focusables[(index + 1) % focusables.length];
+      } else {
+        nextTarget = focusables[(index - 1 + focusables.length) % focusables.length];
+      }
+    }
+
+    if (nextTarget) {
+      nextTarget.focus();
+      if (
+        nextTarget instanceof HTMLInputElement &&
+        (nextTarget.type === "text" || nextTarget.type === "tel" || nextTarget.type === "email" || nextTarget.type === "url")
+      ) {
+        nextTarget.select();
+      }
+      nextTarget.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  };
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (currentStage !== 1) return;
+
+      const activeEl = document.activeElement as HTMLElement | null;
+      const isInputActive =
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "SELECT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          activeEl.tagName === "BUTTON");
+
+      // When no interactive field is focused (e.g. clicked whitespace, active is BODY or DIV)
+      if (!isInputActive) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          navigateFields("next");
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          navigateFields("prev");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [currentStage]);
+
   const handleFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    const target = e.target as HTMLElement;
+
     if (e.key === "Enter") {
-      const target = e.target as HTMLElement;
       if (target.tagName === "TEXTAREA" || target.getAttribute("type") === "submit") {
         return;
       }
       if (target.getAttribute("data-combobox-open") === "true") {
         return;
       }
+      e.preventDefault();
+      navigateFields("next", target);
+      return;
+    }
 
-      const form = e.currentTarget;
-      const focusables = Array.from(
-        form.querySelectorAll<HTMLElement>(
-          'input:not([disabled]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), button[type="submit"]'
-        )
-      ).filter((el) => el.offsetParent !== null);
+    if (e.key === "ArrowDown") {
+      if (target.tagName === "TEXTAREA") return;
+      if (target.getAttribute("data-combobox-open") === "true") return;
+      e.preventDefault();
+      navigateFields("next", target);
+      return;
+    }
 
-      const index = focusables.indexOf(target);
-      if (index > -1 && index < focusables.length - 1) {
-        e.preventDefault();
-        const nextEl = focusables[index + 1];
-        nextEl.focus();
-        if (nextEl instanceof HTMLInputElement && (nextEl.type === "text" || nextEl.type === "tel" || nextEl.type === "email" || nextEl.type === "url")) {
-          nextEl.select();
-        }
-      }
+    if (e.key === "ArrowUp") {
+      if (target.tagName === "TEXTAREA") return;
+      if (target.getAttribute("data-combobox-open") === "true") return;
+      e.preventDefault();
+      navigateFields("prev", target);
+      return;
     }
   };
 
@@ -962,6 +1152,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                 placeholder="e.g. Apollo Specialty Hospital Vizag"
                 value={orgName}
                 onChange={(e) => handleOrgNameChange(e.target.value)}
+                onBlur={() => validateSingleField("orgName")}
                 style={inputStyle(Boolean(fieldErrors.orgName))}
                 required
               />
@@ -990,6 +1181,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                 placeholder="e.g. apollovizag"
                 value={tenantId}
                 onChange={(e) => handleTenantIdChange(e.target.value)}
+                onBlur={() => validateSingleField("tenantId")}
                 style={inputStyle(Boolean(fieldErrors.tenantId || slugCheck.status === "taken"))}
                 required
               />
@@ -1096,6 +1288,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                   setAddressLine1(e.target.value);
                   clearFieldError("addressLine1");
                 }}
+                onBlur={() => validateSingleField("addressLine1")}
                 style={inputStyle(Boolean(fieldErrors.addressLine1))}
                 required
               />
@@ -1131,6 +1324,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                   setCity(e.target.value);
                   clearFieldError("city");
                 }}
+                onBlur={() => validateSingleField("city")}
                 style={inputStyle(Boolean(fieldErrors.city))}
                 required
               />
@@ -1174,6 +1368,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                   setPinCode(e.target.value.replace(/\D/g, ""));
                   clearFieldError("pinCode");
                 }}
+                onBlur={() => validateSingleField("pinCode")}
                 style={inputStyle(Boolean(fieldErrors.pinCode || (pinCode && !isValidPinCode(pinCode))))}
                 required
               />
@@ -1246,6 +1441,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
             <div id="field-orgMobile">
               <label style={labelStyle}>OFFICIAL HELPDESK MOBILE (+91)</label>
               <div
+                className="input-phone-group"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1265,6 +1461,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     setOrgMobileDigits(e.target.value.replace(/\D/g, ""));
                     clearFieldError("orgMobile");
                   }}
+                  onBlur={() => validateSingleField("orgMobile")}
                   style={{ border: "none", outline: "none", padding: "10px 12px", width: "100%", fontSize: 13.5, fontWeight: 500, background: "transparent" }}
                 />
               </div>
@@ -1299,6 +1496,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     setPrimName(e.target.value);
                     clearFieldError("primName");
                   }}
+                  onBlur={() => validateSingleField("primName")}
                   style={inputStyle(Boolean(fieldErrors.primName))}
                   required
                 />
@@ -1333,6 +1531,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     setPrimAadhaar(formatAadhaarInput(e.target.value));
                     clearFieldError("primAadhaar");
                   }}
+                  onBlur={() => validateSingleField("primAadhaar")}
                   style={inputStyle(Boolean(fieldErrors.primAadhaar || (primAadhaar && !isValidAadhaar(primAadhaar))))}
                 />
                 {fieldErrors.primAadhaar && (
@@ -1385,6 +1584,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
               <div id="field-primPhone">
                 <label style={labelStyle}>MOBILE NUMBER (+91) <span style={{ color: "#EF4444" }}>*</span></label>
                 <div
+                  className="input-phone-group"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -1404,6 +1604,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                       setPrimPhoneDigits(e.target.value.replace(/\D/g, ""));
                       clearFieldError("primPhone");
                     }}
+                    onBlur={() => validateSingleField("primPhone")}
                     style={{ border: "none", outline: "none", padding: "10px 12px", width: "100%", fontSize: 13.5, fontWeight: 500, background: "transparent" }}
                     required
                   />
@@ -1426,6 +1627,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     setPrimEmail(e.target.value);
                     clearFieldError("primEmail");
                   }}
+                  onBlur={() => validateSingleField("primEmail")}
                   style={inputStyle(Boolean(fieldErrors.primEmail))}
                   required
                 />
@@ -1477,6 +1679,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     setSecAadhaar(formatAadhaarInput(e.target.value));
                     clearFieldError("secAadhaar");
                   }}
+                  onBlur={() => validateSingleField("secAadhaar")}
                   style={inputStyle(Boolean(fieldErrors.secAadhaar || (secAadhaar && !isValidAadhaar(secAadhaar))))}
                 />
                 {fieldErrors.secAadhaar && (
@@ -1529,6 +1732,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
               <div id="field-secPhone">
                 <label style={labelStyle}>MOBILE NUMBER (+91)</label>
                 <div
+                  className="input-phone-group"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -1548,6 +1752,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                       setSecPhoneDigits(e.target.value.replace(/\D/g, ""));
                       clearFieldError("secPhone");
                     }}
+                    onBlur={() => validateSingleField("secPhone")}
                     style={{ border: "none", outline: "none", padding: "10px 12px", width: "100%", fontSize: 13.5, fontWeight: 500, background: "transparent" }}
                   />
                 </div>
@@ -1569,6 +1774,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     setSecEmail(e.target.value);
                     clearFieldError("secEmail");
                   }}
+                  onBlur={() => validateSingleField("secEmail")}
                   style={inputStyle(Boolean(fieldErrors.secEmail))}
                 />
                 {fieldErrors.secEmail && (
@@ -1657,6 +1863,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     clearFieldError("sigName");
                     clearFieldError("signatoryMismatch");
                   }}
+                  onBlur={() => validateSingleField("sigName")}
                   style={inputStyle(Boolean(fieldErrors.sigName))}
                 />
                 {fieldErrors.sigName && (
@@ -1691,6 +1898,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     clearFieldError("sigAadhaar");
                     clearFieldError("signatoryMismatch");
                   }}
+                  onBlur={() => validateSingleField("sigAadhaar")}
                   style={inputStyle(Boolean(fieldErrors.sigAadhaar || (sigAadhaar && !isValidAadhaar(sigAadhaar))))}
                 />
                 {fieldErrors.sigAadhaar && (
@@ -1732,7 +1940,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                       placeholder="Ext"
                       maxLength={5}
                       value={sigLandlineExt}
-                      onChange={(e) => setSigLandlineExt(e.target.value.replace(/\D/g, ""))}
+                      onChange={(e) => setLandlineExt(e.target.value.replace(/\D/g, ""))}
                       style={inputStyle()}
                     />
                   </div>
@@ -1743,6 +1951,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
               <div id="field-sigPhone">
                 <label style={labelStyle}>MOBILE NUMBER (+91)</label>
                 <div
+                  className="input-phone-group"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -1763,6 +1972,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                       clearFieldError("sigPhone");
                       clearFieldError("signatoryMismatch");
                     }}
+                    onBlur={() => validateSingleField("sigPhone")}
                     style={{ border: "none", outline: "none", padding: "10px 12px", width: "100%", fontSize: 13.5, fontWeight: 500, background: "transparent" }}
                   />
                 </div>
@@ -1785,6 +1995,7 @@ Initial Temporary Passcode: ${tempPasscode}`;
                     clearFieldError("sigEmail");
                     clearFieldError("signatoryMismatch");
                   }}
+                  onBlur={() => validateSingleField("sigEmail")}
                   style={inputStyle(Boolean(fieldErrors.sigEmail))}
                 />
                 {fieldErrors.sigEmail && (

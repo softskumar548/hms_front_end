@@ -31,20 +31,28 @@ body {
   min-height: 100vh;
 }
 :focus-visible {
-  outline: 1.5px solid #64748B;
-  outline-offset: 1px;
+  outline: 2px solid #6366F1 !important;
+  outline-offset: 2px !important;
+}
+input, select, textarea, .input-phone-group, .input-field-group {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 input:focus, select:focus, textarea:focus {
   outline: none !important;
   border-color: #6366F1 !important;
-  box-shadow: 0 0 0 1px #6366F1 !important;
+  box-shadow: 0 0 0 1.5px #6366F1 !important;
 }
 [data-theme="trusted-clinical"] input:focus,
 [data-theme="trusted-clinical"] select:focus,
 [data-theme="trusted-clinical"] textarea:focus {
   outline: none !important;
-  border-color: #0284C7 !important;
-  box-shadow: 0 0 0 1px #0284C7 !important;
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1.5px #6366F1 !important;
+}
+.input-phone-group:focus-within,
+.input-field-group:focus-within {
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 1.5px #6366F1 !important;
 }
 
 @keyframes pulse {
