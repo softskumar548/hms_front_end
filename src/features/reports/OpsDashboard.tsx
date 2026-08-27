@@ -6,8 +6,9 @@ import { Card, Select, Skeleton } from "../../ui/components";
 import OnboardingChecklist from "./OnboardingChecklist";
 
 export default function OpsDashboard() {
-  const { token, tenant } = useAuth();
+  const { token, tenant, userName, role } = useAuth();
   const currentTenantName = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "CLINIC";
+  const displayName = userName || (role === "admin" ? "Hospital Administrator" : "Clinical Staff");
 
   // Site selection filter
   const [selectedSite, setSelectedSite] = useState("main");
@@ -73,7 +74,7 @@ export default function OpsDashboard() {
             Tenant Administration Console
           </div>
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, margin: "0 0 6px", color: "#ffffff" }}>
-            Welcome, Dr. K R Murali (Dean) · {currentTenantName}
+            Welcome, {displayName} · {currentTenantName}
           </h1>
           <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.85)" }}>
             Hospital operations are active. Monitor live wait times, queue tokens, and daily consultation aggregates.
