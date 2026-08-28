@@ -40,6 +40,7 @@ const MyScheduleView = React.lazy(() => import("./features/scheduling/MySchedule
 const QueueDisplayScreen = React.lazy(() => import("./features/scheduling/QueueDisplayScreen"));
 const InpatientBedMatrixScreen = React.lazy(() => import("./features/inpatient/InpatientBedMatrixScreen"));
 const HospitalHRScreen = React.lazy(() => import("./features/hr/HospitalHRScreen"));
+const PrintStationScreen = React.lazy(() => import("./features/printing/PrintStationScreen"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
 
@@ -1362,6 +1363,12 @@ function App() {
           <Route path="/hr" element={
             <RequireRole roles={["admin", "billing", "receptionist", "physician"]}>
               <HospitalHRScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/print-station" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing"]}>
+              <PrintStationScreen />
             </RequireRole>
           } />
 
