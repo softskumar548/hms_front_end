@@ -52,7 +52,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 
 
 ## 1.4 Clinical Staff Navigation & EMR Workstation
-- **Receptionist**: Live Queue / Check-in board (`/queue`), Patients (`/patients`), Scheduling (`/scheduling`).
+- **Receptionist**: Live Queue / Check-in board (`/queue`), Waiting Lounge TV Token Calling Display (`/queue/display`), Patients (`/patients`), Scheduling (`/scheduling`).
 - **Physician / Nurse**:
   - 🩺 **Doctor EMR Launchpad (`/emr`)**: Outpatient consultation queue with live wait times, triage priority, and 1-click encounter launch.
   - 📝 **SOAP Clinical Note Pad (`/emr/patients/:id/encounter/:encounterId`)**: Structured Subjective symptoms chips, Objective systemic exam, Assessment with ICD-10 diagnosis picker, Plan with lifestyle advice, and direct Diagnostic Lab Requisition desk.
