@@ -80,6 +80,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 📄 **A4 Standard Laser/Inkjet Hub**: Direct launcher for MediPass Prescriptions, Discharge Summaries, Employee Pay Slips, and Admission Undertakings.
   - 🧾 **80mm POS Thermal Receipts**: Cashier till receipts, OPD token calling slips, and pharmacy dispensing tags.
 
+## 1.7 Diagnostic Pathology & Radiology Workstation (`/lab`)
+- 🧪 **Phlebotomy Intake & Vacutainer Barcodes**: Real-time intake queue from OPD Doctor EMR and Inpatient beds with color-coded tube cap assignments (EDTA Purple, Serum Red, Fluoride Grey, Urine Yellow) and 50×25mm sticker printing.
+- 🚨 **Analyte Result Entry & Panic Alerts**: Multi-parameter testing (CBC, LFT, RFT, Lipid, Glucose, Thyroid) with automated reference interval checks and high-visibility **🚨 PANIC / CRITICAL VALUE ALERTS** for life-threatening findings.
+- 🔬 **Pathologist Digital Verification**: Authorized review desk with clinical impression and microscopic notes.
+- 📄 **Official A4 Diagnostic Test Reports (`DiagnosticReportPrintModal`)**: NABL accredited format (MC-4891) with hospital letterhead, multi-analyte parameter tables, digital signatures, and ABHA QR verification code.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
