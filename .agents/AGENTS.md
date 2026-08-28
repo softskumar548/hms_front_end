@@ -51,9 +51,14 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 🌐 **Online Services** (`/settings?tab=online`): ABDM ABHA milestones, Telehealth switches, and SMS/WhatsApp gateway.
 
 
-## 1.4 Clinical Staff Navigation
+## 1.4 Clinical Staff Navigation & EMR Workstation
 - **Receptionist**: Live Queue / Check-in board (`/queue`), Patients (`/patients`), Scheduling (`/scheduling`).
-- **Physician / Nurse**: My Schedule (`/my-schedule`), Live Queue (`/queue`), EMR / Notes (`/emr`).
+- **Physician / Nurse**:
+  - 🩺 **Doctor EMR Launchpad (`/emr`)**: Outpatient consultation queue with live wait times, triage priority, and 1-click encounter launch.
+  - 📝 **SOAP Clinical Note Pad (`/emr/patients/:id/encounter/:encounterId`)**: Structured Subjective symptoms chips, Objective systemic exam, Assessment with ICD-10 diagnosis picker, Plan with lifestyle advice, and direct Diagnostic Lab Requisition desk.
+  - 🚨 **Persistent Allergy Warning Banner (`EMR-005`)**: High-visibility contraindication alert across clinical records.
+  - 💊 **Bilingual Rx Medication Composer (`RX-002` / `RX-003`)**: Indian pharmaceutical brand catalog, structured frequency/route/food-timing matrix, Telugu patient instructions, and hard-stop allergy overrides.
+  - 🖨️ **MediPass Printable Stub (`/emr/patients/:id/print`)**: A4 printer-friendly prescription and visit summary with hospital letterhead and physician registration credentials.
 - **Biller**: Invoices (`/billing`), Payment Till, Referral Analytics (`/reports/referrals`).
 
 ---
