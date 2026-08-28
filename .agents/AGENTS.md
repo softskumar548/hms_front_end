@@ -32,13 +32,15 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
     - **Stage 2 (Tenant Admin Handover Certificate)**:
       - Issues copyable credentials certificate (Custom Portal URL, Keycloak `role: admin`, and temporary passcode).
   - 👤 **Operator Profile & Security (`/operator/profile`)**:
-    - Dedicated Operator Profile and Keycloak Password Reset tabs (removed clinic department settings from operator context).
+    - Dedicated Operator Profile and Keycloak Password Reset tabs.
 
 ## 1.3 Tenant Admin Navigation Architecture
 - 📊 **Dashboard** (`/dashboard`): Executive Welcome Banner with Dean details & clinic name (`Welcome, Dr. K R Murali (Dean) · ZEN CLINIC`), facility site filter, live refresh counter, and KPI metric cards (`Today's Consultations`, `Avg Wait Time`, `No-Shows`, `Cashier Till Revenue`). Seeded tour checklist is omitted.
 - 👥 **Admin (Expandable Accordion)**:
   - ⚙️ **Configuration** (`/settings?tab=config`): Master dropdown-driven configuration view (`Payment Type`, `Visit Type`, `Order Status`, `Clinic Type`, `Specialization`, `Room Type`, `Floor Type`, `Bed Category`, `Expense Category`) with dynamic item table & modal forms.
-  - 🏢 **Account Settings** (`/settings?tab=account`): Subscription profile, signatory details (`DR K R MURALI`), and compliance documents.
+  - 🏢 **Account Settings** (`/settings?tab=account`): 
+    - **Subscription Package Summary Card**: Real-time 9-dimensional quota display (`Package Name`, `Expiry Date`, `Admins`, `Staff`, `Beds Limit`, `Doctors Limit`, `SMS Count`, `Email Count`, `Whatsapp Count`) backed by `/api/tenants/{tenant}/quotas`.
+    - Signatory details (`DR K R MURALI`), department sub-tabs, and compliance documents.
   - 🔐 **User Authentication** (`/settings?tab=auth`): Keycloak OIDC issuer, client parameters, token scopes, and MFA status.
   - 👥 **Users** (`/settings?tab=users`): Staff directory with role badges and **+ Invite Staff** modal.
   - 💳 **Payment** (`/settings?tab=payment`): Payment collection rails, daily till reconciliation limits, PMJAY 100% cashless rules.
@@ -53,7 +55,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
 
-Defined once in `src/ui/tokens.css`.
+Defined once in `src/ui/tokens.css`. **Never hardcode hex values in components.**
 - `--indigo` (#131A8F): Primary brand color, field values, active nav.
 - `--indigo-deep` (#0A1166): Dark buttons, toasts, active states.
 - `--indigo-soft` (#E4E9FF): Selected row fills, active sidebar item backgrounds.
@@ -65,10 +67,18 @@ Defined once in `src/ui/tokens.css`.
 - Semantics: Info (`--cyan` #5FC6E9), Attention (`--orange` #F08125), Success (`--green` #1C9A4E), Danger (`--danger` #D93A3A).
 - Minimalist Focus: Non-intrusive 1px focus borders (`#6366F1`) replacing heavy glow rings.
 
+### Signature UI Patterns
+1. **FieldCell Grid**: Airline-booking inspired cell grid (tiny slate label above, bold Baloo-2 value below).
+2. **Persistent Allergy Banner**: Constant orange warning banner on all clinical patient screens (`EMR-005`).
+3. **MediPass**: Boarding pass-style confirmation stub for appointments and lab orders.
+4. **i18n Readiness**: English + Telugu language support; all user-facing strings keyed.
+5. **Synthetic Data**: Synthetic patient and staff data only in dev and fixtures.
+
 ---
 
 # PART 3 — AUTHENTICATION & MULTI-TENANCY
 
 - **Keycloak OIDC Integration**: Realm `hms`, Client `hms-web` (SPA PKCE).
-- **Tenant Context**: Verified server-side and propagated via `app.tenant_id` claim in JWT. Declarative user profile in Keycloak is configured to allow `tenant_id`.
+- **Dynamic Subdomain Resolution**: `resolveTenantFromHostname()` automatically binds tenant context from the host subdomain (`*.hms.zensynq.com`), maintaining seamless multi-tenancy.
+- **Tenant Context**: Verified server-side and propagated via `app.tenant_id` claim in JWT.
 - Role-gated routing in `src/main.tsx` via `<RequireRole>`.

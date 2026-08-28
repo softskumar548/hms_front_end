@@ -179,4 +179,9 @@ export const api = {
     request<any>(`/tenants/${id}/override`, token, { method: "POST", body: JSON.stringify(body) }),
   offboardTenant: (token: string | null, id: string) =>
     request<any>(`/tenants/${id}`, token, { method: "DELETE" }),
+  getTenantQuotas: (token: string | null, id: string) =>
+    request<any>(`/tenants/${id}/quotas`, token),
+  updateTenantPlan: (token: string | null, id: string, body: any) =>
+    request<any>(`/tenants/${id}/subscription/plan`, token, { method: "PUT", body: JSON.stringify(body) }),
 };
+

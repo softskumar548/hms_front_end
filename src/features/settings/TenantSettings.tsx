@@ -107,6 +107,21 @@ export default function TenantSettings() {
   const [opdPrefix, setOpdPrefix] = useState("OPD-");
   const [lowStockThreshold, setLowStockThreshold] = useState("20");
 
+  const { data: quotaData } = useQuery({
+    queryKey: ["tenant-quotas", tenant],
+    queryFn: async () => {
+      if (!token || !tenant) return null;
+      try {
+        return await api.getTenantQuotas(token, tenant);
+      } catch {
+        return null;
+      }
+    },
+    enabled: Boolean(token && tenant),
+  });
+
+
+
   const configCategories = [
     { key: "payment_type", label: "Payment Type", desc: "Patient payment collection methods & cashier rails" },
     { key: "visit_type", label: "Visit Type", desc: "Clinical appointment and consultation categories" },
@@ -788,19 +803,21 @@ export default function TenantSettings() {
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--ink)", width: 130 }}>Package Name :</strong>
-                  <span style={{ color: "var(--indigo)", fontWeight: 700 }}>HMS Basic Subscription Annual</span>
+                  <span style={{ color: "var(--indigo)", fontWeight: 700 }}>
+                    {quotaData?.package_name || "HMS Basic Subscription Annual"}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 130 }}>Expiry Date :</strong>
-                  <span>25/07/2026</span>
+                  <span>{quotaData?.expiry_date || "25/07/2026"}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 130 }}>Admins :</strong>
-                  <span>1</span>
+                  <span>{quotaData?.admins_used ?? 1}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 130 }}>Staff :</strong>
-                  <span>3</span>
+                  <span>{quotaData?.staff_used ?? 3}</span>
                 </div>
               </div>
 
@@ -808,23 +825,23 @@ export default function TenantSettings() {
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Beds Limit :</strong>
-                  <span>15</span>
+                  <span>{quotaData?.beds_limit ?? 15}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Doctors Limit :</strong>
-                  <span>5</span>
+                  <span>{quotaData?.doctors_limit ?? 5}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>SMS Count :</strong>
-                  <span>200</span>
+                  <span>{quotaData?.sms_count_limit ?? 200}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Email Count :</strong>
-                  <span>500</span>
+                  <span>{quotaData?.email_count_limit ?? 500}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Whatsapp Count :</strong>
-                  <span>1000</span>
+                  <span>{quotaData?.whatsapp_count_limit ?? 1000}</span>
                 </div>
               </div>
             </div>

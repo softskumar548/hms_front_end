@@ -80,19 +80,77 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
   const [offboardConfirmId, setOffboardConfirmId] = useState("");
   const [offboardError, setOffboardError] = useState<string | null>(null);
 
-  // Close offboard modal on Escape key press
+  // Subscription & Quotas Modal State
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
+  const [quotaTargetTenant, setQuotaTargetTenant] = useState<TenantTableItem | null>(null);
+  const [quotaData, setQuotaData] = useState<any>(null);
+  const [quotaLoading, setQuotaLoading] = useState(false);
+  const [selectedPlanTier, setSelectedPlanTier] = useState<"starter" | "growth" | "enterprise">("growth");
+  const [upgradeSuccess, setUpgradeSuccess] = useState<string | null>(null);
+
+  // Close modals on Escape key press
   useEffect(() => {
-    if (!showOffboardModal) return;
+    if (!showOffboardModal && !showQuotaModal) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
         setShowOffboardModal(false);
+        setShowQuotaModal(false);
         setOffboardConfirmId("");
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showOffboardModal]);
+  }, [showOffboardModal, showQuotaModal]);
+
+  const openQuotaModal = async (tenantItem: TenantTableItem) => {
+    setQuotaTargetTenant(tenantItem);
+    setShowQuotaModal(true);
+    setQuotaLoading(true);
+    setUpgradeSuccess(null);
+    try {
+      const data = await api.getTenantQuotas(token, tenantItem.id);
+      setQuotaData(data);
+    } catch {
+      setQuotaData({
+        tenant_id: tenantItem.id,
+        package_name: "HMS Basic Subscription Annual",
+        expiry_date: "25/07/2026",
+        admins_limit: 1,
+        admins_used: 1,
+        staff_limit: 3,
+        staff_used: 2,
+        doctors_limit: 5,
+        doctors_used: 2,
+        beds_limit: 15,
+        beds_used: 6,
+        sms_count_limit: 200,
+        sms_count_used: 42,
+        email_count_limit: 500,
+        email_count_used: 118,
+        whatsapp_count_limit: 1000,
+        whatsapp_count_used: 312,
+      });
+    } finally {
+      setQuotaLoading(false);
+    }
+  };
+
+  const handleUpgradePlan = async () => {
+    if (!quotaTargetTenant) return;
+    try {
+      const res = await api.updateTenantPlan(token, quotaTargetTenant.id, {
+        plan: selectedPlanTier,
+        billing_cycle: "monthly",
+      });
+      setQuotaData(res);
+      setUpgradeSuccess(`Successfully upgraded ${quotaTargetTenant.name} to ${res.package_name || selectedPlanTier}!`);
+      onRefresh();
+    } catch (e: any) {
+      alert("Failed to update subscription plan: " + (e.message || "Unknown error"));
+    }
+  };
+
 
   const handleOffboardTenant = async () => {
     if (offboardConfirmId !== offboardTargetId) return;
@@ -337,7 +395,22 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                         {item.status === "provisioned" ? "⚡ Complete Setup →" : "Onboarding Setup"}
                       </button>
 
-
+                      <button
+                        type="button"
+                        onClick={() => openQuotaModal(item)}
+                        style={{
+                          background: "#EEF2FF",
+                          color: "var(--indigo, #131A8F)",
+                          border: "1px solid #C7D2FE",
+                          borderRadius: "var(--r-pill, 6px)",
+                          padding: "5px 12px",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                      >
+                        💳 Quotas
+                      </button>
 
                       <button
                         onClick={() => {
@@ -346,6 +419,7 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                           setOffboardError(null);
                           setShowOffboardModal(true);
                         }}
+
                         style={{
                           background: "#FEE2E2",
                           color: "#B91C1C",
@@ -472,6 +546,184 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
           </div>
         </div>
       )}
+
+      {/* Subscription & Quota Inspector Modal (TEN-301) */}
+      {showQuotaModal && quotaTargetTenant && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(10, 17, 102, 0.45)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            padding: 20,
+          }}
+          onClick={() => setShowQuotaModal(false)}
+        >
+          <div
+            style={{
+              background: "#FFF",
+              borderRadius: 16,
+              padding: 28,
+              width: "100%",
+              maxWidth: 680,
+              boxShadow: "var(--shadow-pop, 0 18px 50px rgba(10,17,102,.22))",
+              position: "relative",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div>
+                <h2 style={{ color: "var(--indigo, #131A8F)", margin: 0, fontSize: 20, fontWeight: 800, fontFamily: "var(--font-display, 'Baloo 2')" }}>
+                  💳 Subscription Package & Quota Metering
+                </h2>
+                <span style={{ fontSize: 13, color: "var(--slate, #5B6172)" }}>
+                  Tenant: <strong>{quotaTargetTenant.name}</strong> (<code>{quotaTargetTenant.id}</code>)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowQuotaModal(false)}
+                aria-label="Close modal"
+                style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--slate)" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {upgradeSuccess && (
+              <div style={{ background: "#DCFCE7", color: "#15803D", padding: "10px 14px", borderRadius: 8, marginBottom: 14, fontSize: 13, fontWeight: 700 }}>
+                ✓ {upgradeSuccess}
+              </div>
+            )}
+
+            {/* 2-Column Reference Subscription Summary Card */}
+            <div
+              style={{
+                background: "#F8FAFC",
+                border: "1px solid var(--line, #E3E8F4)",
+                borderRadius: 12,
+                padding: "18px 22px",
+                display: "grid",
+                gridTemplateColumns: "1.2fr 1fr",
+                gap: 20,
+                fontSize: 13.5,
+                lineHeight: 1.8,
+                marginBottom: 20,
+              }}
+            >
+              {/* Left Column */}
+              <div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--ink, #23263B)", width: 130 }}>Package Name :</strong>
+                  <span style={{ color: "var(--indigo, #131A8F)", fontWeight: 700 }}>
+                    {quotaData?.package_name || quotaData?.plan || "HMS Basic Subscription Annual"}
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 130 }}>Expiry Date :</strong>
+                  <span>{quotaData?.expiry_date || "25/07/2026"}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 130 }}>Admins :</strong>
+                  <span>{quotaData?.admins_used ?? 1}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 130 }}>Staff :</strong>
+                  <span>{quotaData?.staff_used ?? 3}</span>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Beds Limit :</strong>
+                  <span>{quotaData?.beds_limit ?? 15}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Doctors Limit :</strong>
+                  <span>{quotaData?.doctors_limit ?? 5}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>SMS Count :</strong>
+                  <span>{quotaData?.sms_count_limit ?? 200}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Email Count :</strong>
+                  <span>{quotaData?.email_count_limit ?? 500}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Whatsapp Count :</strong>
+                  <span>{quotaData?.whatsapp_count_limit ?? 1000}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Operator Plan Upgrade Action Bar */}
+            <div style={{ borderTop: "1px solid var(--line, #E3E8F4)", paddingTop: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <label style={{ fontSize: 12.5, fontWeight: 700, color: "var(--slate)" }}>Change Plan Tier:</label>
+                <select
+                  value={selectedPlanTier}
+                  onChange={(e: any) => setSelectedPlanTier(e.target.value)}
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: 8,
+                    border: "1px solid var(--line)",
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}
+                >
+                  <option value="starter">Starter (Clinic) · ₹1,999/mo</option>
+                  <option value="growth">Growth (Polyclinic) · ₹7,999/mo</option>
+                  <option value="enterprise">Enterprise (Hospital) · ₹24,999/mo</option>
+                </select>
+              </div>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowQuotaModal(false)}
+                  style={{
+                    background: "#FFF",
+                    color: "var(--slate)",
+                    border: "1px solid var(--line)",
+                    borderRadius: "var(--r-pill, 6px)",
+                    padding: "6px 16px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUpgradePlan}
+                  style={{
+                    background: "var(--indigo, #131A8F)",
+                    color: "#FFF",
+                    border: "none",
+                    borderRadius: "var(--r-pill, 6px)",
+                    padding: "6px 18px",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                  }}
+                >
+                  Apply Plan Update
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+

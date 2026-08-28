@@ -66,13 +66,45 @@ async function generateCodeChallengeFromVerifier(v: string): Promise<string> {
   return base64urlencode(hashed);
 }
 
+export function resolveTenantFromHostname(): string | null {
+  if (typeof window === "undefined") return null;
+  const host = window.location.hostname;
+  
+  // Localhost, Docker, or direct IP dev fallback
+  if (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host.startsWith("192.168.") ||
+    host.startsWith("10.") ||
+    host === "103.174.103.158"
+  ) {
+    return localStorage.getItem("hms_tenant") || "apollo";
+  }
+
+  // Extract tenant from subdomain (e.g. apollo.hms.zensynq.com or zenclinic.stage.zensynq.com)
+  const parts = host.split(".");
+  if (parts.length >= 3) {
+    const subdomain = parts[0].toLowerCase();
+    const platformPrefixes = ["www", "app", "api", "auth", "stage", "staging", "admin", "operator"];
+    if (!platformPrefixes.includes(subdomain)) {
+      return subdomain;
+    }
+  }
+
+  return localStorage.getItem("hms_tenant") || "apollo";
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const getInitialToken = () => {
     return localStorage.getItem("hms_token");
   };
 
   const getInitialTenant = () => {
-    return localStorage.getItem("hms_tenant");
+    const resolved = resolveTenantFromHostname();
+    if (resolved && !localStorage.getItem("hms_tenant")) {
+      localStorage.setItem("hms_tenant", resolved);
+    }
+    return resolved || localStorage.getItem("hms_tenant") || "apollo";
   };
 
   const getInitialRole = () => {
