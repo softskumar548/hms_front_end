@@ -42,6 +42,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     { label: "Scheduling", path: "/scheduling", icon: "🗓️", show: isReceptionist },
     { label: "Queue Board", path: "/queue", icon: "📋", show: isReceptionist || isPhysician },
     { label: "EMR / Clinical", path: "/emr", icon: "📑", show: isPhysician },
+    { label: "OT & Surgery", path: "/ot", icon: "🏥", show: isPhysician || isReceptionist },
     { label: "Inpatient Wards", path: "/inpatient", icon: "🛏️", show: isPhysician || isReceptionist },
     { label: "Diagnostic Lab", path: "/lab", icon: "🧪", show: isPhysician || isReceptionist || isBiller },
     { label: "Pharmacy POS", path: "/pharmacy", icon: "💊", show: isPhysician || isReceptionist || isBiller },
@@ -122,7 +123,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Top Item: Dashboard, Emergency, Inpatient, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
+        {/* Top Item: Dashboard, Emergency, OT, Inpatient, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Link
             to="/dashboard"
@@ -170,6 +171,29 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
               >
                 <span style={{ fontSize: 16 }}>🚨</span>
                 {!collapsed && <span>Emergency</span>}
+              </Link>
+
+              <Link
+                to="/ot"
+                title={collapsed ? "Operation Theatre" : undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: collapsed ? "9px 0" : "9px 12px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  background: isCurrent("/ot") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
+                  color: isCurrent("/ot") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  fontWeight: isCurrent("/ot") ? 800 : 600,
+                  fontSize: 13.5,
+                  borderLeft: isCurrent("/ot") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span style={{ fontSize: 16 }}>🏥</span>
+                {!collapsed && <span>Operation Theatre</span>}
               </Link>
 
               <Link
