@@ -461,9 +461,38 @@ export default function TenantSettings() {
   const [configData, setConfigData] = useState<Record<string, Array<any>>>(() => {
     const saved = localStorage.getItem(`hms-config-data-${tenant || "default"}`);
     if (saved) {
-      try { return JSON.parse(saved); } catch {}
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && (!parsed.specialization || parsed.specialization.length < 10)) {
+          parsed.specialization = [
+            { id: "1", code: "GEN_MED", name: "General Medicine", hod_name: "Dr. K R Murali", default_chamber: "Chamber 101", dept_type: "Clinical OPD", on_call_247: true, description: "Internal medicine & chronic lifestyle care", active: true },
+            { id: "2", code: "CARDIO", name: "Cardiology", hod_name: "Dr. Sreenivasulu", default_chamber: "Chamber 102", dept_type: "Clinical & Diagnostic", on_call_247: true, description: "Heart disease, ECG, 2D Echocardiography", active: true },
+            { id: "3", code: "ORTHO", name: "Orthopedics & Joint Care", hod_name: "Dr. V Ramana", default_chamber: "Chamber 103", dept_type: "Surgical & Trauma", on_call_247: true, description: "Bone fracture, joint replacement, arthroscopy", active: true },
+            { id: "4", code: "PEDIA", name: "Pediatrics & Neonatology", hod_name: "Dr. Ananya Reddy", default_chamber: "Chamber 104", dept_type: "Clinical OPD", on_call_247: false, description: "Child health, immunization & NICU care", active: true },
+            { id: "5", code: "GYNAEC", name: "Obstetrics & Gynecology", hod_name: "Dr. Shanti Kumari", default_chamber: "Chamber 105", dept_type: "Surgical & Maternity", on_call_247: true, description: "Maternity, antenatal care & reproductive health", active: true },
+            { id: "6", code: "GEN_SURG", name: "General & Laparoscopic Surgery", hod_name: "Dr. K. Venkateswarlu", default_chamber: "Chamber 106", dept_type: "Surgical OT", on_call_247: true, description: "Minimal access surgery, hernia & appendix excision", active: true },
+            { id: "7", code: "DERMA", name: "Dermatology & Cosmetology", hod_name: "Dr. Pooja Rao", default_chamber: "Chamber 107", dept_type: "Clinical OPD", on_call_247: false, description: "Skin, hair, nail disorders & laser aesthetics", active: true },
+            { id: "8", code: "ENT", name: "ENT (Ear, Nose, Throat)", hod_name: "Dr. S. Nagesh", default_chamber: "Chamber 108", dept_type: "Clinical & Surgical", on_call_247: true, description: "Micro-ear surgery, sinus endoscopy, audiometry", active: true },
+            { id: "9", code: "OPHTHAL", name: "Ophthalmology & Eye Care", hod_name: "Dr. M. Jayaram", default_chamber: "Chamber 109", dept_type: "Clinical & Daycare", on_call_247: false, description: "Cataract phacoemulsification & refraction", active: true },
+            { id: "10", code: "NEURO", name: "Neurology & Neurosurgery", hod_name: "Dr. P. Chandrasekhar", default_chamber: "Chamber 110", dept_type: "Critical & Clinical", on_call_247: true, description: "Stroke management, epilepsy & neuro-trauma", active: true },
+            { id: "11", code: "PULMO", name: "Pulmonology & Chest Medicine", hod_name: "Dr. T. Hariprasad", default_chamber: "Chamber 111", dept_type: "Clinical & ICU", on_call_247: true, description: "Asthma, COPD, sleep apnea & bronchoscopy", active: true },
+            { id: "12", code: "GASTRO", name: "Gastroenterology & Hepatology", hod_name: "Dr. N. Sudhakar", default_chamber: "Chamber 112", dept_type: "Endoscopy & OPD", on_call_247: true, description: "Upper GI endoscopy, colonoscopy & liver care", active: true },
+            { id: "13", code: "NEPHRO", name: "Nephrology & Dialysis Care", hod_name: "Dr. K. Lavanya", default_chamber: "Chamber 114", dept_type: "Inpatient & Dialysis", on_call_247: true, description: "Kidney disorders, hemodialysis & hypertension", active: true },
+            { id: "14", code: "URO", name: "Urology & Andrology", hod_name: "Dr. G. Seshagiri", default_chamber: "Chamber 113", dept_type: "Surgical & Lithotripsy", on_call_247: true, description: "Kidney stones, prostate health & laser surgery", active: true },
+            { id: "15", code: "PSYCH", name: "Psychiatry & Behavioral Health", hod_name: "Dr. R. Manjunath", default_chamber: "Chamber 115", dept_type: "Clinical & Counseling", on_call_247: false, description: "Mental health, de-addiction & neuro-psychiatry", active: true },
+            { id: "16", code: "DENTAL", name: "Dental & Maxillofacial Surgery", hod_name: "Dr. B. Deepa", default_chamber: "Chamber 116", dept_type: "Dental Operatory", on_call_247: false, description: "Root canal, orthodontics, oral implants & trauma", active: true },
+            { id: "17", code: "EMERGENCY", name: "Emergency & Trauma Medicine", hod_name: "Dr. K. Rajesh", default_chamber: "Emergency Bay 1", dept_type: "Acute Resuscitation", on_call_247: true, description: "24/7 casualty, CPR, cardiac arrest & polytrauma", active: true },
+            { id: "18", code: "ONCO", name: "Medical & Surgical Oncology", hod_name: "Dr. V. Muralikrishna", default_chamber: "Oncology Ward", dept_type: "Daycare & Clinical", on_call_247: true, description: "Chemotherapy daycare, cancer staging & palliative care", active: true },
+            { id: "19", code: "ANESTH", name: "Anesthesiology & Pain Clinic", hod_name: "Dr. D. Madhavi", default_chamber: "Main OT Complex", dept_type: "Perioperative & Pain", on_call_247: true, description: "General/spinal anesthesia, ICU sedation, pain block", active: true },
+            { id: "20", code: "RADIO", name: "Radiology & Imaging Sciences", hod_name: "Dr. C. Sunder", default_chamber: "Radiology Block", dept_type: "Diagnostic Imaging", on_call_247: true, description: "Ultrasound, 32-slice CT scan, digital X-Ray", active: true },
+          ];
+          localStorage.setItem(`hms-config-data-${tenant || "default"}`, JSON.stringify(parsed));
+        }
+        return parsed;
+      } catch {}
     }
     return {
+
       room_type: [
         { id: "1", code: "CONS-101", name: "Chamber 101 (OPD)", floor: "Ground Floor", category: "Consultation Chamber", tariff_inr: 0, nursing_charge_inr: 0, amenities: ["AC", "Exam Bed", "Stethoscope Unit"], status: "Available", active: true },
         { id: "2", code: "ICU-01", name: "ICU Ventilator Bed 01", floor: "2nd Floor", category: "ICU Ventilator", tariff_inr: 6500, nursing_charge_inr: 1200, amenities: ["Oxygen", "Ventilator", "Multipara Monitor", "Defibrillator", "AC"], status: "Occupied", active: true },
@@ -480,12 +509,28 @@ export default function TenantSettings() {
         { id: "5", code: "HEALTH_CHECK", name: "Comprehensive Executive Check", fee_inr: 2500, validity_days: 30, duration_mins: 45, is_emergency: false, is_telehealth: false, description: "Full health screening package", active: true },
       ],
       specialization: [
-        { id: "1", code: "GEN_MED", name: "General Medicine", hod_name: "Dr. K R Murali", default_chamber: "Chamber 101", dept_type: "Clinical OPD", on_call_247: true, description: "Internal medicine & chronic care", active: true },
-        { id: "2", code: "CARDIO", name: "Cardiology", hod_name: "Dr. Sreenivasulu", default_chamber: "Chamber 102", dept_type: "Clinical & Diagnostic", on_call_247: true, description: "Heart disease, ECG, Echocardiography", active: true },
-        { id: "3", code: "ORTHO", name: "Orthopedics & Joint Care", hod_name: "Dr. V Ramana", default_chamber: "Chamber 103", dept_type: "Surgical & OPD", on_call_247: true, description: "Bone, joint, trauma surgery", active: true },
-        { id: "4", code: "PEDIA", name: "Pediatrics & Neonatology", hod_name: "Dr. Ananya Reddy", default_chamber: "Chamber 104", dept_type: "Clinical OPD", on_call_247: false, description: "Child healthcare & immunization", active: true },
-        { id: "5", code: "GYNAEC", name: "Obstetrics & Gynecology", hod_name: "Dr. Shanti Kumari", default_chamber: "Chamber 105", dept_type: "Surgical & Maternity", on_call_247: true, description: "Maternity and women's reproductive health", active: true },
+        { id: "1", code: "GEN_MED", name: "General Medicine", hod_name: "Dr. K R Murali", default_chamber: "Chamber 101", dept_type: "Clinical OPD", on_call_247: true, description: "Internal medicine & chronic lifestyle care", active: true },
+        { id: "2", code: "CARDIO", name: "Cardiology", hod_name: "Dr. Sreenivasulu", default_chamber: "Chamber 102", dept_type: "Clinical & Diagnostic", on_call_247: true, description: "Heart disease, ECG, 2D Echocardiography", active: true },
+        { id: "3", code: "ORTHO", name: "Orthopedics & Joint Care", hod_name: "Dr. V Ramana", default_chamber: "Chamber 103", dept_type: "Surgical & Trauma", on_call_247: true, description: "Bone fracture, joint replacement, arthroscopy", active: true },
+        { id: "4", code: "PEDIA", name: "Pediatrics & Neonatology", hod_name: "Dr. Ananya Reddy", default_chamber: "Chamber 104", dept_type: "Clinical OPD", on_call_247: false, description: "Child health, immunization & NICU care", active: true },
+        { id: "5", code: "GYNAEC", name: "Obstetrics & Gynecology", hod_name: "Dr. Shanti Kumari", default_chamber: "Chamber 105", dept_type: "Surgical & Maternity", on_call_247: true, description: "Maternity, antenatal care & reproductive health", active: true },
+        { id: "6", code: "GEN_SURG", name: "General & Laparoscopic Surgery", hod_name: "Dr. K. Venkateswarlu", default_chamber: "Chamber 106", dept_type: "Surgical OT", on_call_247: true, description: "Minimal access surgery, hernia & appendix excision", active: true },
+        { id: "7", code: "DERMA", name: "Dermatology & Cosmetology", hod_name: "Dr. Pooja Rao", default_chamber: "Chamber 107", dept_type: "Clinical OPD", on_call_247: false, description: "Skin, hair, nail disorders & laser aesthetics", active: true },
+        { id: "8", code: "ENT", name: "ENT (Ear, Nose, Throat)", hod_name: "Dr. S. Nagesh", default_chamber: "Chamber 108", dept_type: "Clinical & Surgical", on_call_247: true, description: "Micro-ear surgery, sinus endoscopy, audiometry", active: true },
+        { id: "9", code: "OPHTHAL", name: "Ophthalmology & Eye Care", hod_name: "Dr. M. Jayaram", default_chamber: "Chamber 109", dept_type: "Clinical & Daycare", on_call_247: false, description: "Cataract phacoemulsification & refraction", active: true },
+        { id: "10", code: "NEURO", name: "Neurology & Neurosurgery", hod_name: "Dr. P. Chandrasekhar", default_chamber: "Chamber 110", dept_type: "Critical & Clinical", on_call_247: true, description: "Stroke management, epilepsy & neuro-trauma", active: true },
+        { id: "11", code: "PULMO", name: "Pulmonology & Chest Medicine", hod_name: "Dr. T. Hariprasad", default_chamber: "Chamber 111", dept_type: "Clinical & ICU", on_call_247: true, description: "Asthma, COPD, sleep apnea & bronchoscopy", active: true },
+        { id: "12", code: "GASTRO", name: "Gastroenterology & Hepatology", hod_name: "Dr. N. Sudhakar", default_chamber: "Chamber 112", dept_type: "Endoscopy & OPD", on_call_247: true, description: "Upper GI endoscopy, colonoscopy & liver care", active: true },
+        { id: "13", code: "NEPHRO", name: "Nephrology & Dialysis Care", hod_name: "Dr. K. Lavanya", default_chamber: "Chamber 114", dept_type: "Inpatient & Dialysis", on_call_247: true, description: "Kidney disorders, hemodialysis & hypertension", active: true },
+        { id: "14", code: "URO", name: "Urology & Andrology", hod_name: "Dr. G. Seshagiri", default_chamber: "Chamber 113", dept_type: "Surgical & Lithotripsy", on_call_247: true, description: "Kidney stones, prostate health & laser surgery", active: true },
+        { id: "15", code: "PSYCH", name: "Psychiatry & Behavioral Health", hod_name: "Dr. R. Manjunath", default_chamber: "Chamber 115", dept_type: "Clinical & Counseling", on_call_247: false, description: "Mental health, de-addiction & neuro-psychiatry", active: true },
+        { id: "16", code: "DENTAL", name: "Dental & Maxillofacial Surgery", hod_name: "Dr. B. Deepa", default_chamber: "Chamber 116", dept_type: "Dental Operatory", on_call_247: false, description: "Root canal, orthodontics, oral implants & trauma", active: true },
+        { id: "17", code: "EMERGENCY", name: "Emergency & Trauma Medicine", hod_name: "Dr. K. Rajesh", default_chamber: "Emergency Bay 1", dept_type: "Acute Resuscitation", on_call_247: true, description: "24/7 casualty, CPR, cardiac arrest & polytrauma", active: true },
+        { id: "18", code: "ONCO", name: "Medical & Surgical Oncology", hod_name: "Dr. V. Muralikrishna", default_chamber: "Oncology Ward", dept_type: "Daycare & Clinical", on_call_247: true, description: "Chemotherapy daycare, cancer staging & palliative care", active: true },
+        { id: "19", code: "ANESTH", name: "Anesthesiology & Pain Clinic", hod_name: "Dr. D. Madhavi", default_chamber: "Main OT Complex", dept_type: "Perioperative & Pain", on_call_247: true, description: "General/spinal anesthesia, ICU sedation, pain block", active: true },
+        { id: "20", code: "RADIO", name: "Radiology & Imaging Sciences", hod_name: "Dr. C. Sunder", default_chamber: "Radiology Block", dept_type: "Diagnostic Imaging", on_call_247: true, description: "Ultrasound, 32-slice CT scan, digital X-Ray", active: true },
       ],
+
       floor_type: [
         { id: "1", code: "FL-GND", name: "Ground Floor", floor_level: "0", wing_block: "Main Wing", bed_capacity: 12, nurse_ext: "101", description: "Main Reception, Emergency, OPD Chambers, Pharmacy", active: true },
         { id: "2", code: "FL-1ST", name: "First Floor", floor_level: "1", wing_block: "Inpatient Block A", bed_capacity: 25, nurse_ext: "201", description: "General Wards, Semi-Private Rooms, Deluxe Suites", active: true },
