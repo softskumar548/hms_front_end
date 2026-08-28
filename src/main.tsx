@@ -47,6 +47,7 @@ const EmergencyTriageScreen = React.lazy(() => import("./features/emergency/Emer
 const OperationTheatreScreen = React.lazy(() => import("./features/ot/OperationTheatreScreen"));
 const TelehealthScreen = React.lazy(() => import("./features/telehealth/TelehealthScreen"));
 const DietaryNutritionScreen = React.lazy(() => import("./features/dietary/DietaryNutritionScreen"));
+const BloodBankScreen = React.lazy(() => import("./features/bloodbank/BloodBankScreen"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
 
@@ -1387,6 +1388,12 @@ function App() {
           <Route path="/dietary" element={
             <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing"]}>
               <DietaryNutritionScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/blood-bank" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing"]}>
+              <BloodBankScreen />
             </RequireRole>
           } />
 

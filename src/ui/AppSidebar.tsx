@@ -46,6 +46,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     { label: "OT & Surgery", path: "/ot", icon: "🏥", show: isPhysician || isReceptionist },
     { label: "Inpatient Wards", path: "/inpatient", icon: "🛏️", show: isPhysician || isReceptionist },
     { label: "Dietary", path: "/dietary", icon: "🥗", show: isPhysician || isReceptionist || isBiller },
+    { label: "Blood Bank", path: "/blood-bank", icon: "🩸", show: isPhysician || isReceptionist || isBiller },
     { label: "Diagnostic Lab", path: "/lab", icon: "🧪", show: isPhysician || isReceptionist || isBiller },
     { label: "Pharmacy POS", path: "/pharmacy", icon: "💊", show: isPhysician || isReceptionist || isBiller },
     { label: "Print Station", path: "/print-station", icon: "🖨️", show: isPhysician || isReceptionist || isBiller },
@@ -125,7 +126,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Top Item: Dashboard, Telehealth, Emergency, OT, Inpatient, Dietary, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
+        {/* Top Item: Dashboard, Telehealth, Emergency, OT, Inpatient, Dietary, Blood Bank, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Link
             to="/dashboard"
@@ -265,6 +266,29 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
               >
                 <span style={{ fontSize: 16 }}>🥗</span>
                 {!collapsed && <span>Dietary</span>}
+              </Link>
+
+              <Link
+                to="/blood-bank"
+                title={collapsed ? "Blood Bank" : undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: collapsed ? "9px 0" : "9px 12px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  background: isCurrent("/blood-bank") ? "#FEF2F2" : "transparent",
+                  color: isCurrent("/blood-bank") ? "#DC2626" : "var(--ink, #23263B)",
+                  fontWeight: isCurrent("/blood-bank") ? 800 : 600,
+                  fontSize: 13.5,
+                  borderLeft: isCurrent("/blood-bank") ? "3px solid #DC2626" : "3px solid transparent",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span style={{ fontSize: 16 }}>🩸</span>
+                {!collapsed && <span>Blood Bank</span>}
               </Link>
 
               <Link
