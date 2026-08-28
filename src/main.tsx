@@ -37,6 +37,7 @@ const OperatorDashboardScreen = React.lazy(() => import("./features/tenants/Oper
 const OperatorInsightsScreen = React.lazy(() => import("./features/tenants/OperatorInsightsScreen").then(m => ({ default: m.OperatorInsightsScreen })));
 const OperatorProfileScreen = React.lazy(() => import("./features/tenants/OperatorProfileScreen").then(m => ({ default: m.OperatorProfileScreen })));
 const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
+const QueueDisplayScreen = React.lazy(() => import("./features/scheduling/QueueDisplayScreen"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
 
@@ -129,6 +130,11 @@ function Shell({ children }: { children: React.ReactNode }) {
     location.pathname.startsWith("/ops-control");
 
   const isPatientRoute = role === "patient" || location.pathname.startsWith("/portal");
+  const isDisplayRoute = location.pathname === "/queue/display";
+
+  if (isDisplayRoute) {
+    return <div data-theme="trusted-clinical">{children}</div>;
+  }
 
   const handleLangChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);
@@ -1330,6 +1336,8 @@ function App() {
               <QueueBoard />
             </RequireRole>
           } />
+
+          <Route path="/queue/display" element={<QueueDisplayScreen />} />
 
           <Route path="/billing" element={
             <RequireRole roles={["receptionist", "admin", "billing"]}>

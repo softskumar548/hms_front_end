@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/client";
 import { useAuth } from "../../auth/AuthProvider";
@@ -78,11 +79,39 @@ export default function QueueBoard() {
     <div style={{ display: "grid", gap: 20 }}>
       {/* Clinic queue board workspace (UI-304) */}
       <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: 0, color: "var(--indigo)" }}>
-            OPD Outpatient Queue Management Board
-          </h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
           <div>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 4px", color: "var(--indigo)" }}>
+              OPD Outpatient Queue Management Board
+            </h2>
+            <span style={{ fontSize: 13, color: "var(--slate)" }}>
+              Manage check-ins, call next tokens, and launch the Waiting Lounge TV display.
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <Link to="/queue/display" target="_blank" style={{ textDecoration: "none" }}>
+              <button
+                type="button"
+                style={{
+                  background: "linear-gradient(135deg, #0284C7 0%, #131A8F 100%)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "9px 16px",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  boxShadow: "0 2px 8px rgba(2, 132, 199, 0.35)",
+                }}
+              >
+                🖥️ Launch Waiting Lounge TV Display ↗
+              </button>
+            </Link>
+
             <Select value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)}>
               <option value="">-- All consultation rooms --</option>
               <option value="room-101">Room 101 - Cardiology OPD</option>
