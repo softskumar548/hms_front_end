@@ -86,6 +86,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 🔬 **Pathologist Digital Verification**: Authorized review desk with clinical impression and microscopic notes.
 - 📄 **Official A4 Diagnostic Test Reports (`DiagnosticReportPrintModal`)**: NABL accredited format (MC-4891) with hospital letterhead, multi-analyte parameter tables, digital signatures, and ABHA QR verification code.
 
+## 1.8 Hospital Pharmacy & FEFO Dispensary POS (`/pharmacy`)
+- 💊 **EMR Prescription Dispensing Queue**: Direct sync with outpatient e-prescriptions with Telugu dosage instructions and 1-click batch allocation.
+- 📦 **FEFO Inventory & Expiry Controls**: Multi-batch inventory tracking with automated First-Expired-First-Out stock deduction and near-expiry alerts (< 60 days).
+- 🏷️ **Bilingual Thermal Pill Bottle Labels (`PillBottleLabelPrintModal`)**: 50mm × 25mm barcode stickers with English & Telugu patient dosage instructions (*"ఉదయం, రాత్రి భోజనం తర్వాత"*).
+- 🧾 **GST Tax Invoices & Till Settlement**: 12% GST tax breakdown, UPI QR generator, Aarogyasri 100% cashless rules, and 80mm thermal receipt printing.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
