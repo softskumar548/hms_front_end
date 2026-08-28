@@ -41,6 +41,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     { label: "Scheduling", path: "/scheduling", icon: "🗓️", show: isReceptionist },
     { label: "Queue Board", path: "/queue", icon: "📋", show: isReceptionist || isPhysician },
     { label: "EMR / Clinical", path: "/emr", icon: "📑", show: isPhysician },
+    { label: "Inpatient Wards", path: "/inpatient", icon: "🛏️", show: isPhysician || isReceptionist },
     { label: "Billing", path: "/billing", icon: "💳", show: isBiller },
     { label: "Referrals", path: "/reports/referrals", icon: "🔄", show: isBiller || isPhysician },
   ].filter((item) => item.show);
@@ -116,8 +117,8 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Top Item: Dashboard (for Admin or Overview) */}
-        <div>
+        {/* Top Item: Dashboard & Inpatient (for Admin or Overview) */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Link
             to="/dashboard"
             title={collapsed ? "Dashboard" : undefined}
@@ -140,6 +141,31 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
             <span style={{ fontSize: 16 }}>📊</span>
             {!collapsed && <span>Dashboard</span>}
           </Link>
+
+          {isAdmin && (
+            <Link
+              to="/inpatient"
+              title={collapsed ? "Inpatient Wards" : undefined}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: collapsed ? "9px 0" : "9px 12px",
+                justifyContent: collapsed ? "center" : "flex-start",
+                borderRadius: 10,
+                textDecoration: "none",
+                background: isCurrent("/inpatient") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
+                color: isCurrent("/inpatient") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                fontWeight: isCurrent("/inpatient") ? 800 : 600,
+                fontSize: 13.5,
+                borderLeft: isCurrent("/inpatient") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <span style={{ fontSize: 16 }}>🛏️</span>
+              {!collapsed && <span>Inpatient Wards</span>}
+            </Link>
+          )}
         </div>
 
         {/* Clinical Staff Navigation (only shown for non-admin staff) */}

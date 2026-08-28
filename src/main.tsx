@@ -38,6 +38,7 @@ const OperatorInsightsScreen = React.lazy(() => import("./features/tenants/Opera
 const OperatorProfileScreen = React.lazy(() => import("./features/tenants/OperatorProfileScreen").then(m => ({ default: m.OperatorProfileScreen })));
 const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
 const QueueDisplayScreen = React.lazy(() => import("./features/scheduling/QueueDisplayScreen"));
+const InpatientBedMatrixScreen = React.lazy(() => import("./features/inpatient/InpatientBedMatrixScreen"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
 
@@ -1348,6 +1349,12 @@ function App() {
           <Route path="/emr" element={
             <RequireRole roles={["physician", "admin"]}>
               <EMRStub />
+            </RequireRole>
+          } />
+
+          <Route path="/inpatient" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist"]}>
+              <InpatientBedMatrixScreen />
             </RequireRole>
           } />
 
