@@ -116,6 +116,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 🍳 **Central Kitchen Batch Aggregation**: Recipe quantities aggregated for hospital chefs.
 - 🏷️ **Thermal Meal Tray Stickers (`MealTrayLabelModal`)**: 50mm × 25mm barcode stickers with English & Telugu dietary precautions (*"చక్కెర పూర్తిగా నిషిద్ధం, ఉప్పు తక్కువగా తీసుకోవాలి"*).
 
+## 1.13 Blood Bank & Cross-Matching Management (`/blood-bank`)
+- 🩸 **Blood Group & Component Inventory**: Real-time stock tracking across all 8 ABO/Rh blood groups + Bombay phenotype for PRBC, FFP, Platelets, and Cryoprecipitate.
+- 💉 **Voluntary Donor Intake & Mandatory 5-Serology Screen**: 12-digit Indian Aadhaar ID verification and mandatory NACO serological infection screening (HIV 1/2, HBsAg, HCV, VDRL, Malaria) yielding 3 distinct components per donation.
+- 🧪 **Transfusion Cross-Matching & Compatibility Desk**: Serological Major/Minor cross-matching and AHG Coombs testing with 24-hour reservation lock for surgical suites.
+- 🚨 **Emergency STAT Uncrossmatched Release**: 2-unit O-Negative emergency trauma release protocol with Casualty Medical Officer (CMO) statutory override.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
