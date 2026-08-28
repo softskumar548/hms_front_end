@@ -59,7 +59,11 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 🚨 **Persistent Allergy Warning Banner (`EMR-005`)**: High-visibility contraindication alert across clinical records.
   - 💊 **Bilingual Rx Medication Composer (`RX-002` / `RX-003`)**: Indian pharmaceutical brand catalog, structured frequency/route/food-timing matrix, Telugu patient instructions, and hard-stop allergy overrides.
   - 🖨️ **MediPass Printable Stub (`/emr/patients/:id/print`)**: A4 printer-friendly prescription and visit summary with hospital letterhead and physician registration credentials.
-- **Biller**: Invoices (`/billing`), Payment Till, Referral Analytics (`/reports/referrals`).
+- **Biller**:
+  - 💳 **Invoicing & Ledger (`/billing`)**: Itemized charge sheets, gross invoice totals, PMJAY/Aarogyasri eligibility indicators, and invoice locking.
+  - 💵 **Daily Till Drawer Reconciliation (`TillReconciliationModal`)**: Physical currency denomination breakdown (`₹500`...`₹1`), opening float, cash refunds, and live till variance/shortage audits.
+  - 🔀 **Multi-Rail Split Invoicing (`PaymentTill`)**: Settle across YSR Aarogyasri 100% cashless, TPA corporate insurance pre-auths, and patient copay with dynamic UPI QR code generator and 80mm thermal receipt printer.
+  - 📈 **Referral Partner Analytics (`/reports/referrals`)**: Diagnostic partner ledger and volume reports.
 
 ---
 
