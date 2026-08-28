@@ -685,7 +685,73 @@ export default function TenantSettings() {
 
 
   const currentCategoryInfo = configCategories.find((c) => c.key === selectedConfigType) || configCategories[0];
-  const currentItems = (configData[selectedConfigType] || []).filter((item) => {
+  const [upgradeContext, setUpgradeContext] = useState<"catalog" | "item">("catalog");
+
+  // Category Item Limits based on Subscription Plan Tier
+  const getCategoryItemLimit = (catKey: string, tier: "starter" | "growth" | "enterprise"): number => {
+    if (role === "operator" || tier === "enterprise") return 9999;
+
+    const limitsByTier: Record<"starter" | "growth", Record<string, number>> = {
+      starter: {
+        room_type: quotaData?.beds_limit || 15,
+        bed_category: 6,
+        visit_type: 5,
+        specialization: quotaData?.doctors_limit || 5,
+        floor_type: 3,
+        lab_test: 20,
+        payment_type: 4,
+        expense_category: 8,
+        surgical_package: 5,
+        ambulance_fleet: 2,
+        tpa_insurance: 4,
+        biomedical_asset: 10,
+        diet_plan: 5,
+        specimen_type: 6,
+        dosage_route: 6,
+        referral_partner: 5,
+        consent_template: 5,
+        waste_category: 4,
+        clinic_type: 3,
+        order_status: 6,
+      },
+      growth: {
+        room_type: quotaData?.beds_limit || 50,
+        bed_category: 15,
+        visit_type: 25,
+        specialization: quotaData?.doctors_limit || 25,
+        floor_type: 10,
+        lab_test: 100,
+        payment_type: 12,
+        expense_category: 30,
+        surgical_package: 30,
+        ambulance_fleet: 10,
+        tpa_insurance: 15,
+        biomedical_asset: 50,
+        diet_plan: 25,
+        specimen_type: 20,
+        dosage_route: 20,
+        referral_partner: 25,
+        consent_template: 25,
+        waste_category: 15,
+        clinic_type: 10,
+        order_status: 15,
+      },
+    };
+
+    const tierDefaults = {
+      starter: 10,
+      growth: 50,
+    };
+
+    return limitsByTier[tier]?.[catKey] ?? tierDefaults[tier];
+  };
+
+  const currentCategoryAllItems = configData[selectedConfigType] || [];
+  const currentCategoryItemCount = currentCategoryAllItems.length;
+  const currentCategoryItemLimit = getCategoryItemLimit(selectedConfigType, currentPlanTier);
+  const isCategoryItemQuotaExhausted = currentCategoryItemLimit !== 9999 && currentCategoryItemCount >= currentCategoryItemLimit;
+
+  const currentItems = currentCategoryAllItems.filter((item) => {
     const q = configSearch.toLowerCase();
     return (
       (item.name && item.name.toLowerCase().includes(q)) ||
@@ -693,6 +759,7 @@ export default function TenantSettings() {
       (item.description && item.description.toLowerCase().includes(q))
     );
   });
+
 
   const filteredAuthUsers = authUsers.filter((u: any) => {
     const q = authSearch.toLowerCase();
@@ -803,6 +870,7 @@ export default function TenantSettings() {
                       ghost
                       type="button"
                       onClick={() => {
+                        setUpgradeContext("catalog");
                         if (isCustomCatalogQuotaExhausted) {
                           setShowUpgradePlanModal(true);
                         } else {
@@ -880,7 +948,11 @@ export default function TenantSettings() {
                   <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: "0 0 2px", display: "flex", alignItems: "center", gap: 8 }}>
                     {(currentCategoryInfo as any).icon || "🏷️"} {currentCategoryInfo.label} Master
                   </h3>
-                  <span style={{ fontSize: 12.5, color: "var(--slate)" }}>{currentCategoryInfo.desc}</span>
+                  <span style={{ fontSize: 12.5, color: "var(--slate)" }}>
+                    {currentCategoryInfo.desc} · <strong style={{ color: isCategoryItemQuotaExhausted ? "#DC2626" : "var(--indigo)" }}>
+                      {currentCategoryItemCount} of {currentCategoryItemLimit === 9999 ? "∞ Unlimited" : currentCategoryItemLimit} Items Registered
+                    </strong>
+                  </span>
                 </div>
 
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -888,11 +960,48 @@ export default function TenantSettings() {
                     placeholder="Search items..."
                     value={configSearch}
                     onChange={(e) => setConfigSearch(e.target.value)}
-                    style={{ width: 220 }}
+                    style={{ width: 200 }}
                   />
-                  <Button onClick={() => setShowAddConfigModal(true)}>+ Add {currentCategoryInfo.label}</Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (isCategoryItemQuotaExhausted) {
+                        setUpgradeContext("item");
+                        setShowUpgradePlanModal(true);
+                      } else {
+                        setShowAddConfigModal(true);
+                      }
+                    }}
+                    style={{
+                      border: isCategoryItemQuotaExhausted ? "1px solid #EF4444" : undefined,
+                      background: isCategoryItemQuotaExhausted ? "#FEF2F2" : undefined,
+                      color: isCategoryItemQuotaExhausted ? "#B91C1C" : undefined,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    + Add {currentCategoryInfo.label}
+                    {currentPlanTier === "enterprise" ? (
+                      <span style={{ fontSize: 10.5, background: "#10B981", color: "#fff", padding: "1px 6px", borderRadius: 6, fontWeight: 800 }}>
+                        👑 ∞
+                      </span>
+                    ) : (
+                      <span style={{
+                        fontSize: 10.5,
+                        background: isCategoryItemQuotaExhausted ? "#EF4444" : "rgba(255,255,255,0.25)",
+                        color: isCategoryItemQuotaExhausted ? "#fff" : "inherit",
+                        padding: "1px 6px",
+                        borderRadius: 6,
+                        fontWeight: 800,
+                      }}>
+                        {currentCategoryItemCount}/{currentCategoryItemLimit}
+                      </span>
+                    )}
+                  </Button>
                 </div>
               </div>
+
 
               {/* Dynamic Polymorphic Data Table */}
               <div style={{ overflowX: "auto" }}>
@@ -1324,7 +1433,18 @@ export default function TenantSettings() {
                   </button>
                 </div>
 
+                {/* Plan Category Item Quota Banner */}
+                <div style={{ background: "#EEF2FF", padding: "8px 12px", borderRadius: 10, border: "1px solid var(--indigo)", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
+                  <span style={{ color: "var(--indigo)", fontWeight: 700 }}>
+                    📊 Category Item Quota: {currentCategoryItemCount + 1} of {currentCategoryItemLimit === 9999 ? "∞ Unlimited" : currentCategoryItemLimit} Items
+                  </span>
+                  <span style={{ background: "var(--indigo)", color: "#fff", padding: "2px 8px", borderRadius: 8, fontSize: 11, fontWeight: 800, textTransform: "uppercase" }}>
+                    {currentPlanTier} PLAN
+                  </span>
+                </div>
+
                 <div style={{ display: "grid", gap: 14 }}>
+
                   {/* Common Code & Name with Dynamic Placeholders */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 12 }}>
                     <div>
@@ -2249,7 +2369,7 @@ export default function TenantSettings() {
             </div>
           )}
 
-          {/* Subscription Tier Upgrade Modal for Custom Catalogs */}
+          {/* Subscription Tier Upgrade Modal for Custom Catalogs & Items */}
           {showUpgradePlanModal && (
             <div
               style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.6)", backdropFilter: "blur(5px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
@@ -2266,10 +2386,18 @@ export default function TenantSettings() {
                     </div>
                     <div>
                       <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: 0 }}>
-                        {currentPlanTier === "starter" ? "Unlock Custom Master Catalogs" : "Custom Catalog Quota Reached"}
+                        {upgradeContext === "item"
+                          ? `${currentCategoryInfo.label} Quota Reached`
+                          : currentPlanTier === "starter"
+                          ? "Unlock Custom Master Catalogs"
+                          : "Custom Catalog Quota Reached"}
                       </h3>
                       <span style={{ fontSize: 12.5, color: "var(--slate)" }}>
-                        Current Tier: <strong style={{ color: "var(--indigo)", textTransform: "uppercase" }}>{currentPlanTier} PLAN</strong> ({customCatalogCount} of {customCatalogLimit === 999 ? "∞" : customCatalogLimit} custom catalogs used)
+                        Current Tier: <strong style={{ color: "var(--indigo)", textTransform: "uppercase" }}>{currentPlanTier} PLAN</strong> (
+                        {upgradeContext === "item"
+                          ? `${currentCategoryItemCount} of ${currentCategoryItemLimit === 9999 ? "∞" : currentCategoryItemLimit} items used`
+                          : `${customCatalogCount} of ${customCatalogLimit === 999 ? "∞" : customCatalogLimit} custom catalogs used`
+                        })
                       </span>
                     </div>
                   </div>
@@ -2285,7 +2413,12 @@ export default function TenantSettings() {
 
                 <div style={{ background: "var(--wash-a)", padding: 16, borderRadius: 14, border: "1px solid var(--line)", marginBottom: 18 }}>
                   <div style={{ fontSize: 13, color: "var(--ink)", lineHeight: 1.6, marginBottom: 12 }}>
-                    {currentPlanTier === "starter" ? (
+                    {upgradeContext === "item" ? (
+                      <>
+                        You have reached the maximum allowance of <strong>{currentCategoryItemLimit} items</strong> for <strong>{currentCategoryInfo.label}</strong> on your <strong>{currentPlanTier.toUpperCase()} Plan</strong>.
+                        Upgrade to <strong>Growth</strong> or <strong>Enterprise</strong> to register additional rooms, doctors, tests, packages, and clinical assets.
+                      </>
+                    ) : currentPlanTier === "starter" ? (
                       <>
                         Your <strong>Starter Subscription</strong> includes all <strong>20 core healthcare catalogs</strong> by default.
                         To define hospital-specific catalogs (e.g. <em>Dialysis Chairs</em>, <em>Ophthalmology Lanes</em>, <em>Physiotherapy Stations</em>) with custom data capturing schemas, upgrade to <strong>Growth</strong> or <strong>Enterprise</strong>.
@@ -2303,13 +2436,17 @@ export default function TenantSettings() {
                     <div style={{ background: currentPlanTier === "starter" ? "#EFF6FF" : "#fff", padding: "10px 12px", borderRadius: 10, border: currentPlanTier === "starter" ? "2px solid var(--indigo)" : "1px solid var(--line)", textAlign: "center" }}>
                       <strong style={{ display: "block", color: "var(--indigo)" }}>Starter</strong>
                       <div style={{ color: "var(--slate)", fontSize: 11, margin: "4px 0" }}>20 Built-in Catalogs</div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)" }}>0 Custom</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)" }}>
+                        {upgradeContext === "item" ? `Up to ${getCategoryItemLimit(selectedConfigType, "starter")} Items` : "0 Custom Catalogs"}
+                      </span>
                     </div>
 
                     <div style={{ background: currentPlanTier === "growth" ? "#EFF6FF" : "#fff", padding: "10px 12px", borderRadius: 10, border: currentPlanTier === "growth" ? "2px solid var(--indigo)" : "1px solid var(--line)", textAlign: "center" }}>
                       <strong style={{ display: "block", color: "var(--indigo)" }}>Growth</strong>
                       <div style={{ color: "var(--slate)", fontSize: 11, margin: "4px 0" }}>20 Built-in Catalogs</div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A" }}>5 Custom Schemas</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A" }}>
+                        {upgradeContext === "item" ? `Up to ${getCategoryItemLimit(selectedConfigType, "growth")} Items` : "5 Custom Catalogs"}
+                      </span>
                     </div>
 
                     <div style={{ background: currentPlanTier === "enterprise" ? "#EFF6FF" : "#fff", padding: "10px 12px", borderRadius: 10, border: currentPlanTier === "enterprise" ? "2px solid var(--indigo)" : "1px solid #F59E0B", textAlign: "center" }}>
@@ -2334,11 +2471,11 @@ export default function TenantSettings() {
                   >
                     View Account Quotas ➔
                   </Button>
-
                 </div>
               </Card>
             </div>
           )}
+
 
 
         </div>
