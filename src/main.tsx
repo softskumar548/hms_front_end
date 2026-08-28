@@ -42,6 +42,7 @@ const InpatientBedMatrixScreen = React.lazy(() => import("./features/inpatient/I
 const HospitalHRScreen = React.lazy(() => import("./features/hr/HospitalHRScreen"));
 const PrintStationScreen = React.lazy(() => import("./features/printing/PrintStationScreen"));
 const LaboratoryWorkstationScreen = React.lazy(() => import("./features/lab/LaboratoryWorkstationScreen"));
+const HospitalPharmacyScreen = React.lazy(() => import("./features/pharmacy/HospitalPharmacyScreen"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
 
@@ -1376,6 +1377,12 @@ function App() {
           <Route path="/lab" element={
             <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing"]}>
               <LaboratoryWorkstationScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/pharmacy" element={
+            <RequireRole roles={["admin", "physician", "doctor", "billing", "receptionist", "nurse"]}>
+              <HospitalPharmacyScreen />
             </RequireRole>
           } />
 
