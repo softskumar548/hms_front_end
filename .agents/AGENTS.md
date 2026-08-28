@@ -104,6 +104,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 📋 **Interactive 3-Stage WHO Surgical Safety Checklist**: Digital verification of Sign-In (Pre-induction), Time-Out (Pre-incision), and Sign-Out (Pre-exit) with instrument/sponge count verification and compliance certification.
 - 🛏️ **PACU Post-Anesthesia Recovery & Aldrete Score**: Real-time Modified Aldrete scoring (`0-10`) with automated discharge criteria (Score ≥ 9) for ward transfers.
 
+## 1.11 Telehealth WebRTC Video Consultations (`/telehealth`)
+- 📹 **In-Browser HD WebRTC Video Room**: High-definition video with live audio waveforms, picture-in-picture self-view, camera switch, microphone mute, and screen sharing.
+- 💊 **Simultaneous Bilingual e-Prescription (Rx) Composer**: Real-time Rx generation with Telugu dosage instructions (*"ఉదయం, రాత్రి భోజనం తర్వాత"*) and persistent allergy warnings (`EMR-005`).
+- 📋 **Virtual Waiting Room Queue**: Real-time waiting room with device readiness checks (Camera, Mic, Network throughput).
+- 💬 **Instant WhatsApp & SMS Video Link Dispatch**: 1-click video invitation dispatching direct join URLs to patient mobile phones.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
