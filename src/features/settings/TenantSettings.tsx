@@ -119,6 +119,21 @@ export default function TenantSettings() {
   const [newConfigMonthlyBudgetInr, setNewConfigMonthlyBudgetInr] = useState("50000");
   const [newConfigApprovalLimitInr, setNewConfigApprovalLimitInr] = useState("5000");
 
+  const [newConfigAmbulanceType, setNewConfigAmbulanceType] = useState("ACLS Advanced Life Support");
+  const [newConfigPerKmTariff, setNewConfigPerKmTariff] = useState("25");
+  const [newConfigPackageDays, setNewConfigPackageDays] = useState("3");
+  const [newConfigPreAuthPhone, setNewConfigPreAuthPhone] = useState("1800-102-4477");
+  const [newConfigAssetModel, setNewConfigAssetModel] = useState("GE Healthcare Diagnostic");
+  const [newConfigCalibrationDate, setNewConfigCalibrationDate] = useState("2026-12-15");
+  const [newConfigDietCalories, setNewConfigDietCalories] = useState("1800 kcal");
+  const [newConfigCapColor, setNewConfigCapColor] = useState("Purple (EDTA)");
+  const [newConfigRouteType, setNewConfigRouteType] = useState("Oral (PO)");
+  const [newConfigPartnerCity, setNewConfigPartnerCity] = useState("Nandyal");
+  const [newConfigPartnerPhone, setNewConfigPartnerPhone] = useState("+91 98480 22338");
+  const [newConfigLanguage, setNewConfigLanguage] = useState("Bilingual (English + Telugu)");
+  const [newConfigWasteColor, setNewConfigWasteColor] = useState("Yellow Bag (Incineration)");
+
+
   // Account Settings Sub-tabs & Fields (Matching Screenshot & Operator aware)
   const isOperator = role === "operator";
   const defaultOrgName = isOperator ? "ZEN SAAS PLATFORM" : (tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "ZEN CLINIC");
@@ -506,6 +521,32 @@ export default function TenantSettings() {
       newItem.gst_slab = newConfigGstSlab;
       newItem.monthly_budget_inr = Number(newConfigMonthlyBudgetInr) || 0;
       newItem.approval_limit_inr = Number(newConfigApprovalLimitInr) || 0;
+    } else if (selectedConfigType === "surgical_package") {
+      newItem.tariff_inr = Number(newConfigTariffInr) || 0;
+      newItem.duration_days = Number(newConfigPackageDays) || 3;
+    } else if (selectedConfigType === "ambulance_fleet") {
+      newItem.tariff_inr = Number(newConfigTariffInr) || 0;
+      newItem.per_km_inr = Number(newConfigPerKmTariff) || 25;
+      newItem.vehicle_type = newConfigAmbulanceType;
+    } else if (selectedConfigType === "tpa_insurance") {
+      newItem.contact_phone = newConfigPreAuthPhone;
+      newItem.tat_hours = Number(newConfigTatHours) || 2;
+    } else if (selectedConfigType === "biomedical_asset") {
+      newItem.model = newConfigAssetModel;
+      newItem.calibration_date = newConfigCalibrationDate;
+    } else if (selectedConfigType === "diet_plan") {
+      newItem.calories = newConfigDietCalories;
+    } else if (selectedConfigType === "specimen_type") {
+      newItem.cap_color = newConfigCapColor;
+    } else if (selectedConfigType === "dosage_route") {
+      newItem.route_type = newConfigRouteType;
+    } else if (selectedConfigType === "referral_partner") {
+      newItem.city = newConfigPartnerCity;
+      newItem.phone = newConfigPartnerPhone;
+    } else if (selectedConfigType === "consent_template") {
+      newItem.language = newConfigLanguage;
+    } else if (selectedConfigType === "waste_category") {
+      newItem.color_bag = newConfigWasteColor;
     }
 
     setConfigData((prev) => {
@@ -523,6 +564,50 @@ export default function TenantSettings() {
     setNewConfigDesc("");
     triggerToast(`New ${currentCategoryInfo.label} item added!`);
   };
+
+  const getItemPlaceholders = () => {
+    switch (selectedConfigType) {
+      case "room_type":
+        return { code: "e.g. ICU-03", nameLabel: "Room / Bed Name", namePlaceholder: "e.g. ICU Ventilator Chamber 03" };
+      case "visit_type":
+        return { code: "e.g. VIP_CONSULT", nameLabel: "Visit Type Category", namePlaceholder: "e.g. Super Specialist Review" };
+      case "specialization":
+        return { code: "e.g. NEURO", nameLabel: "Department / Specialty Name", namePlaceholder: "e.g. Neurology & Spine Care" };
+      case "floor_type":
+        return { code: "e.g. FL-4TH", nameLabel: "Floor / Level Name", namePlaceholder: "e.g. Fourth Floor (Daycare & Chemotherapy)" };
+      case "lab_test":
+        return { code: "e.g. LAB-HBA1C", nameLabel: "Investigation / Test Name", namePlaceholder: "e.g. Glycated Hemoglobin (HbA1c)" };
+      case "bed_category":
+        return { code: "e.g. HDU_BED", nameLabel: "Bed Category Classification", namePlaceholder: "e.g. High Dependency Unit (HDU)" };
+      case "payment_type":
+        return { code: "e.g. PAYTM_QR", nameLabel: "Payment Method / Rail", namePlaceholder: "e.g. Dynamic Paytm Soundbox QR" };
+      case "expense_category":
+        return { code: "e.g. EXP_DIESEL", nameLabel: "Expense Head Title", namePlaceholder: "e.g. DG Power Backup Diesel" };
+      case "surgical_package":
+        return { code: "e.g. SURG-LAP", nameLabel: "Surgical Procedure / Package Name", namePlaceholder: "e.g. Laparoscopic Cholecystectomy" };
+      case "ambulance_fleet":
+        return { code: "e.g. AMB-03", nameLabel: "Ambulance Vehicle / Unit", namePlaceholder: "e.g. ACLS Cardiac Ambulance (AP-21-TX-3003)" };
+      case "tpa_insurance":
+        return { code: "e.g. TPA-ICICI", nameLabel: "Insurance Company / TPA Name", namePlaceholder: "e.g. ICICI Lombard General Insurance" };
+      case "biomedical_asset":
+        return { code: "e.g. BIO-VENT-02", nameLabel: "Medical Equipment / Device", namePlaceholder: "e.g. Hamilton T1 Transport Ventilator" };
+      case "diet_plan":
+        return { code: "e.g. DIET-HIGHPRO", nameLabel: "Diet / Nutrition Plan Title", namePlaceholder: "e.g. High Protein Post-Surgical Diet" };
+      case "specimen_type":
+        return { code: "e.g. SPEC-SST", nameLabel: "Specimen / Vacutainer Name", namePlaceholder: "e.g. Serum Gel SST Vacutainer (Yellow Cap)" };
+      case "dosage_route":
+        return { code: "e.g. ROUTE-NEB", nameLabel: "Medication Administration Route", namePlaceholder: "e.g. Inhalation via Nebulization" };
+      case "referral_partner":
+        return { code: "e.g. REF-APOLLO", nameLabel: "Partner Diagnostic / Clinic", namePlaceholder: "e.g. Apollo Diagnostics Hub Nandyal" };
+      case "consent_template":
+        return { code: "e.g. CONS-ENDO", nameLabel: "Consent Document Title", namePlaceholder: "e.g. Upper GI Endoscopy Informed Consent" };
+      case "waste_category":
+        return { code: "e.g. BMW-CYTO", nameLabel: "Biomedical Waste Category", namePlaceholder: "e.g. Yellow Bag - Cytotoxic Waste" };
+      default:
+        return { code: "e.g. ITEM_01", nameLabel: `${currentCategoryInfo.label} Name`, namePlaceholder: `e.g. New ${currentCategoryInfo.label}` };
+    }
+  };
+
 
   const handleAddCustomCategory = () => {
     if (!newCatLabel) return;
@@ -1105,7 +1190,7 @@ export default function TenantSettings() {
                 </div>
 
                 <div style={{ display: "grid", gap: 14 }}>
-                  {/* Common Code & Name */}
+                  {/* Common Code & Name with Dynamic Placeholders */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 12 }}>
                     <div>
                       <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
@@ -1113,17 +1198,17 @@ export default function TenantSettings() {
                       </label>
                       <Input
                         autoFocus
-                        placeholder="e.g. ICU-03"
+                        placeholder={getItemPlaceholders().code}
                         value={newConfigCode}
                         onChange={(e) => setNewConfigCode(e.target.value)}
                       />
                     </div>
                     <div>
                       <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
-                        Display Name <span style={{ color: "var(--danger)" }}>*</span>
+                        {getItemPlaceholders().nameLabel} <span style={{ color: "var(--danger)" }}>*</span>
                       </label>
                       <Input
-                        placeholder="e.g. ICU Ventilator Chamber 03"
+                        placeholder={getItemPlaceholders().namePlaceholder}
                         value={newConfigName}
                         onChange={(e) => setNewConfigName(e.target.value)}
                       />
@@ -1316,6 +1401,66 @@ export default function TenantSettings() {
                     </>
                   )}
 
+                  {/* FLOOR & BUILDING WING SPECIFIC FIELDS */}
+                  {selectedConfigType === "floor_type" && (
+                    <>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Floor Level
+                          </label>
+                          <select
+                            value={newConfigFloorLevel}
+                            onChange={(e) => setNewConfigFloorLevel(e.target.value)}
+                            style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                          >
+                            <option value="-1">Basement (-1)</option>
+                            <option value="0">Ground Level (0)</option>
+                            <option value="1">1st Floor Level (1)</option>
+                            <option value="2">2nd Floor Level (2)</option>
+                            <option value="3">3rd Floor Level (3)</option>
+                            <option value="4">4th Floor Level (4)</option>
+                            <option value="5">5th Floor Level (5)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Building Wing / Block
+                          </label>
+                          <Input
+                            value={newConfigWingBlock}
+                            onChange={(e) => setNewConfigWingBlock(e.target.value)}
+                            placeholder="e.g. Inpatient Block A / Surgical Wing"
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Bed Capacity (Beds Count)
+                          </label>
+                          <Input
+                            type="number"
+                            value={newConfigBedCapacity}
+                            onChange={(e) => setNewConfigBedCapacity(e.target.value)}
+                            placeholder="e.g. 24"
+                          />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Nurse Station Phone / Extension
+                          </label>
+                          <Input
+                            value={newConfigNurseExt}
+                            onChange={(e) => setNewConfigNurseExt(e.target.value)}
+                            placeholder="e.g. Ext: 201"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   {/* LAB TEST SPECIFIC FIELDS */}
                   {selectedConfigType === "lab_test" && (
                     <>
@@ -1383,6 +1528,276 @@ export default function TenantSettings() {
                       </div>
                     </>
                   )}
+
+                  {/* BED CATEGORY SPECIFIC FIELDS */}
+                  {selectedConfigType === "bed_category" && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Base Room Tariff (₹ / Day)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigTariffInr}
+                          onChange={(e) => setNewConfigTariffInr(e.target.value)}
+                          placeholder="e.g. 2500"
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Daily Nursing Charge (₹ / Day)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigNursingInr}
+                          onChange={(e) => setNewConfigNursingInr(e.target.value)}
+                          placeholder="e.g. 450"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PAYMENT TYPE SPECIFIC FIELDS */}
+                  {selectedConfigType === "payment_type" && (
+                    <>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Payment Rail / Type
+                        </label>
+                        <select
+                          value={newConfigRailType}
+                          onChange={(e) => setNewConfigRailType(e.target.value)}
+                          style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                        >
+                          <option value="UPI QR">Instant Dynamic UPI QR</option>
+                          <option value="Card Swipe Terminal">POS Debit / Credit Card Swipe</option>
+                          <option value="Physical Currency">Physical Cash Till Drawer</option>
+                          <option value="Govt 100% Cashless">Govt Cashless Scheme (Dr. YSR / PMJAY)</option>
+                          <option value="Insurance Pre-Auth">Private TPA Cashless Pre-Auth</option>
+                          <option value="NEFT / RTGS">Bank Wire NEFT / RTGS</option>
+                        </select>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 16, background: "var(--wash-a)", padding: "10px 14px", borderRadius: 8 }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                          <input type="checkbox" checked={newConfigRequiresUtr} onChange={(e) => setNewConfigRequiresUtr(e.target.checked)} />
+                          🔢 Requires UTR / Txn Reference #
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+                          <input type="checkbox" checked={newConfigCashlessScheme} onChange={(e) => setNewConfigCashlessScheme(e.target.checked)} />
+                          🛡️ 100% Govt Cashless Scheme
+                        </label>
+                      </div>
+                    </>
+                  )}
+
+                  {/* EXPENSE CATEGORY SPECIFIC FIELDS */}
+                  {selectedConfigType === "expense_category" && (
+                    <>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            GST Tax Slab
+                          </label>
+                          <select
+                            value={newConfigGstSlab}
+                            onChange={(e) => setNewConfigGstSlab(e.target.value)}
+                            style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                          >
+                            <option value="0%">0% Exempted</option>
+                            <option value="5%">5% GST</option>
+                            <option value="12%">12% GST</option>
+                            <option value="18%">18% GST</option>
+                            <option value="28%">28% GST</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Monthly Budget (₹)
+                          </label>
+                          <Input
+                            type="number"
+                            value={newConfigMonthlyBudgetInr}
+                            onChange={(e) => setNewConfigMonthlyBudgetInr(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Approval Limit (₹)
+                          </label>
+                          <Input
+                            type="number"
+                            value={newConfigApprovalLimitInr}
+                            onChange={(e) => setNewConfigApprovalLimitInr(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* SURGICAL PACKAGE SPECIFIC FIELDS */}
+                  {selectedConfigType === "surgical_package" && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Package Tariff Total (₹)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigTariffInr}
+                          onChange={(e) => setNewConfigTariffInr(e.target.value)}
+                          placeholder="e.g. 35000"
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Included Stay Days (IPD)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigPackageDays}
+                          onChange={(e) => setNewConfigPackageDays(e.target.value)}
+                          placeholder="e.g. 3"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AMBULANCE FLEET SPECIFIC FIELDS */}
+                  {selectedConfigType === "ambulance_fleet" && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Life Support Type
+                        </label>
+                        <select
+                          value={newConfigAmbulanceType}
+                          onChange={(e) => setNewConfigAmbulanceType(e.target.value)}
+                          style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                        >
+                          <option value="ACLS Advanced Life Support">ACLS Ventilator Unit</option>
+                          <option value="BLS Basic Life Support">BLS Oxygen Unit</option>
+                          <option value="Patient Transport Vehicle">Non-Emergency Transport</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Base Callout Fee (₹)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigTariffInr}
+                          onChange={(e) => setNewConfigTariffInr(e.target.value)}
+                          placeholder="e.g. 2500"
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Per KM Tariff (₹/km)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigPerKmTariff}
+                          onChange={(e) => setNewConfigPerKmTariff(e.target.value)}
+                          placeholder="e.g. 25"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TPA INSURANCE SPECIFIC FIELDS */}
+                  {selectedConfigType === "tpa_insurance" && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Pre-Auth Desk Phone / Toll-Free
+                        </label>
+                        <Input
+                          value={newConfigPreAuthPhone}
+                          onChange={(e) => setNewConfigPreAuthPhone(e.target.value)}
+                          placeholder="e.g. 1800-102-4477"
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Claim Approval TAT (Hours)
+                        </label>
+                        <Input
+                          type="number"
+                          value={newConfigTatHours}
+                          onChange={(e) => setNewConfigTatHours(e.target.value)}
+                          placeholder="e.g. 2"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* BIOMEDICAL ASSET SPECIFIC FIELDS */}
+                  {selectedConfigType === "biomedical_asset" && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Manufacturer & Model
+                        </label>
+                        <Input
+                          value={newConfigAssetModel}
+                          onChange={(e) => setNewConfigAssetModel(e.target.value)}
+                          placeholder="e.g. Philips 12-Lead Diagnostic ECG"
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                          Next Calibration Due Date
+                        </label>
+                        <Input
+                          type="date"
+                          value={newConfigCalibrationDate}
+                          onChange={(e) => setNewConfigCalibrationDate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SPECIMEN VACUTAINER SPECIFIC FIELDS */}
+                  {selectedConfigType === "specimen_type" && (
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Vacutainer Cap Color Code
+                      </label>
+                      <select
+                        value={newConfigCapColor}
+                        onChange={(e) => setNewConfigCapColor(e.target.value)}
+                        style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                      >
+                        <option value="Purple (EDTA)">Purple Cap (EDTA - Whole Blood)</option>
+                        <option value="Red (Plain Clot)">Red Cap (Plain Clot Activator - Serum)</option>
+                        <option value="Yellow (Gel SST)">Yellow Cap (Gel Serum Separator SST)</option>
+                        <option value="Grey (Fluoride)">Grey Cap (Sodium Fluoride - Glucose)</option>
+                        <option value="Blue (Citrate)">Blue Cap (Sodium Citrate - Coagulation)</option>
+                        <option value="Sterile Container">Sterile Container (Urine / Body Fluid)</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {/* BIOMEDICAL WASTE SPECIFIC FIELDS */}
+                  {selectedConfigType === "waste_category" && (
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        CPCB / APPCB Waste Color Code
+                      </label>
+                      <select
+                        value={newConfigWasteColor}
+                        onChange={(e) => setNewConfigWasteColor(e.target.value)}
+                        style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                      >
+                        <option value="Yellow Bag (Incineration)">Yellow Bag (Anatomical & Soiled Tissue)</option>
+                        <option value="Red Bag (Autoclave & Recycle)">Red Bag (Contaminated Plastics & IV sets)</option>
+                        <option value="White Container (Puncture-Proof Sharps)">White Container (Needles & Scalpels)</option>
+                        <option value="Blue Box (Glassware & Implants)">Blue Box (Glass Vials & Metal Implants)</option>
+                      </select>
+                    </div>
+                  )}
+
 
                   {/* Description */}
                   <div>
