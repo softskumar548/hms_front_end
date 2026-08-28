@@ -98,6 +98,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 🛏️ **1-Click Critical Care ICU Escalation**: Rapid transfer workflow from casualty bays directly to Floor 4 ICU ventilator beds (`ICU-01` to `ICU-03`) with SBAR clinical handover notes.
 - 🩸 **Emergency STAT Requisitions**: Uncrossmatched O-negative blood release and bedside FAST ultrasound / trauma CT requests.
 
+## 1.10 Operation Theatre (OT) Scheduling & WHO Surgical Safety (`/ot`)
+- 🏥 **4-Theatre Complex & Grid**: Visual scheduling across OT 1 (Major Ortho/Joints), OT 2 (Advanced Laparoscopy), OT 3 (Cardiothoracic CTVS), and OT 4 (Emergency Trauma 24/7).
+- 📅 **Surgery Booking & Team Allocation**: Full team scheduling (Lead Surgeon, Assistant, Anesthesiologist, Scrub Nurse) with 4-point pre-op validation (PAC clearance, Consent, NPO 8h, PRBC blood reservation).
+- 📋 **Interactive 3-Stage WHO Surgical Safety Checklist**: Digital verification of Sign-In (Pre-induction), Time-Out (Pre-incision), and Sign-Out (Pre-exit) with instrument/sponge count verification and compliance certification.
+- 🛏️ **PACU Post-Anesthesia Recovery & Aldrete Score**: Real-time Modified Aldrete scoring (`0-10`) with automated discharge criteria (Score ≥ 9) for ward transfers.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
