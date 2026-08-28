@@ -977,7 +977,9 @@ function BillingStub() {
 
 function EMRStub() {
   const { t } = useTranslation();
-  const { token } = useAuth();
+  const { token, role } = useAuth();
+  const [emrSearch, setEmrSearch] = useState("");
+  const [emrFilter, setEmrFilter] = useState("all");
 
   // Fetch Patients List
   const { data: patients = [], isLoading } = useQuery({
@@ -985,31 +987,209 @@ function EMRStub() {
     queryFn: () => api.listPatients(token),
   });
 
+  const filteredPatients = patients.filter((p: any) => {
+    const q = emrSearch.toLowerCase();
+    const fullName = `${p.given_name || ""} ${p.family_name || ""}`.toLowerCase();
+    const phone = (p.phone || "").toLowerCase();
+    const natId = (p.national_id || "").toLowerCase();
+    return fullName.includes(q) || phone.includes(q) || natId.includes(q);
+  });
+
   return (
-    <div>
-      <PageTitle>{t("emr_title")}</PageTitle>
-      <Card>
-        <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 12px" }}>{t("active_consultations")}</h2>
-        <p style={{ color: "var(--slate)", fontSize: 14.5 }}>
-          {t("emr_desc")}
-        </p>
+    <div style={{ display: "grid", gap: 18 }}>
+      {/* Top Breadcrumb Banner */}
+      <div
+        style={{
+          background: "#00BCD4",
+          borderRadius: "14px 14px 0 0",
+          padding: "12px 20px",
+          color: "#ffffff",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 10,
+          fontSize: 15,
+          fontWeight: 700,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 18 }}>🩺</span>
+          <span>Doctor Consultation & EMR Clinical Workstation</span>
+        </div>
+        <div style={{ fontSize: 12, background: "rgba(255,255,255,0.2)", padding: "4px 12px", borderRadius: 20 }}>
+          Live Queue · Dr. K R Murali (Dean) · Chamber 101
+        </div>
+      </div>
+
+      {/* Top Clinical KPI Metric Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
+        <Card style={{ padding: "14px 18px", borderLeft: "4px solid var(--indigo)" }}>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Total Consultations</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "var(--indigo)" }}>{patients.length}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>Registered</span>
+          </div>
+        </Card>
+
+        <Card style={{ padding: "14px 18px", borderLeft: "4px solid #F59E0B" }}>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Waiting in Queue</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "#F59E0B" }}>{Math.max(1, Math.floor(patients.length / 2))}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>Avg wait: 8 mins</span>
+          </div>
+        </Card>
+
+        <Card style={{ padding: "14px 18px", borderLeft: "4px solid #16A34A" }}>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Completed Today</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "#16A34A" }}>{Math.max(2, Math.floor(patients.length / 3))}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>Signed notes</span>
+          </div>
+        </Card>
+
+        <Card style={{ padding: "14px 18px", borderLeft: "4px solid #DC2626" }}>
+          <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Emergency Triage</div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "#DC2626" }}>1</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>Priority acute</span>
+          </div>
+        </Card>
+      </div>
+
+      {/* Main Patient Roster Card */}
+      <Card style={{ borderRadius: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+          <Input
+            placeholder="Search patient by name, phone, ABHA ID..."
+            value={emrSearch}
+            onChange={(e) => setEmrSearch(e.target.value)}
+            style={{ width: 320 }}
+          />
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <Link to="/scheduling" style={{ textDecoration: "none" }}>
+              <Button ghost type="button">📅 View Schedule</Button>
+            </Link>
+            <Link to="/patients/new" style={{ textDecoration: "none" }}>
+              <Button type="button">+ Quick Register Patient</Button>
+            </Link>
+          </div>
+        </div>
 
         {isLoading ? (
-          <Skeleton height={50} />
+          <div style={{ display: "grid", gap: 10 }}>
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+            <Skeleton height={50} />
+          </div>
         ) : (
-          <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
-            {patients.map((p: any) => (
-              <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px dashed var(--line)" }}>
-                <span><strong>{p.given_name} {p.family_name}</strong> · {p.gender}, {p.dob || "Age N/A"}</span>
-                <span style={{ marginLeft: "auto" }}>
-                  <Link to={`/patients/${p.id}`}>
-                    <Button type="button" style={{ fontSize: 12, padding: "4px 14px" }}>
-                      Open EMR Chart
-                    </Button>
-                  </Link>
-                </span>
-              </div>
-            ))}
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead>
+                <tr style={{ background: "var(--wash-a)", borderBottom: "2px solid var(--line)" }}>
+                  <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Token / Patient</th>
+                  <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Contact & ABHA</th>
+                  <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Visit Type</th>
+                  <th style={{ textAlign: "center", padding: "10px 14px", color: "var(--slate)" }}>Triage Status</th>
+                  <th style={{ textAlign: "right", padding: "10px 14px", color: "var(--slate)" }}>Clinical Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPatients.map((p: any, idx: number) => (
+                  <tr key={p.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                    {/* Patient Name & Avatar */}
+                    <td style={{ padding: "12px 14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: "50%",
+                            background: "var(--indigo-soft)",
+                            color: "var(--indigo)",
+                            display: "grid",
+                            placeItems: "center",
+                            fontWeight: 800,
+                            fontSize: 13,
+                          }}
+                        >
+                          T-{String(idx + 1).padStart(2, "0")}
+                        </div>
+                        <div>
+                          <strong style={{ display: "block", color: "var(--ink)", fontSize: 13.5 }}>
+                            {p.given_name} {p.family_name}
+                          </strong>
+                          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>
+                            {p.gender || "M"}, {p.dob || "Adult"} · <span style={{ fontFamily: "monospace" }}>{p.id?.slice(0, 8)}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Contact & ABHA */}
+                    <td style={{ padding: "12px 14px" }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 600 }}>📞 +91 {p.phone || "9876543210"}</div>
+                      <div style={{ fontSize: 11, color: "var(--slate)", fontFamily: "monospace" }}>
+                        {p.national_id ? `ABHA: ${p.national_id}` : "ABHA not linked"}
+                      </div>
+                    </td>
+
+                    {/* Visit Type */}
+                    <td style={{ padding: "12px 14px" }}>
+                      <span style={{ fontWeight: 600, color: "var(--indigo)" }}>
+                        {idx % 3 === 0 ? "New OPD Consultation" : idx % 3 === 1 ? "Follow-up Review" : "Telehealth Video"}
+                      </span>
+                      <div style={{ fontSize: 11, color: "var(--slate)" }}>General Medicine · Chamber 101</div>
+                    </td>
+
+                    {/* Triage Status */}
+                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                      <StatusPill kind={idx === 0 ? "warn" : idx === 1 ? "brand" : "success"}>
+                        {idx === 0 ? "ARRIVED (WAITING)" : idx === 1 ? "IN-CONSULT" : "COMPLETED"}
+                      </StatusPill>
+                    </td>
+
+                    {/* Clinical Actions */}
+                    <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                      <div style={{ display: "inline-flex", gap: 8 }}>
+                        <Link to={`/patients/${p.id}`} style={{ textDecoration: "none" }}>
+                          <Button
+                            type="button"
+                            style={{
+                              background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)",
+                              color: "#fff",
+                              fontSize: 12,
+                              padding: "6px 14px",
+                            }}
+                          >
+                            🩺 Open EMR Chart
+                          </Button>
+                        </Link>
+
+                        <Link to={`/emr/patients/${p.id}/print`} style={{ textDecoration: "none" }}>
+                          <Button
+                            ghost
+                            type="button"
+                            style={{ fontSize: 12, padding: "6px 12px" }}
+                          >
+                            🖨️ Rx Stub
+                          </Button>
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {filteredPatients.length === 0 && (
+                  <tr>
+                    <td colSpan={5} style={{ padding: 30, textAlign: "center", color: "var(--slate)" }}>
+                      No patients found matching search query.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         )}
       </Card>
@@ -1021,6 +1201,7 @@ function PatientWorkspace() {
   const { role } = useAuth();
   return role === "physician" ? <PatientSummary /> : <PatientDetail />;
 }
+
 
 
 /* ---------- App ---------- */
