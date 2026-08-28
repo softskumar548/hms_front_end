@@ -176,8 +176,18 @@ export default function TenantSettings() {
     enabled: Boolean(token && tenant),
   });
 
-  // Custom Categories Created On-the-Fly by Hospital Admin
-  const [customCategories, setCustomCategories] = useState<Array<{ key: string; label: string; desc: string; icon?: string }>>(() => {
+  // Custom Field Definition for Dynamic User-Defined Catalogs
+  interface CustomFieldDef {
+    id: string;
+    name: string;
+    label: string;
+    type: "text" | "number" | "select" | "boolean" | "date";
+    options?: string;
+    required?: boolean;
+  }
+
+  // Custom Categories with Dynamic User-Defined Schemas
+  const [customCategories, setCustomCategories] = useState<Array<{ key: string; label: string; desc: string; icon?: string; fields?: CustomFieldDef[] }>>(() => {
     const saved = localStorage.getItem(`hms-custom-cats-${tenant || "default"}`);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
@@ -189,6 +199,12 @@ export default function TenantSettings() {
   const [newCatLabel, setNewCatLabel] = useState("");
   const [newCatDesc, setNewCatDesc] = useState("");
   const [newCatIcon, setNewCatIcon] = useState("🏷️");
+  const [newCatFields, setNewCatFields] = useState<CustomFieldDef[]>([
+    { id: "1", name: "tariff_inr", label: "Tariff / Rate (₹)", type: "number", required: false },
+    { id: "2", name: "specification", label: "Type / Specification", type: "text", required: false },
+  ]);
+  const [customItemValues, setCustomItemValues] = useState<Record<string, any>>({});
+
 
   const builtInCategories = [
     { key: "room_type", label: "Rooms & Inpatient Beds", desc: "Consultation chambers, OT, recovery beds, tariffs & equipment", icon: "🛏️" },
@@ -549,6 +565,11 @@ export default function TenantSettings() {
       newItem.color_bag = newConfigWasteColor;
     }
 
+    // Merge any user-defined dynamic schema fields
+    Object.entries(customItemValues).forEach(([k, v]) => {
+      newItem[k] = v;
+    });
+
     setConfigData((prev) => {
       const next = {
         ...prev,
@@ -562,6 +583,7 @@ export default function TenantSettings() {
     setNewConfigCode("");
     setNewConfigName("");
     setNewConfigDesc("");
+    setCustomItemValues({});
     triggerToast(`New ${currentCategoryInfo.label} item added!`);
   };
 
@@ -617,6 +639,10 @@ export default function TenantSettings() {
       label: newCatLabel,
       desc: newCatDesc || `${newCatLabel} Master Configuration`,
       icon: newCatIcon || "🏷️",
+      fields: newCatFields.map((f, idx) => ({
+        ...f,
+        name: f.name.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_") || `field_${idx + 1}`,
+      })),
     };
     const nextCats = [...customCategories, newCat];
     setCustomCategories(nextCats);
@@ -627,8 +653,13 @@ export default function TenantSettings() {
     setNewCatLabel("");
     setNewCatDesc("");
     setNewCatIcon("🏷️");
-    triggerToast(`Custom Master Catalog '${newCatLabel}' created!`);
+    setNewCatFields([
+      { id: "1", name: "tariff_inr", label: "Tariff / Rate (₹)", type: "number", required: false },
+      { id: "2", name: "specification", label: "Type / Specification", type: "text", required: false },
+    ]);
+    triggerToast(`Custom Master Catalog '${newCatLabel}' with ${newCat.fields.length} dynamic fields created!`);
   };
+
 
   const currentCategoryInfo = configCategories.find((c) => c.key === selectedConfigType) || configCategories[0];
   const currentItems = (configData[selectedConfigType] || []).filter((item) => {
@@ -922,16 +953,24 @@ export default function TenantSettings() {
                         </>
                       )}
 
+                      {/* Dynamic Custom Catalog Defined Headers */}
+                      {(currentCategoryInfo as any).fields && (currentCategoryInfo as any).fields.map((f: CustomFieldDef) => (
+                        <th key={f.id} style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>
+                          {f.label}
+                        </th>
+                      ))}
+
                       {![
                         "room_type", "visit_type", "specialization", "floor_type", 
                         "lab_test", "bed_category", "payment_type", "expense_category", 
                         "surgical_package", "ambulance_fleet"
-                      ].includes(selectedConfigType) && (
+                      ].includes(selectedConfigType) && !(currentCategoryInfo as any).fields && (
                         <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Description / Clinical Scope</th>
                       )}
 
                       <th style={{ textAlign: "center", padding: "10px 14px", color: "var(--slate)" }}>Status</th>
                       <th style={{ textAlign: "right", padding: "10px 14px", color: "var(--slate)" }}>Actions</th>
+
                     </tr>
                   </thead>
                   <tbody>
@@ -1111,14 +1150,57 @@ export default function TenantSettings() {
                           </>
                         )}
 
-                        {/* Simple Description for all other standard & custom categories */}
+                        {/* Dynamic Custom Catalog Defined Data Cells */}
+                        {(currentCategoryInfo as any).fields && (currentCategoryInfo as any).fields.map((f: CustomFieldDef) => {
+                          const val = item[f.name];
+                          if (f.type === "boolean") {
+                            return (
+                              <td key={f.id} style={{ padding: "12px 14px", textAlign: "center" }}>
+                                <span style={{
+                                  fontSize: 11,
+                                  padding: "2px 8px",
+                                  borderRadius: 4,
+                                  fontWeight: 800,
+                                  background: val ? "#DCFCE7" : "var(--wash-a)",
+                                  color: val ? "#15803D" : "var(--slate)",
+                                }}>
+                                  {val ? "YES" : "NO"}
+                                </span>
+                              </td>
+                            );
+                          }
+                          if (f.type === "number" && (f.label.includes("₹") || f.label.toLowerCase().includes("tariff") || f.label.toLowerCase().includes("price") || f.label.toLowerCase().includes("fee") || f.label.toLowerCase().includes("rate"))) {
+                            return (
+                              <td key={f.id} style={{ padding: "12px 14px", fontWeight: 700, color: "var(--indigo)" }}>
+                                {val !== undefined && val !== null && val !== "" ? `₹${Number(val).toLocaleString("en-IN")}` : "₹0"}
+                              </td>
+                            );
+                          }
+                          if (f.type === "select") {
+                            return (
+                              <td key={f.id} style={{ padding: "12px 14px" }}>
+                                <span style={{ fontSize: 11.5, background: "var(--wash-b)", color: "var(--indigo)", padding: "3px 8px", borderRadius: 4, fontWeight: 700 }}>
+                                  {val || "—"}
+                                </span>
+                              </td>
+                            );
+                          }
+                          return (
+                            <td key={f.id} style={{ padding: "12px 14px" }}>
+                              {val !== undefined && val !== null && val !== "" ? String(val) : "—"}
+                            </td>
+                          );
+                        })}
+
+                        {/* Simple Description for standard categories with no custom fields */}
                         {![
                           "room_type", "visit_type", "specialization", "floor_type", 
                           "lab_test", "bed_category", "payment_type", "expense_category", 
                           "surgical_package", "ambulance_fleet"
-                        ].includes(selectedConfigType) && (
+                        ].includes(selectedConfigType) && !(currentCategoryInfo as any).fields && (
                           <td style={{ padding: "12px 14px", color: "var(--slate)" }}>{item.description || "Master entity details"}</td>
                         )}
+
 
 
                         {/* Status */}
@@ -1798,6 +1880,72 @@ export default function TenantSettings() {
                     </div>
                   )}
 
+                  {/* DYNAMIC USER-DEFINED SCHEMA FIELDS FOR CUSTOM CATALOGS */}
+                  {(currentCategoryInfo as any).fields && (currentCategoryInfo as any).fields.length > 0 && (
+                    <div style={{ display: "grid", gap: 12, background: "var(--wash-a)", padding: "14px 16px", borderRadius: 12, border: "1px solid var(--line)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 12, fontWeight: 800, color: "var(--indigo)" }}>
+                          📋 Dynamic Schema Parameters ({currentCategoryInfo.label})
+                        </span>
+                        <span style={{ fontSize: 11, color: "var(--slate)" }}>Custom hospital-defined fields</span>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: (currentCategoryInfo as any).fields.length > 1 ? "1fr 1fr" : "1fr", gap: 12 }}>
+                        {(currentCategoryInfo as any).fields.map((f: CustomFieldDef) => (
+                          <div key={f.id}>
+                            <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                              {f.label} {f.required && <span style={{ color: "var(--danger)" }}>*</span>}
+                            </label>
+                            {f.type === "text" && (
+                              <Input
+                                placeholder={`Enter ${f.label}`}
+                                value={customItemValues[f.name] || ""}
+                                onChange={(e) => setCustomItemValues((prev) => ({ ...prev, [f.name]: e.target.value }))}
+                              />
+                            )}
+                            {f.type === "number" && (
+                              <Input
+                                type="number"
+                                placeholder={f.label.includes("₹") ? "e.g. 1500" : "e.g. 10"}
+                                value={customItemValues[f.name] || ""}
+                                onChange={(e) => setCustomItemValues((prev) => ({ ...prev, [f.name]: e.target.value }))}
+                              />
+                            )}
+                            {f.type === "select" && (
+                              <select
+                                value={customItemValues[f.name] || ""}
+                                onChange={(e) => setCustomItemValues((prev) => ({ ...prev, [f.name]: e.target.value }))}
+                                style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", fontSize: 13.5 }}
+                              >
+                                <option value="">Select Option</option>
+                                {(f.options ? f.options.split(",").map((o) => o.trim()) : ["Standard", "Premium", "Priority"]).map((opt) => (
+                                  <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                              </select>
+                            )}
+                            {f.type === "boolean" && (
+                              <div style={{ marginTop: 8 }}>
+                                <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(customItemValues[f.name])}
+                                    onChange={(e) => setCustomItemValues((prev) => ({ ...prev, [f.name]: e.target.checked }))}
+                                  />
+                                  <span>Enable {f.label}</span>
+                                </label>
+                              </div>
+                            )}
+                            {f.type === "date" && (
+                              <Input
+                                type="date"
+                                value={customItemValues[f.name] || ""}
+                                onChange={(e) => setCustomItemValues((prev) => ({ ...prev, [f.name]: e.target.value }))}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Description */}
                   <div>
@@ -1825,14 +1973,14 @@ export default function TenantSettings() {
             </div>
           )}
 
-          {/* Create Custom Master Catalog Modal */}
+          {/* Create Custom Master Catalog Modal with Dynamic Schema Builder */}
           {showAddCategoryModal && (
             <div
               style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.5)", backdropFilter: "blur(4px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
               onClick={() => setShowAddCategoryModal(false)}
             >
               <Card
-                style={{ width: "100%", maxWidth: 520, padding: 28, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
+                style={{ width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", padding: 28, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
@@ -1840,7 +1988,7 @@ export default function TenantSettings() {
                     <h3 style={{ fontFamily: "var(--font-display)", fontSize: 21, color: "var(--indigo)", margin: 0 }}>
                       ✨ Create Custom Master Catalog
                     </h3>
-                    <span style={{ fontSize: 12.5, color: "var(--slate)" }}>Define a new hospital-specific master category on-the-fly</span>
+                    <span style={{ fontSize: 12.5, color: "var(--slate)" }}>Define a new hospital-specific master category & data fields</span>
                   </div>
                   <button
                     type="button"
@@ -1920,6 +2068,111 @@ export default function TenantSettings() {
                     />
                   </div>
 
+                  {/* DATA CAPTURING FIELDS SCHEMA BUILDER */}
+                  <div style={{ background: "var(--wash-a)", padding: "14px 16px", borderRadius: 12, border: "1px solid var(--line)", marginTop: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                      <div>
+                        <span style={{ fontSize: 12.5, fontWeight: 800, color: "var(--indigo)", display: "block" }}>
+                          📋 Data Capturing Fields Schema
+                        </span>
+                        <span style={{ fontSize: 11, color: "var(--slate)" }}>
+                          Define custom data attributes to capture for each item in this catalog
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewCatFields((prev) => [
+                            ...prev,
+                            {
+                              id: String(Date.now()),
+                              name: `field_${prev.length + 1}`,
+                              label: `Custom Field ${prev.length + 1}`,
+                              type: "text",
+                              required: false,
+                            },
+                          ]);
+                        }}
+                        style={{
+                          background: "var(--indigo-soft)",
+                          color: "var(--indigo-deep)",
+                          border: "1px solid var(--indigo)",
+                          borderRadius: 6,
+                          padding: "4px 10px",
+                          fontSize: 11.5,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                      >
+                        + Add Custom Field
+                      </button>
+                    </div>
+
+                    <div style={{ display: "grid", gap: 10 }}>
+                      {newCatFields.map((f) => (
+                        <div key={f.id} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 30px", gap: 8, alignItems: "center", background: "#fff", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--line)" }}>
+                          <div>
+                            <Input
+                              placeholder="Field Name / Label (e.g. Daily Tariff ₹)"
+                              value={f.label}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setNewCatFields((prev) =>
+                                  prev.map((item) => (item.id === f.id ? { ...item, label: val, name: val.toLowerCase().replace(/[^a-z0-9_]/g, "_") } : item))
+                                );
+                              }}
+                              style={{ fontSize: 12.5, padding: "6px 10px" }}
+                            />
+                          </div>
+                          <div>
+                            <select
+                              value={f.type}
+                              onChange={(e) => {
+                                const val = e.target.value as any;
+                                setNewCatFields((prev) =>
+                                  prev.map((item) => (item.id === f.id ? { ...item, type: val } : item))
+                                );
+                              }}
+                              style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: "1px solid var(--line)", fontSize: 12 }}
+                            >
+                              <option value="text">🔤 Text / String</option>
+                              <option value="number">🔢 Number / Currency (₹)</option>
+                              <option value="select">📑 Dropdown Options</option>
+                              <option value="boolean">🔘 Yes / No Toggle</option>
+                              <option value="date">📅 Date</option>
+                            </select>
+                          </div>
+                          <div style={{ textAlign: "center" }}>
+                            <button
+                              type="button"
+                              onClick={() => setNewCatFields((prev) => prev.filter((item) => item.id !== f.id))}
+                              title="Remove Field"
+                              style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer", fontSize: 14, fontWeight: 800 }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+
+                          {f.type === "select" && (
+                            <div style={{ gridColumn: "span 3", marginTop: 2 }}>
+                              <Input
+                                placeholder="Comma-separated choices (e.g. Morning Shift, Evening Shift, Night Shift)"
+                                value={f.options || ""}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setNewCatFields((prev) =>
+                                    prev.map((item) => (item.id === f.id ? { ...item, options: val } : item))
+                                  );
+                                }}
+                                style={{ fontSize: 11.5, padding: "4px 8px" }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14 }}>
                     <Button ghost type="button" onClick={() => setShowAddCategoryModal(false)}>
                       Cancel
@@ -1932,6 +2185,7 @@ export default function TenantSettings() {
               </Card>
             </div>
           )}
+
         </div>
       )}
 
