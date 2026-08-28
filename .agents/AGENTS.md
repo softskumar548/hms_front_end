@@ -37,14 +37,21 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 ## 1.3 Tenant Admin Navigation Architecture
 - 📊 **Dashboard** (`/dashboard`): Executive Welcome Banner with Dean details & clinic name (`Welcome, Dr. K R Murali (Dean) · ZEN CLINIC`), facility site filter, live refresh counter, and KPI metric cards (`Today's Consultations`, `Avg Wait Time`, `No-Shows`, `Cashier Till Revenue`). Seeded tour checklist is omitted.
 - 👥 **Admin (Expandable Accordion)**:
-  - ⚙️ **Configuration** (`/settings?tab=config`): Master dropdown-driven configuration view (`Payment Type`, `Visit Type`, `Order Status`, `Clinic Type`, `Specialization`, `Room Type`, `Floor Type`, `Bed Category`, `Expense Category`) with dynamic item table & modal forms.
+  - ⚙️ **Configuration** (`/settings?tab=config`): Master dropdown-driven configuration view with **20 standard healthcare catalogs** (`room_type`, `visit_type`, `specialization`, `floor_type`, `lab_test`, `bed_category`, `payment_type`, `expense_category`, `surgical_package`, `ambulance_fleet`, `tpa_insurance`, `biomedical_asset`, `diet_plan`, `specimen_type`, `dosage_route`, `referral_partner`, `consent_template`, `waste_category`, `clinic_type`, `order_status`) with specialized polymorphic entity input forms.
+  - 👑 **Custom Master Catalogs & Dynamic Schema Builder**: Allows creating custom master catalogs on the fly with a visual data field schema builder (`CustomFieldDef`: text, currency/numbers, select dropdowns, boolean toggles, dates). Automatically renders dynamic table headers, formatted cells, and form inputs.
+  - 📊 **Subscription Tier Metering & Item Quotas**:
+    - **Starter Plan**: 20 Built-in Catalogs, 0 Custom Catalogs (`👑 PRO`), item-level limits (15 rooms/beds, 20 lab tests, 5 visit types, 5 specialties, 5 surgical packages, 3 floors, 2 ambulances, 10 general items).
+    - **Growth Plan**: 20 Built-in Catalogs + 5 Custom Schemas (`x/5 Used`), expanded item limits (50 rooms/beds, 100 lab tests, 25 visit types, 25 specialties, 30 surgical packages, 10 floors, 10 ambulances, 50 general items).
+    - **Enterprise Plan / Operator**: 20 Built-in Catalogs + Unlimited Custom Catalogs (`👑 Unlimited`) + Unlimited items per category (`∞ Unlimited`).
+    - Real-time quota pills on action buttons (`+ Add Item (x/limit Used)`), top allocation banners inside addition modals, and automatic tier comparison upgrade triggers (`showUpgradePlanModal`).
   - 🏢 **Account Settings** (`/settings?tab=account`): 
-    - **Subscription Package Summary Card**: Real-time 9-dimensional quota display (`Package Name`, `Expiry Date`, `Admins`, `Staff`, `Beds Limit`, `Doctors Limit`, `SMS Count`, `Email Count`, `Whatsapp Count`) backed by `/api/tenants/{tenant}/quotas`.
+    - **Subscription Package Summary Card**: Real-time quota display tracking `Standard Master Catalogs (20 Included)`, `Custom Master Catalogs (x / limit)`, `Package Name`, `Expiry Date`, `Admins`, `Staff`, `Beds Limit`, `Doctors Limit`, `SMS Count`, `Email Count`, and `Whatsapp Count`.
     - Signatory details (`DR K R MURALI`), department sub-tabs, and compliance documents.
   - 🔐 **User Authentication** (`/settings?tab=auth`): Keycloak OIDC issuer, client parameters, token scopes, and MFA status.
   - 👥 **Users** (`/settings?tab=users`): Staff directory with role badges and **+ Invite Staff** modal.
   - 💳 **Payment** (`/settings?tab=payment`): Payment collection rails, daily till reconciliation limits, PMJAY 100% cashless rules.
   - 🌐 **Online Services** (`/settings?tab=online`): ABDM ABHA milestones, Telehealth switches, and SMS/WhatsApp gateway.
+
 
 ## 1.4 Clinical Staff Navigation
 - **Receptionist**: Live Queue / Check-in board (`/queue`), Patients (`/patients`), Scheduling (`/scheduling`).
