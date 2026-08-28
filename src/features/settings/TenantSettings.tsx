@@ -204,6 +204,29 @@ export default function TenantSettings() {
     { id: "2", name: "specification", label: "Type / Specification", type: "text", required: false },
   ]);
   const [customItemValues, setCustomItemValues] = useState<Record<string, any>>({});
+  const [showUpgradePlanModal, setShowUpgradePlanModal] = useState(false);
+
+
+  // Subscription Plan Tier & Custom Catalog Quotas
+  const currentPlanTier: "starter" | "growth" | "enterprise" = (() => {
+    if (role === "operator") return "enterprise";
+    const pkg = (quotaData?.package_name || quotaData?.plan || "").toLowerCase();
+    if (pkg.includes("enterprise")) return "enterprise";
+    if (pkg.includes("starter") || pkg.includes("basic")) return "starter";
+    if (pkg.includes("growth") || pkg.includes("pro")) return "growth";
+    return "growth";
+  })();
+
+  const customCatalogLimits: Record<"starter" | "growth" | "enterprise", number> = {
+    starter: 0,
+    growth: 5,
+    enterprise: 999,
+  };
+
+  const customCatalogLimit = customCatalogLimits[currentPlanTier];
+  const customCatalogCount = customCategories.length;
+  const isCustomCatalogQuotaExhausted = currentPlanTier === "starter" || (customCatalogLimit !== 999 && customCatalogCount >= customCatalogLimit);
+
 
 
   const builtInCategories = [
@@ -700,12 +723,16 @@ export default function TenantSettings() {
         } else if (showInviteModal) {
           setShowInviteModal(false);
           e.preventDefault();
+        } else if (showUpgradePlanModal) {
+          setShowUpgradePlanModal(false);
+          e.preventDefault();
         }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showAddConfigModal, showAddCategoryModal, showAddAuthModal, showChangePasswordModal, showInviteModal]);
+  }, [showAddConfigModal, showAddCategoryModal, showAddAuthModal, showChangePasswordModal, showInviteModal, showUpgradePlanModal]);
+
 
 
   // Fetch practitioners for Users tab (safely handles operator tenant)
@@ -767,19 +794,45 @@ export default function TenantSettings() {
                   <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "flex", alignItems: "center", gap: 6 }}>
                     Select Master Configuration Category
                     <span style={{ fontSize: 11, background: "var(--wash-b)", color: "var(--indigo)", padding: "2px 8px", borderRadius: 10, fontWeight: 800 }}>
-                      {configCategories.length} Master Catalogs
+                      {configCategories.length} Master Catalogs (20 Standard{customCatalogCount > 0 ? ` + ${customCatalogCount} Custom` : ""})
                     </span>
                   </label>
 
-                  <Button
-                    ghost
-                    type="button"
-                    onClick={() => setShowAddCategoryModal(true)}
-                    style={{ fontSize: 12.5, padding: "6px 14px", border: "1px dashed var(--indigo)", color: "var(--indigo)", background: "#EEF2FF" }}
-                  >
-                    ✨ + Add Custom Master Catalog
-                  </Button>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <Button
+                      ghost
+                      type="button"
+                      onClick={() => {
+                        if (isCustomCatalogQuotaExhausted) {
+                          setShowUpgradePlanModal(true);
+                        } else {
+                          setShowAddCategoryModal(true);
+                        }
+                      }}
+                      style={{
+                        fontSize: 12.5,
+                        padding: "6px 14px",
+                        border: currentPlanTier === "starter" ? "1px solid #D97706" : isCustomCatalogQuotaExhausted ? "1px solid #EF4444" : "1px dashed var(--indigo)",
+                        color: currentPlanTier === "starter" ? "#B45309" : isCustomCatalogQuotaExhausted ? "#B91C1C" : "var(--indigo)",
+                        background: currentPlanTier === "starter" ? "#FEF3C7" : isCustomCatalogQuotaExhausted ? "#FEE2E2" : "#EEF2FF",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      }}
+                    >
+                      {currentPlanTier === "starter" ? (
+                        <>✨ + Add Custom Catalog <span style={{ background: "#D97706", color: "#fff", padding: "1px 6px", borderRadius: 8, fontSize: 10.5, fontWeight: 800 }}>👑 PRO</span></>
+                      ) : currentPlanTier === "growth" ? (
+                        <>✨ + Add Custom Catalog <span style={{ background: isCustomCatalogQuotaExhausted ? "#EF4444" : "var(--indigo)", color: "#fff", padding: "1px 6px", borderRadius: 8, fontSize: 10.5, fontWeight: 800 }}>{customCatalogCount}/5 Used</span></>
+                      ) : (
+                        <>✨ + Add Custom Catalog <span style={{ background: "#10B981", color: "#fff", padding: "1px 6px", borderRadius: 8, fontSize: 10.5, fontWeight: 800 }}>👑 Unlimited</span></>
+                      )}
+                    </Button>
+                  </div>
                 </div>
+
 
                 <div style={{ position: "relative" }}>
                   <select
@@ -1983,7 +2036,7 @@ export default function TenantSettings() {
                 style={{ width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto", padding: 28, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                   <div>
                     <h3 style={{ fontFamily: "var(--font-display)", fontSize: 21, color: "var(--indigo)", margin: 0 }}>
                       ✨ Create Custom Master Catalog
@@ -1998,6 +2051,16 @@ export default function TenantSettings() {
                   >
                     ✕
                   </button>
+                </div>
+
+                {/* Plan Quota Indicator Banner */}
+                <div style={{ background: "#EEF2FF", padding: "8px 12px", borderRadius: 10, border: "1px solid var(--indigo)", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
+                  <span style={{ color: "var(--indigo)", fontWeight: 700 }}>
+                    👑 Plan Quota: {customCatalogCount + 1} of {customCatalogLimit === 999 ? "∞ Unlimited" : customCatalogLimit} Custom Catalogs
+                  </span>
+                  <span style={{ background: "var(--indigo)", color: "#fff", padding: "2px 8px", borderRadius: 8, fontSize: 11, fontWeight: 800, textTransform: "uppercase" }}>
+                    {currentPlanTier} PLAN
+                  </span>
                 </div>
 
                 <div style={{ display: "grid", gap: 14 }}>
@@ -2186,6 +2249,98 @@ export default function TenantSettings() {
             </div>
           )}
 
+          {/* Subscription Tier Upgrade Modal for Custom Catalogs */}
+          {showUpgradePlanModal && (
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.6)", backdropFilter: "blur(5px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowUpgradePlanModal(false)}
+            >
+              <Card
+                style={{ width: "100%", maxWidth: 540, padding: 28, borderRadius: 24, boxShadow: "var(--shadow-pop)", border: "2px solid #F59E0B" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: "#FEF3C7", color: "#D97706", display: "grid", placeItems: "center", fontSize: 24, fontWeight: 800 }}>
+                      👑
+                    </div>
+                    <div>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: 0 }}>
+                        {currentPlanTier === "starter" ? "Unlock Custom Master Catalogs" : "Custom Catalog Quota Reached"}
+                      </h3>
+                      <span style={{ fontSize: 12.5, color: "var(--slate)" }}>
+                        Current Tier: <strong style={{ color: "var(--indigo)", textTransform: "uppercase" }}>{currentPlanTier} PLAN</strong> ({customCatalogCount} of {customCatalogLimit === 999 ? "∞" : customCatalogLimit} custom catalogs used)
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowUpgradePlanModal(false)}
+                    aria-label="Close modal"
+                    style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div style={{ background: "var(--wash-a)", padding: 16, borderRadius: 14, border: "1px solid var(--line)", marginBottom: 18 }}>
+                  <div style={{ fontSize: 13, color: "var(--ink)", lineHeight: 1.6, marginBottom: 12 }}>
+                    {currentPlanTier === "starter" ? (
+                      <>
+                        Your <strong>Starter Subscription</strong> includes all <strong>20 core healthcare catalogs</strong> by default.
+                        To define hospital-specific catalogs (e.g. <em>Dialysis Chairs</em>, <em>Ophthalmology Lanes</em>, <em>Physiotherapy Stations</em>) with custom data capturing schemas, upgrade to <strong>Growth</strong> or <strong>Enterprise</strong>.
+                      </>
+                    ) : (
+                      <>
+                        You have reached the maximum limit of <strong>5 Custom Catalogs</strong> on your <strong>Growth Plan</strong>.
+                        To create unlimited custom catalogs with bespoke clinical schemas, upgrade to the <strong>Enterprise Plan</strong>.
+                      </>
+                    )}
+                  </div>
+
+                  {/* Plan Comparison Mini Grid */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, fontSize: 12 }}>
+                    <div style={{ background: currentPlanTier === "starter" ? "#EFF6FF" : "#fff", padding: "10px 12px", borderRadius: 10, border: currentPlanTier === "starter" ? "2px solid var(--indigo)" : "1px solid var(--line)", textAlign: "center" }}>
+                      <strong style={{ display: "block", color: "var(--indigo)" }}>Starter</strong>
+                      <div style={{ color: "var(--slate)", fontSize: 11, margin: "4px 0" }}>20 Built-in Catalogs</div>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)" }}>0 Custom</span>
+                    </div>
+
+                    <div style={{ background: currentPlanTier === "growth" ? "#EFF6FF" : "#fff", padding: "10px 12px", borderRadius: 10, border: currentPlanTier === "growth" ? "2px solid var(--indigo)" : "1px solid var(--line)", textAlign: "center" }}>
+                      <strong style={{ display: "block", color: "var(--indigo)" }}>Growth</strong>
+                      <div style={{ color: "var(--slate)", fontSize: 11, margin: "4px 0" }}>20 Built-in Catalogs</div>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#16A34A" }}>5 Custom Schemas</span>
+                    </div>
+
+                    <div style={{ background: currentPlanTier === "enterprise" ? "#EFF6FF" : "#fff", padding: "10px 12px", borderRadius: 10, border: currentPlanTier === "enterprise" ? "2px solid var(--indigo)" : "1px solid #F59E0B", textAlign: "center" }}>
+                      <strong style={{ display: "block", color: "#D97706" }}>Enterprise 👑</strong>
+                      <div style={{ color: "var(--slate)", fontSize: 11, margin: "4px 0" }}>20 Built-in Catalogs</div>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: "#D97706" }}>∞ Unlimited</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                  <Button ghost type="button" onClick={() => setShowUpgradePlanModal(false)}>
+                    Close
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowUpgradePlanModal(false);
+                      navigate("?tab=account");
+                    }}
+                    style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                  >
+                    View Account Quotas ➔
+                  </Button>
+
+                </div>
+              </Card>
+            </div>
+          )}
+
+
         </div>
       )}
 
@@ -2358,22 +2513,26 @@ export default function TenantSettings() {
               {/* Left Column Info */}
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--ink)", width: 130 }}>Package Name :</strong>
+                  <strong style={{ color: "var(--ink)", width: 140 }}>Package Name :</strong>
                   <span style={{ color: "var(--indigo)", fontWeight: 700 }}>
-                    {quotaData?.package_name || "HMS Basic Subscription Annual"}
+                    {quotaData?.package_name || "HMS Growth Tier Subscription"}
                   </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate)", width: 130 }}>Expiry Date :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Expiry Date :</strong>
                   <span>{quotaData?.expiry_date || "25/07/2026"}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate)", width: 130 }}>Admins :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Admins :</strong>
                   <span>{quotaData?.admins_used ?? 1}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate)", width: 130 }}>Staff :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Staff :</strong>
                   <span>{quotaData?.staff_used ?? 3}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--indigo)", width: 140 }}>Standard Catalogs :</strong>
+                  <span style={{ fontWeight: 700, color: "#16A34A" }}>20 Included (All Tiers)</span>
                 </div>
               </div>
 
@@ -2399,7 +2558,14 @@ export default function TenantSettings() {
                   <strong style={{ color: "var(--slate)", width: 140 }}>Whatsapp Count :</strong>
                   <span>{quotaData?.whatsapp_count_limit ?? 1000}</span>
                 </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <strong style={{ color: "var(--indigo)", width: 140 }}>Custom Catalogs :</strong>
+                  <span style={{ fontWeight: 700, color: isCustomCatalogQuotaExhausted && currentPlanTier !== "enterprise" ? "#DC2626" : "var(--indigo)" }}>
+                    {customCatalogCount} / {customCatalogLimit === 999 ? "∞ Unlimited" : `${customCatalogLimit} Max`} ({currentPlanTier.toUpperCase()})
+                  </span>
+                </div>
               </div>
+
             </div>
           </Card>
 
