@@ -45,6 +45,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     { label: "EMR / Clinical", path: "/emr", icon: "📑", show: isPhysician },
     { label: "OT & Surgery", path: "/ot", icon: "🏥", show: isPhysician || isReceptionist },
     { label: "Inpatient Wards", path: "/inpatient", icon: "🛏️", show: isPhysician || isReceptionist },
+    { label: "Dietary", path: "/dietary", icon: "🥗", show: isPhysician || isReceptionist || isBiller },
     { label: "Diagnostic Lab", path: "/lab", icon: "🧪", show: isPhysician || isReceptionist || isBiller },
     { label: "Pharmacy POS", path: "/pharmacy", icon: "💊", show: isPhysician || isReceptionist || isBiller },
     { label: "Print Station", path: "/print-station", icon: "🖨️", show: isPhysician || isReceptionist || isBiller },
@@ -124,7 +125,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Top Item: Dashboard, Telehealth, Emergency, OT, Inpatient, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
+        {/* Top Item: Dashboard, Telehealth, Emergency, OT, Inpatient, Dietary, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Link
             to="/dashboard"
@@ -241,6 +242,29 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
               >
                 <span style={{ fontSize: 16 }}>🛏️</span>
                 {!collapsed && <span>Inpatient Wards</span>}
+              </Link>
+
+              <Link
+                to="/dietary"
+                title={collapsed ? "Dietary & Nutrition" : undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: collapsed ? "9px 0" : "9px 12px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  background: isCurrent("/dietary") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
+                  color: isCurrent("/dietary") ? "#16A34A" : "var(--ink, #23263B)",
+                  fontWeight: isCurrent("/dietary") ? 800 : 600,
+                  fontSize: 13.5,
+                  borderLeft: isCurrent("/dietary") ? "3px solid #16A34A" : "3px solid transparent",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span style={{ fontSize: 16 }}>🥗</span>
+                {!collapsed && <span>Dietary</span>}
               </Link>
 
               <Link
