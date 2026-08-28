@@ -47,8 +47,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 🏢 **Account Settings** (`/settings?tab=account`): 
     - **Subscription Package Summary Card**: Real-time quota display tracking `Standard Master Catalogs (20 Included)`, `Custom Master Catalogs (x / limit)`, `Package Name`, `Expiry Date`, `Admins`, `Staff`, `Beds Limit`, `Doctors Limit`, `SMS Count`, `Email Count`, and `Whatsapp Count`.
     - Signatory details (`DR K R MURALI`), department sub-tabs, and compliance documents.
-  - 🔐 **User Authentication** (`/settings?tab=auth`): Keycloak OIDC issuer, client parameters, token scopes, and MFA status.
-  - 👥 **Users** (`/settings?tab=users`): Staff directory with role badges and **+ Invite Staff** modal.
+  - 👥 **Users & Staff Directory** (`/settings?tab=users`): Full personnel lifecycle management with live quota meters (`Staff Limit`, `Doctor Limit`). Captures Indian Medical Council Reg No (`NMC / APMC`), designation, department linking (`specialization` catalog), chamber allocation (`room_type` catalog), standard OPD consultation fee (₹), 12-digit Indian Aadhaar ID, duty shifts, and on-call toggles. Includes printable **MediGo Hospital Staff ID Lanyard Badges** with 2D barcodes, Keycloak login passcode resets, and multi-filter search.
   - 💳 **Payment** (`/settings?tab=payment`): Payment collection rails, daily till reconciliation limits, PMJAY 100% cashless rules.
   - 🌐 **Online Services** (`/settings?tab=online`): ABDM ABHA milestones, Telehealth switches, and SMS/WhatsApp gateway.
 
