@@ -5,6 +5,7 @@ import { api } from "../../api/client";
 import { useAuth } from "../../auth/AuthProvider";
 import { Card, Button, StatusPill, Toast, Skeleton, Input } from "../../ui/components";
 import PaymentTill from "./PaymentTill";
+import TillReconciliationModal from "./TillReconciliationModal";
 
 export default function InvoiceScreen() {
   const { id: urlPatientId } = useParams<{ id: string }>();
@@ -16,9 +17,10 @@ export default function InvoiceScreen() {
   const [patientSearch, setPatientSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
-  // Cashier Till modal visibility
+  // Cashier Till & Reconciliation modals
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [tillModalOpen, setTillModalOpen] = useState(false);
 
   // Fetch all patients for search lookup
   const { data: patientsList = [] } = useQuery({
@@ -34,13 +36,6 @@ export default function InvoiceScreen() {
     return full.includes(patientSearch.toLowerCase());
   });
 
-  // Fetch Patient Summary (to check Aarogyasri scheme badge status)
-  const { data: summary, isLoading: patientLoading } = useQuery({
-    queryKey: ["patientSummary", activePatientId],
-    queryFn: () => api.getPatientSummary(token, activePatientId || ""),
-    enabled: !!activePatientId,
-  });
-
   // Fetch Invoices
   const { data: rawInvoices = [], isLoading: invoicesLoading } = useQuery({
     queryKey: ["invoices", activePatientId],
@@ -50,12 +45,15 @@ export default function InvoiceScreen() {
 
   // Fallback mock invoice if patient has no invoice recorded yet
   const mockInvoice = {
-    id: `inv_demo_${activePatientId?.substring(0, 8) || "001"}`,
+    id: `INV-2026-${activePatientId?.substring(0, 6).toUpperCase() || "89201"}`,
     patient_id: activePatientId,
     status: "finalized",
     created_at: new Date().toISOString(),
     lines: [
-      { id: "line_1", description: "CT Scan Cardiology Procedure", amount: 4500 },
+      { id: "line_1", description: "Specialist OPD Consultation (Cardiology)", amount: 800 },
+      { id: "line_2", description: "12-Lead Diagnostic ECG & Interpretation", amount: 450 },
+      { id: "line_3", description: "Comprehensive Lipid Profile (Biochemistry)", amount: 850 },
+      { id: "line_4", description: "Cardiac Stress Echo 2D Doppler", amount: 3200 },
     ],
     payments: [],
   };
@@ -79,84 +77,153 @@ export default function InvoiceScreen() {
     },
   });
 
-  const isAarogyasriEligible = true;
-
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* Billing Worklist Summary Row */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      {/* Top Breadcrumb & Header Bar */}
+      <div
+        style={{
+          background: "#00BCD4",
+          borderRadius: "14px 14px 0 0",
+          padding: "12px 20px",
+          color: "#ffffff",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 10,
+          fontSize: 15,
+          fontWeight: 700,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 18 }}>💳</span>
+          <span>Hospital Cashier Till, Invoicing & Split Billing Workstation</span>
+        </div>
+        <div style={{ fontSize: 12, background: "rgba(255,255,255,0.2)", padding: "4px 12px", borderRadius: 20 }}>
+          Terminal: POS-COUNTER-01 · Cashier: Venkata Rao
+        </div>
+      </div>
+
+      {/* Billing Worklist Summary Cards with Reconciliation Launcher */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
         <Card style={{ borderLeft: "4px solid var(--indigo)" }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
             Open / Pending Invoices
           </span>
-          <strong style={{ fontSize: 26, color: "var(--indigo)", display: "block", marginTop: 4 }}>
-            {rawInvoices.length > 0 ? rawInvoices.filter((i: any) => i.status !== "paid").length : 3} Pending
+          <strong style={{ fontSize: 24, color: "var(--indigo)", display: "block", marginTop: 4 }}>
+            {rawInvoices.length > 0 ? rawInvoices.filter((i: any) => i.status !== "paid").length : 3} Invoices
           </strong>
-          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Requires payment / claim dispatch</span>
+          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Awaiting cashier settlement</span>
         </Card>
 
-        <Card style={{ borderLeft: "4px solid var(--green)" }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
-            Today's Till Balance
-          </span>
-          <strong style={{ fontSize: 26, color: "var(--green)", display: "block", marginTop: 4 }}>
-            ₹45,200
-          </strong>
-          <span style={{ fontSize: 11.5, color: "var(--green)" }}>🟢 Cashier Till open & balanced</span>
+        {/* Daily Till Balance Card with Reconciliation Action Button */}
+        <Card style={{ borderLeft: "4px solid #16A34A", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#166534", textTransform: "uppercase" }}>
+                Today's Till Balance
+              </span>
+              <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 8px", borderRadius: 10, fontWeight: 800 }}>
+                SHIFT OPEN
+              </span>
+            </div>
+            <strong style={{ fontSize: 24, color: "#16A34A", display: "block", marginTop: 4 }}>
+              ₹46,500
+            </strong>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setTillModalOpen(true)}
+            style={{
+              marginTop: 10,
+              background: "linear-gradient(135deg, #16A34A 0%, #15803D 100%)",
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              padding: "6px 12px",
+              fontSize: 12,
+              fontWeight: 800,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)",
+            }}
+          >
+            💵 Till Denomination Reconcile ↗
+          </button>
         </Card>
 
-        <Card style={{ borderLeft: "4px solid var(--cyan)" }}>
+        <Card style={{ borderLeft: "4px solid #00BCD4" }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
-            Aarogyasri / PMJAY Pre-Auths
+            YSR Aarogyasri / PMJAY Pre-Auths
           </span>
-          <strong style={{ fontSize: 26, color: "var(--indigo)", display: "block", marginTop: 4 }}>
-            2 Active Pre-Auths
+          <strong style={{ fontSize: 24, color: "var(--indigo)", display: "block", marginTop: 4 }}>
+            2 Active Cashless Claims
           </strong>
-          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Government scheme pre-approval queue</span>
+          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Govt 100% cashless pre-approvals</span>
+        </Card>
+
+        <Card style={{ borderLeft: "4px solid #F59E0B" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>
+            TPA Insurance Pre-Auths
+          </span>
+          <strong style={{ fontSize: 24, color: "#D97706", display: "block", marginTop: 4 }}>
+            3 Star Health / Care Pre-Auths
+          </strong>
+          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>Corporate claim deductions</span>
         </Card>
       </div>
 
-      {/* Search Header */}
+      {/* Patient Search & Selection Card */}
       <Card style={{ display: "grid", gap: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2 style={{ fontFamily: "var(--font-display)", fontSize: 22, color: "var(--indigo)", margin: 0 }}>
-            Billing Worklist & Invoice Ledger (BIL-002 / AP-2)
-          </h2>
+          <div>
+            <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: "0 0 4px" }}>
+              Patient Invoicing & Multi-Rail Settle Ledger
+            </h2>
+            <span style={{ fontSize: 12.5, color: "var(--slate)" }}>
+              Search patient to view itemized charge sheets, collect payments, and split across Aarogyasri, TPA and copay.
+            </span>
+          </div>
+
           {activePatientId && (
-            <Link to={`/patients/${activePatientId}`} style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700 }}>
-              ← Return to patient dashboard
+            <Link to={`/patients/${activePatientId}`} style={{ textDecoration: "none", color: "var(--indigo)", fontWeight: 700, fontSize: 13 }}>
+              ← Return to patient chart
             </Link>
           )}
         </div>
 
         <div>
-          <label style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>
-            Search Patient for Billing Ledger
-          </label>
           <Input
             data-testid="invoice-patient-search"
-            placeholder="Search patient name..."
+            placeholder="Search patient by name or phone (e.g. Ramesh, Sita, Venkata)..."
             value={patientSearch}
             onChange={(e) => setPatientSearch(e.target.value)}
           />
           {patientSearch && filteredPatients.length > 0 && (
-            <div style={{ background: "#fff", border: "1px solid var(--line)", padding: 8, borderRadius: 8, marginTop: 4 }}>
+            <div style={{ background: "#fff", border: "1px solid var(--line)", padding: 8, borderRadius: 8, marginTop: 4, maxHeight: 180, overflowY: "auto" }}>
               {filteredPatients.map((p: any) => (
                 <div
                   key={p.id}
-                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 10px" }}
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderBottom: "1px solid var(--wash-a)" }}
                 >
-                  <span>{p.given_name} {p.family_name} ({p.phone})</span>
+                  <div>
+                    <strong style={{ color: "var(--ink)", fontSize: 13 }}>{p.given_name} {p.family_name}</strong>
+                    <span style={{ fontSize: 11.5, color: "var(--slate)", marginLeft: 8 }}>📞 +91 {p.phone}</span>
+                  </div>
                   <Button
                     data-testid="invoice-open"
                     type="button"
-                    style={{ fontSize: 12, padding: "4px 10px" }}
+                    style={{ fontSize: 11.5, padding: "4px 12px" }}
                     onClick={() => {
                       setSelectedPatientId(p.id);
                       setPatientSearch("");
                     }}
                   >
-                    Open Invoice
+                    Open Ledger
                   </Button>
                 </div>
               ))}
@@ -165,97 +232,156 @@ export default function InvoiceScreen() {
         </div>
       </Card>
 
-      {patientLoading || invoicesLoading ? (
+      {/* Invoice Details & Multi-Rail Splitting */}
+      {invoicesLoading ? (
         <Skeleton height={200} />
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20, alignItems: "start" }}>
-          {/* Left Side: Invoices Lists */}
-          <div style={{ display: "grid", gap: 20 }}>
-            {invoices.map((inv: any) => {
-              const totalAmount = inv.lines.reduce((sum: number, l: any) => sum + l.amount, 0);
-              const totalPaid = inv.payments?.reduce((sum: number, p: any) => sum + p.amount, 0) || 0;
-              const balance = totalAmount - totalPaid;
-              const payerShare = isAarogyasriEligible ? totalAmount : 0;
+        <div style={{ display: "grid", gap: 20 }}>
+          {invoices.map((inv: any) => {
+            const totalAmount = inv.lines.reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
+            const totalPaid = inv.payments?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
+            const balance = totalAmount - totalPaid;
 
-              return (
-                <Card key={inv.id}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--line)", paddingBottom: 10, marginBottom: 14 }}>
-                    <div>
-                      <strong style={{ fontSize: 15, color: "var(--indigo)" }}>Invoice ID: {inv.id}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)", display: "block" }}>
-                        Created: {new Date(inv.created_at || Date.now()).toLocaleDateString("en-IN")}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <StatusPill data-testid="scheme-indicator" kind="success">
-                        AAROGYASRI CASHLESS ELIGIBLE
-                      </StatusPill>
+            return (
+              <Card key={inv.id} style={{ borderRadius: 16 }}>
+                {/* Top Invoice Metadata */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px dashed var(--line)", paddingBottom: 12, marginBottom: 16 }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <strong style={{ fontSize: 16, color: "var(--indigo)", fontFamily: "monospace" }}>{inv.id}</strong>
                       <StatusPill kind={inv.status === "paid" ? "success" : inv.status === "finalized" ? "info" : "warn"}>
                         {(inv.status || "FINALIZED").toUpperCase()}
                       </StatusPill>
                     </div>
+                    <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
+                      Created: {new Date(inv.created_at || Date.now()).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} · Outpatient Billing Ledger
+                    </span>
                   </div>
 
-                  {/* Charge lines details */}
-                  <div style={{ display: "grid", gap: 8, marginBottom: 14 }}>
-                    {inv.lines.map((line: any) => (
-                      <div key={line.id} data-testid="invoice-line" style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, padding: "4px 0" }}>
-                        <span>{line.description}</span>
-                        <strong>₹{line.amount.toLocaleString("en-IN")}</strong>
-                      </div>
-                    ))}
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <span style={{ fontSize: 11.5, background: "#DCFCE7", color: "#166534", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>
+                      🏛️ YSR AAROGYASRI ELIGIBLE
+                    </span>
+                    <span style={{ fontSize: 11.5, background: "#EFF6FF", color: "#1D4ED8", padding: "4px 10px", borderRadius: 20, fontWeight: 700 }}>
+                      🏢 TPA CASHLESS ACTIVE
+                    </span>
+                  </div>
+                </div>
+
+                {/* Charge Lines Table */}
+                <div style={{ border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden", marginBottom: 16 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ background: "var(--wash-a)", borderBottom: "1px solid var(--line)" }}>
+                        <th style={{ textAlign: "left", padding: "8px 12px", color: "var(--slate)" }}>Service / Procedure Item</th>
+                        <th style={{ textAlign: "right", padding: "8px 12px", color: "var(--slate)", width: 140 }}>Amount (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inv.lines.map((line: any, idx: number) => (
+                        <tr key={line.id || idx} style={{ borderBottom: "1px solid var(--wash-a)" }}>
+                          <td style={{ padding: "8px 12px", color: "var(--ink)" }}>{line.description}</td>
+                          <td style={{ padding: "8px 12px", textAlign: "right", fontWeight: 700, color: "var(--indigo)" }}>
+                            ₹{(line.amount || 0).toLocaleString("en-IN")}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Summary & Split Matrix Cards */}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12, background: "var(--wash-a)", padding: 14, borderRadius: "14px", border: "1px solid var(--line)", marginBottom: 16 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block" }}>
+                      Gross Invoice Total
+                    </span>
+                    <strong style={{ fontSize: 17, color: "var(--indigo)" }}>
+                      ₹{totalAmount.toLocaleString("en-IN")}
+                    </strong>
                   </div>
 
-                  {/* Split calculator cards */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, background: "var(--wash-a)", padding: 14, borderRadius: "14px", border: "1px solid var(--line)", marginBottom: 14 }}>
-                    <div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block" }}>
-                        Payer Share (Aarogyasri Scheme)
-                      </span>
-                      <strong style={{ fontSize: 16, color: "var(--indigo)" }}>
-                        ₹{payerShare.toLocaleString("en-IN")}
-                      </strong>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block" }}>
-                        Patient Share Dues
-                      </span>
-                      <strong style={{ fontSize: 16, color: "var(--green)" }}>
-                        ₹0 (Cashless Pathway)
-                      </strong>
-                    </div>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block" }}>
+                      YSR Aarogyasri Share (70%)
+                    </span>
+                    <strong style={{ fontSize: 17, color: "#16A34A" }}>
+                      ₹{Math.floor(totalAmount * 0.7).toLocaleString("en-IN")}
+                    </strong>
+                    <span style={{ fontSize: 10.5, color: "#166534" }}>Govt Cashless</span>
                   </div>
 
-                  {/* Actions buttons */}
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block" }}>
+                      TPA Pre-Auth Share (20%)
+                    </span>
+                    <strong style={{ fontSize: 17, color: "var(--indigo)" }}>
+                      ₹{Math.floor(totalAmount * 0.2).toLocaleString("en-IN")}
+                    </strong>
+                    <span style={{ fontSize: 10.5, color: "var(--slate)" }}>Star Health / Care</span>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block" }}>
+                      Patient Copay / Out-of-Pocket
+                    </span>
+                    <strong style={{ fontSize: 17, color: "#D97706" }}>
+                      ₹{(totalAmount - Math.floor(totalAmount * 0.7) - Math.floor(totalAmount * 0.2)).toLocaleString("en-IN")}
+                    </strong>
+                    <span style={{ fontSize: 10.5, color: "#B45309" }}>Due via UPI/Cash</span>
+                  </div>
+                </div>
+
+                {/* Actions: Finalize & Settle / Split Pay */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                    Outstanding Balance: <strong style={{ color: balance > 0 ? "var(--danger)" : "var(--green)" }}>₹{balance.toLocaleString("en-IN")}</strong>
+                  </span>
+
+                  <div style={{ display: "flex", gap: 10 }}>
                     <Button
                       data-testid="invoice-finalize"
                       type="button"
+                      ghost
                       onClick={() => finalizeMutation.mutate(inv.id)}
                       disabled={finalizeMutation.isPending}
                     >
-                      {finalizeMutation.isPending ? "Finalizing..." : "🖋️ Finalize & Lock Invoice"}
+                      {finalizeMutation.isPending ? "Finalizing..." : "🖋️ Lock Invoice"}
                     </Button>
+
                     <Button
                       type="button"
                       onClick={() => {
                         setSelectedInvoice(inv);
                         setPaymentModalOpen(true);
                       }}
+                      style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
                     >
-                      💰 Cashier Reconcile
+                      💳 Settle / Split Pay (Aarogyasri / TPA / Copay)
                     </Button>
                   </div>
-                </Card>
-              );
-            })}
-          </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
 
-      {/* Cashier Payment Till Modal */}
+      {/* Cashier Payment Till Modal (Single & Split) */}
       {paymentModalOpen && selectedInvoice && (
         <PaymentTill invoice={selectedInvoice} onClose={() => setPaymentModalOpen(false)} />
+      )}
+
+      {/* Daily Till Drawer Reconciliation Modal */}
+      {tillModalOpen && (
+        <TillReconciliationModal
+          isOpen={tillModalOpen}
+          onClose={() => setTillModalOpen(false)}
+          onSuccess={(reconciliation) => {
+            triggerToast(`Till shift finalized with ₹${reconciliation.variance} variance.`);
+            setTillModalOpen(false);
+          }}
+        />
       )}
 
       <Toast message={toastMessage} isVisible={toastVisible} onClose={() => setToastVisible(false)} />
