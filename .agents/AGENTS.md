@@ -66,6 +66,13 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 🔀 **Multi-Rail Split Invoicing (`PaymentTill`)**: Settle across YSR Aarogyasri 100% cashless, TPA corporate insurance pre-auths, and patient copay with dynamic UPI QR code generator and 80mm thermal receipt printer.
   - 📈 **Referral Partner Analytics (`/reports/referrals`)**: Diagnostic partner ledger and volume reports.
 
+## 1.5 Hospital Human Resources (HR) & Automated Payroll Engine (`/hr`)
+- 👥 **Staff Lifecycle & Statutory Compliance**: Comprehensive staff roster tracking 12-digit Indian Aadhaar ID, PAN, UAN/EPF registration, ESIC numbers, Andhra Pradesh Professional Tax (PT), and Medical Council Reg Nos (`NMC/APMC`).
+- 💵 **Monthly Payroll Run & Bank NEFT Payout (`/hr?tab=payroll`)**: Automated gross-to-net salary batch calculation with EPF (12%), ESIC (0.75%), PT (₹200), and TDS deductions with 1-click batch locking and NEFT CMS bank file export (`.csv`).
+- 📅 **Attendance & Duty Rostering (`/hr?tab=attendance`)**: Monthly biometric attendance calendar, Present/Absent/LOP days, night-shift & on-call duty counters, and leave application approval queue.
+- 💼 **Salary Structure & CTC Configurator (`SalaryStructureModal`)**: Custom earnings breakdown (Basic 50%, HRA 40%, Medical, Special Allowances, Doctor OPD revenue share) and statutory enrollment controls.
+- 📄 **Official Printable Pay Slips (`PaySlipPrintModal`)**: A4 printer-friendly pay slips with hospital letterhead, side-by-side earnings vs deductions breakdown, net take-home in Indian currency words, and digital HR stamp seal.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
