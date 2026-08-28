@@ -61,6 +61,208 @@ export default function TenantSettings() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
+  // Staff & Doctor Directory Management Interface & State
+  interface StaffMember {
+    id: string;
+    name: string;
+    gender: "Male" | "Female" | "Other";
+    role: "doctor" | "nurse" | "receptionist" | "billing" | "pharmacist" | "lab_tech" | "admin";
+    email: string;
+    phone: string;
+    aadhaarId: string;
+    designation: string;
+    specialization?: string;
+    councilRegNo?: string;
+    chamberRoom?: string;
+    opdFeeInr?: number;
+    shift: string;
+    onCall247?: boolean;
+    active: boolean;
+    joinedDate: string;
+    bloodGroup?: string;
+  }
+
+  const defaultStaffList: StaffMember[] = [
+    {
+      id: "EMP-001",
+      name: "Dr. K R Murali",
+      gender: "Male",
+      role: "admin",
+      email: "drkrmurali9090@yopmail.com",
+      phone: "9100242466",
+      aadhaarId: "5421 8890 1234",
+      designation: "Dean & Medical Director",
+      specialization: "Cardiology",
+      councilRegNo: "APMC-1998-4421",
+      chamberRoom: "Chamber 101",
+      opdFeeInr: 700,
+      shift: "General (09:00 AM - 05:00 PM)",
+      onCall247: true,
+      active: true,
+      joinedDate: "12-JAN-2024",
+      bloodGroup: "O+",
+    },
+    {
+      id: "EMP-002",
+      name: "Dr. SATHVIK NANDAN",
+      gender: "Male",
+      role: "doctor",
+      email: "sathvik.nandan@zenclinic.com",
+      phone: "8884242466",
+      aadhaarId: "6723 4412 8899",
+      designation: "Senior Consultant Physician",
+      specialization: "General Medicine",
+      councilRegNo: "APMC-2021-9921",
+      chamberRoom: "Chamber 102",
+      opdFeeInr: 500,
+      shift: "Morning (08:00 AM - 02:00 PM)",
+      onCall247: true,
+      active: true,
+      joinedDate: "15-MAR-2024",
+      bloodGroup: "B+",
+    },
+    {
+      id: "EMP-003",
+      name: "Dr. A. Sharma",
+      gender: "Female",
+      role: "doctor",
+      email: "dr.sharma@zenclinic.com",
+      phone: "9876543210",
+      aadhaarId: "8912 3456 7890",
+      designation: "Consultant Pediatrician",
+      specialization: "Pediatrics & Neonatology",
+      councilRegNo: "APMC-2019-3381",
+      chamberRoom: "Chamber 104",
+      opdFeeInr: 500,
+      shift: "Evening (02:00 PM - 08:00 PM)",
+      onCall247: false,
+      active: true,
+      joinedDate: "01-MAY-2024",
+      bloodGroup: "A+",
+    },
+    {
+      id: "EMP-004",
+      name: "Nurse Anjali",
+      gender: "Female",
+      role: "nurse",
+      email: "nurse.anjali@zenclinic.com",
+      phone: "9845123456",
+      aadhaarId: "3344 5566 7788",
+      designation: "Head Triage & ICU Nurse",
+      specialization: "Critical Care",
+      councilRegNo: "APNC-2020-1120",
+      chamberRoom: "Nursing Station 1",
+      shift: "General (09:00 AM - 05:00 PM)",
+      onCall247: true,
+      active: true,
+      joinedDate: "10-FEB-2024",
+      bloodGroup: "AB+",
+    },
+    {
+      id: "EMP-005",
+      name: "Rajesh Kumar",
+      gender: "Male",
+      role: "receptionist",
+      email: "reception@zenclinic.com",
+      phone: "9123456780",
+      aadhaarId: "7788 9900 1122",
+      designation: "Front Desk & Token Officer",
+      chamberRoom: "Front Desk Counter 1",
+      shift: "Morning (08:00 AM - 02:00 PM)",
+      onCall247: false,
+      active: true,
+      joinedDate: "05-JAN-2024",
+      bloodGroup: "O+",
+    },
+    {
+      id: "EMP-006",
+      name: "Suresh Reddy",
+      gender: "Male",
+      role: "billing",
+      email: "billing@zenclinic.com",
+      phone: "9988776655",
+      aadhaarId: "1234 5678 9012",
+      designation: "Cashier & Till Officer",
+      chamberRoom: "Billing Counter 1",
+      shift: "General (09:00 AM - 05:00 PM)",
+      onCall247: false,
+      active: true,
+      joinedDate: "18-FEB-2024",
+      bloodGroup: "B+",
+    },
+    {
+      id: "EMP-007",
+      name: "Priya Devi",
+      gender: "Female",
+      role: "pharmacist",
+      email: "pharmacy@zenclinic.com",
+      phone: "9876501234",
+      aadhaarId: "4567 8901 2345",
+      designation: "Chief Pharmacist",
+      chamberRoom: "Hospital Pharmacy",
+      shift: "General (09:00 AM - 05:00 PM)",
+      onCall247: false,
+      active: true,
+      joinedDate: "01-MAR-2024",
+      bloodGroup: "A+",
+    },
+    {
+      id: "EMP-008",
+      name: "Venkatesh Rao",
+      gender: "Male",
+      role: "lab_tech",
+      email: "pathology@zenclinic.com",
+      phone: "9765432109",
+      aadhaarId: "8901 2345 6789",
+      designation: "Lead Diagnostic Technician",
+      chamberRoom: "Biochemistry Lab",
+      shift: "Morning (08:00 AM - 02:00 PM)",
+      onCall247: false,
+      active: true,
+      joinedDate: "12-APR-2024",
+      bloodGroup: "O-",
+    },
+  ];
+
+  const [staffList, setStaffList] = useState<StaffMember[]>(() => {
+    const saved = localStorage.getItem(`hms-staff-roster-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : defaultStaffList;
+  });
+
+  const [staffSearch, setStaffSearch] = useState("");
+  const [staffRoleFilter, setStaffRoleFilter] = useState("all");
+  const [staffDeptFilter, setStaffDeptFilter] = useState("all");
+
+  const [showOnboardStaffModal, setShowOnboardStaffModal] = useState(false);
+  const [showStaffIdCardModal, setShowStaffIdCardModal] = useState(false);
+  const [selectedStaffForCard, setSelectedStaffForCard] = useState<StaffMember | null>(null);
+
+  const [showEditStaffModal, setShowEditStaffModal] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
+
+  const [showResetPassModal, setShowResetPassModal] = useState(false);
+  const [resetStaffTarget, setResetStaffTarget] = useState<StaffMember | null>(null);
+  const [resetStaffNewPass, setResetStaffNewPass] = useState("");
+  const [resetStaffShowPass, setResetStaffShowPass] = useState(false);
+
+  // Form fields for Onboarding / Adding new staff
+  const [newStaffName, setNewStaffName] = useState("");
+  const [newStaffGender, setNewStaffGender] = useState<"Male" | "Female" | "Other">("Male");
+  const [newStaffRole, setNewStaffRole] = useState<"doctor" | "nurse" | "receptionist" | "billing" | "pharmacist" | "lab_tech" | "admin">("doctor");
+  const [newStaffEmail, setNewStaffEmail] = useState("");
+  const [newStaffPhone, setNewStaffPhone] = useState("");
+  const [newStaffAadhaar, setNewStaffAadhaar] = useState("");
+  const [newStaffDesignation, setNewStaffDesignation] = useState("Consultant Physician");
+  const [newStaffCouncilRegNo, setNewStaffCouncilRegNo] = useState("APMC-2026-");
+  const [newStaffSpecialization, setNewStaffSpecialization] = useState("General Medicine");
+  const [newStaffChamber, setNewStaffChamber] = useState("Chamber 101");
+  const [newStaffOpdFee, setNewStaffOpdFee] = useState("500");
+  const [newStaffShift, setNewStaffShift] = useState("General (09:00 AM - 05:00 PM)");
+  const [newStaffOnCall, setNewStaffOnCall] = useState(true);
+  const [newStaffBloodGroup, setNewStaffBloodGroup] = useState("B+");
+  const [newStaffPassword, setNewStaffPassword] = useState("ZenMed@2026");
+  const [newStaffSendInvite, setNewStaffSendInvite] = useState(true);
+
   const availableEmployees = [
     { name: "Dr. SATHVIK NANDAN", role: "DOCTOR", phone: "8884242466", email: "" },
     { name: "DR K R MURALI (Dean)", role: "SUPER_ADMINISTRATOR", phone: "9100242466", email: "drkrmurali9090@yopmail.com" },
@@ -73,6 +275,7 @@ export default function TenantSettings() {
   // Configuration Master Category selection
   const [selectedConfigType, setSelectedConfigType] = useState("room_type");
   const [configSearch, setConfigSearch] = useState("");
+
   const [showAddConfigModal, setShowAddConfigModal] = useState(false);
 
   // Common Form Fields
@@ -771,6 +974,140 @@ export default function TenantSettings() {
     );
   });
 
+  // Save staff list helper
+  const saveStaffList = (nextList: StaffMember[]) => {
+    setStaffList(nextList);
+    localStorage.setItem(`hms-staff-roster-${tenant || "default"}`, JSON.stringify(nextList));
+  };
+
+  const handleOnboardStaff = () => {
+    if (!newStaffName.trim() || !newStaffEmail.trim() || !newStaffPhone.trim()) {
+      triggerToast("Please enter Staff Name, Email Address, and Phone Number.");
+      return;
+    }
+
+    // Quota Enforcement
+    const maxStaffAllowed = quotaData?.staff_limit || (currentPlanTier === "starter" ? 10 : currentPlanTier === "growth" ? 50 : 9999);
+    const maxDoctorsAllowed = quotaData?.doctors_limit || (currentPlanTier === "starter" ? 5 : currentPlanTier === "growth" ? 25 : 9999);
+    const currentDoctorCount = staffList.filter((s) => s.role === "doctor" || s.role === "admin").length;
+
+    if (newStaffRole === "doctor" && currentDoctorCount >= maxDoctorsAllowed && currentPlanTier !== "enterprise" && role !== "operator") {
+      setUpgradeContext("item");
+      setShowOnboardStaffModal(false);
+      setShowUpgradePlanModal(true);
+      triggerToast("Doctor quota limit reached. Upgrade plan to register more doctors.");
+      return;
+    }
+
+    if (staffList.length >= maxStaffAllowed && currentPlanTier !== "enterprise" && role !== "operator") {
+      setUpgradeContext("item");
+      setShowOnboardStaffModal(false);
+      setShowUpgradePlanModal(true);
+      triggerToast("Total staff quota limit reached. Upgrade plan to onboard more personnel.");
+      return;
+    }
+
+    const newMember: StaffMember = {
+      id: `EMP-${String(staffList.length + 1).padStart(3, "0")}`,
+      name: newStaffName.trim(),
+      gender: newStaffGender,
+      role: newStaffRole,
+      email: newStaffEmail.trim(),
+      phone: newStaffPhone.trim(),
+      aadhaarId: newStaffAadhaar.trim() || "XXXX XXXX XXXX",
+      designation: newStaffDesignation.trim() || (newStaffRole === "doctor" ? "Consultant" : "Staff Member"),
+      specialization: newStaffRole === "doctor" || newStaffRole === "nurse" ? newStaffSpecialization : undefined,
+      councilRegNo: newStaffRole === "doctor" || newStaffRole === "nurse" ? newStaffCouncilRegNo.trim() : undefined,
+      chamberRoom: newStaffChamber.trim() || "General Counter",
+      opdFeeInr: newStaffRole === "doctor" ? Number(newStaffOpdFee) || 500 : undefined,
+      shift: newStaffShift,
+      onCall247: newStaffOnCall,
+      active: true,
+      joinedDate: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
+      bloodGroup: newStaffBloodGroup,
+    };
+
+    const nextStaff = [newMember, ...staffList];
+    saveStaffList(nextStaff);
+
+    // Sync with authUsers table
+    const nextAuthUsers = [
+      {
+        id: String(authUsers.length + 1),
+        name: newMember.name,
+        phone: newMember.phone,
+        email: newMember.email,
+        role: newMember.role.toUpperCase(),
+      },
+      ...authUsers,
+    ];
+    setAuthUsers(nextAuthUsers);
+    localStorage.setItem(`auth-users-${tenant}`, JSON.stringify(nextAuthUsers));
+
+    // Reset Form
+    setShowOnboardStaffModal(false);
+    setNewStaffName("");
+    setNewStaffEmail("");
+    setNewStaffPhone("");
+    setNewStaffAadhaar("");
+    setNewStaffDesignation("Consultant Physician");
+    setNewStaffCouncilRegNo("APMC-2026-");
+    setNewStaffOpdFee("500");
+    setNewStaffPassword("ZenMed@2026");
+
+    triggerToast(`🎉 ${newMember.name} successfully registered and Keycloak identity provisioned!`);
+  };
+
+  const handleUpdateStaff = () => {
+    if (!editingStaff) return;
+    const nextList = staffList.map((s) => (s.id === editingStaff.id ? editingStaff : s));
+    saveStaffList(nextList);
+    setShowEditStaffModal(false);
+    setEditingStaff(null);
+    triggerToast(`Staff details for '${editingStaff.name}' updated successfully.`);
+  };
+
+  const handleToggleStaffStatus = (id: string) => {
+    const nextList = staffList.map((s) => (s.id === id ? { ...s, active: !s.active } : s));
+    saveStaffList(nextList);
+    const target = staffList.find((s) => s.id === id);
+    triggerToast(`Staff account for '${target?.name}' is now ${target?.active ? "Deactivated" : "Activated"}.`);
+  };
+
+  const handleDeleteStaff = (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to remove staff member '${name}' from the roster?`)) {
+      const nextList = staffList.filter((s) => s.id !== id);
+      saveStaffList(nextList);
+      triggerToast(`Staff member '${name}' removed from directory.`);
+    }
+  };
+
+  const handleSaveResetPass = () => {
+    if (!resetStaffTarget || !resetStaffNewPass.trim()) return;
+    setShowResetPassModal(false);
+    triggerToast(`🔑 Login passcode for '${resetStaffTarget.name}' reset successfully.`);
+    setResetStaffTarget(null);
+    setResetStaffNewPass("");
+  };
+
+  // Filtered Staff Roster List
+  const filteredStaffList = staffList.filter((s) => {
+    const q = staffSearch.toLowerCase();
+    const matchesSearch =
+      s.name.toLowerCase().includes(q) ||
+      s.phone.toLowerCase().includes(q) ||
+      s.email.toLowerCase().includes(q) ||
+      s.designation.toLowerCase().includes(q) ||
+      (s.specialization && s.specialization.toLowerCase().includes(q)) ||
+      (s.councilRegNo && s.councilRegNo.toLowerCase().includes(q)) ||
+      (s.chamberRoom && s.chamberRoom.toLowerCase().includes(q));
+
+    const matchesRole = staffRoleFilter === "all" || s.role === staffRoleFilter;
+    const matchesDept = staffDeptFilter === "all" || s.specialization === staffDeptFilter;
+
+    return matchesSearch && matchesRole && matchesDept;
+  });
+
   // Close any active modal on Escape key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -793,12 +1130,29 @@ export default function TenantSettings() {
         } else if (showUpgradePlanModal) {
           setShowUpgradePlanModal(false);
           e.preventDefault();
+        } else if (showOnboardStaffModal) {
+          setShowOnboardStaffModal(false);
+          e.preventDefault();
+        } else if (showStaffIdCardModal) {
+          setShowStaffIdCardModal(false);
+          e.preventDefault();
+        } else if (showEditStaffModal) {
+          setShowEditStaffModal(false);
+          e.preventDefault();
+        } else if (showResetPassModal) {
+          setShowResetPassModal(false);
+          e.preventDefault();
         }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showAddConfigModal, showAddCategoryModal, showAddAuthModal, showChangePasswordModal, showInviteModal, showUpgradePlanModal]);
+  }, [
+    showAddConfigModal, showAddCategoryModal, showAddAuthModal, showChangePasswordModal,
+    showInviteModal, showUpgradePlanModal, showOnboardStaffModal, showStaffIdCardModal,
+    showEditStaffModal, showResetPassModal
+  ]);
+
 
 
 
@@ -3418,122 +3772,917 @@ export default function TenantSettings() {
         </div>
       )}
 
-      {/* TAB 6: USERS & STAFF */}
+      {/* TAB 6: USERS & STAFF DIRECTORY (Comprehensive Hospital Personnel Management) */}
       {activeTab === "users" && (
-        <Card>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <div>
-              <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 4px", color: "var(--indigo)" }}>
-                Hospital Practitioners & Staff Directory
-              </h2>
-              <span style={{ fontSize: 13, color: "var(--slate)" }}>
-                Manage login identities, roles, and consultation availability.
-              </span>
+        <div style={{ display: "grid", gap: 18 }}>
+          {/* Top Cyan Breadcrumb Banner */}
+          <div
+            style={{
+              background: "#00BCD4",
+              borderRadius: "14px 14px 0 0",
+              padding: "12px 20px",
+              color: "#ffffff",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 10,
+              fontSize: 15,
+              fontWeight: 700,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 16 }}>Personnel</span>
+              <span style={{ fontSize: 13, opacity: 0.85 }}>👥 Hospital Practitioners & Staff Directory</span>
             </div>
-            <Button onClick={() => setShowInviteModal(true)}>+ Invite New Staff</Button>
+            <div style={{ fontSize: 12, background: "rgba(255,255,255,0.2)", padding: "4px 12px", borderRadius: 20 }}>
+              Hospital Quotas: {staffList.length} / {quotaData?.staff_limit || (currentPlanTier === "starter" ? 10 : currentPlanTier === "growth" ? 50 : "∞")} Staff · {staffList.filter(s => s.role === "doctor" || s.role === "admin").length} / {quotaData?.doctors_limit || (currentPlanTier === "starter" ? 5 : currentPlanTier === "growth" ? 25 : "∞")} Doctors
+            </div>
           </div>
 
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
-            <thead>
-              <tr style={{ background: "var(--wash-a)", borderBottom: "2px solid var(--line)" }}>
-                <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Staff Name</th>
-                <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Email / Username</th>
-                <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Role</th>
-                <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ borderBottom: "1px solid var(--line)" }}>
-                <td style={{ padding: "12px 14px", fontWeight: 700, color: "var(--indigo)" }}>DR K R MURALI (Dean)</td>
-                <td style={{ padding: "12px 14px" }}>drkrmurali9090@yopmail.com</td>
-                <td style={{ padding: "12px 14px" }}><StatusPill kind="brand">admin</StatusPill></td>
-                <td style={{ padding: "12px 14px" }}><StatusPill kind="success">Active (Keycloak)</StatusPill></td>
-              </tr>
-              {practitioners.map((p: any) => (
-                <tr key={p.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                  <td style={{ padding: "12px 14px", fontWeight: 700 }}>{p.name}</td>
-                  <td style={{ padding: "12px 14px" }}>{p.email || `${p.id}@${tenant || "zen_clinic"}.com`}</td>
-                  <td style={{ padding: "12px 14px" }}><StatusPill kind="info">{p.role || "doctor"}</StatusPill></td>
-                  <td style={{ padding: "12px 14px" }}><StatusPill kind="success">Active</StatusPill></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Top KPI Metrics Bar */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
+            <Card style={{ padding: "14px 18px", borderLeft: "4px solid var(--indigo)" }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Total Personnel</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+                <strong style={{ fontSize: 24, color: "var(--indigo)" }}>{staffList.length}</strong>
+                <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                  Limit: {quotaData?.staff_limit || (currentPlanTier === "starter" ? 10 : currentPlanTier === "growth" ? 50 : "∞ Unlimited")}
+                </span>
+              </div>
+            </Card>
 
-          {/* Staff Invite Modal */}
-          {showInviteModal && (
+            <Card style={{ padding: "14px 18px", borderLeft: "4px solid #16A34A" }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Registered Doctors</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+                <strong style={{ fontSize: 24, color: "#16A34A" }}>
+                  {staffList.filter((s) => s.role === "doctor" || s.role === "admin").length}
+                </strong>
+                <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                  Limit: {quotaData?.doctors_limit || (currentPlanTier === "starter" ? 5 : currentPlanTier === "growth" ? 25 : "∞ Unlimited")}
+                </span>
+              </div>
+            </Card>
+
+            <Card style={{ padding: "14px 18px", borderLeft: "4px solid #00BCD4" }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Nursing Staff</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+                <strong style={{ fontSize: 24, color: "#00BCD4" }}>
+                  {staffList.filter((s) => s.role === "nurse").length}
+                </strong>
+                <span style={{ fontSize: 12, color: "var(--slate)" }}>Triage & Inpatient</span>
+              </div>
+            </Card>
+
+            <Card style={{ padding: "14px 18px", borderLeft: "4px solid #D97706" }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Admin & Front-Desk</div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+                <strong style={{ fontSize: 24, color: "#D97706" }}>
+                  {staffList.filter((s) => ["receptionist", "billing", "pharmacist", "lab_tech"].includes(s.role)).length}
+                </strong>
+                <span style={{ fontSize: 12, color: "var(--slate)" }}>Operations & Till</span>
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Staff Directory Card */}
+          <Card style={{ borderRadius: 16 }}>
+            {/* Search, Filter & Action Bar */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", flex: 1 }}>
+                <Input
+                  placeholder="Search staff by name, phone, reg no, chamber..."
+                  value={staffSearch}
+                  onChange={(e) => setStaffSearch(e.target.value)}
+                  style={{ width: 280 }}
+                />
+
+                <select
+                  value={staffRoleFilter}
+                  onChange={(e) => setStaffRoleFilter(e.target.value)}
+                  style={{
+                    padding: "9px 14px",
+                    borderRadius: 8,
+                    border: "1px solid var(--line)",
+                    background: "#fff",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--ink)",
+                  }}
+                >
+                  <option value="all">All Roles (All Staff)</option>
+                  <option value="doctor">Doctors / Clinicians</option>
+                  <option value="nurse">Nurses / Triage</option>
+                  <option value="receptionist">Receptionists</option>
+                  <option value="billing">Billers / Cashiers</option>
+                  <option value="pharmacist">Pharmacists</option>
+                  <option value="lab_tech">Lab Technicians</option>
+                  <option value="admin">Administrators</option>
+                </select>
+
+                <select
+                  value={staffDeptFilter}
+                  onChange={(e) => setStaffDeptFilter(e.target.value)}
+                  style={{
+                    padding: "9px 14px",
+                    borderRadius: 8,
+                    border: "1px solid var(--line)",
+                    background: "#fff",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--ink)",
+                  }}
+                >
+                  <option value="all">All Departments</option>
+                  {(configData["specialization"] || []).map((s: any) => (
+                    <option key={s.id || s.code} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => setShowOnboardStaffModal(true)}
+                style={{
+                  background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                + Onboard New Staff / Doctor
+              </Button>
+            </div>
+
+            {/* Staff Roster Table */}
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: "var(--wash-a)", borderBottom: "2px solid var(--line)" }}>
+                    <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Staff Member</th>
+                    <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Role & Credentials</th>
+                    <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Dept & Chamber</th>
+                    <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Contact & Aadhaar</th>
+                    <th style={{ textAlign: "left", padding: "10px 14px", color: "var(--slate)" }}>Shift & Fee</th>
+                    <th style={{ textAlign: "center", padding: "10px 14px", color: "var(--slate)" }}>Status</th>
+                    <th style={{ textAlign: "center", padding: "10px 14px", color: "var(--slate)" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStaffList.map((member) => (
+                    <tr key={member.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      {/* Staff Member & Avatar */}
+                      <td style={{ padding: "12px 14px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div
+                            style={{
+                              width: 38,
+                              height: 38,
+                              borderRadius: "50%",
+                              background: member.gender === "Female" ? "#FDF2F8" : "#EFF6FF",
+                              color: member.gender === "Female" ? "#DB2777" : "var(--indigo)",
+                              border: "1px solid var(--line)",
+                              display: "grid",
+                              placeItems: "center",
+                              fontWeight: 800,
+                              fontSize: 16,
+                            }}
+                          >
+                            {member.gender === "Female" ? "👩‍⚕️" : member.role === "doctor" ? "👨‍⚕️" : "👤"}
+                          </div>
+                          <div>
+                            <strong style={{ display: "block", color: "var(--ink)", fontSize: 13.5 }}>
+                              {member.name}
+                            </strong>
+                            <span style={{ fontSize: 11.5, color: "var(--slate)" }}>
+                              {member.designation} · <span style={{ fontFamily: "monospace" }}>{member.id}</span>
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Role & Medical Council Reg No */}
+                      <td style={{ padding: "12px 14px" }}>
+                        <StatusPill kind={member.role === "admin" ? "brand" : member.role === "doctor" ? "success" : member.role === "nurse" ? "info" : "default"}>
+                          {member.role.toUpperCase()}
+                        </StatusPill>
+                        {member.councilRegNo && (
+                          <div style={{ fontSize: 11, color: "var(--slate)", marginTop: 4, fontFamily: "monospace" }}>
+                            📜 {member.councilRegNo}
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Department & Chamber */}
+                      <td style={{ padding: "12px 14px" }}>
+                        <div style={{ fontWeight: 600, color: "var(--indigo)" }}>
+                          {member.specialization || "General Operations"}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "var(--slate)" }}>
+                          📍 {member.chamberRoom || "Main Facility"}
+                        </div>
+                      </td>
+
+                      {/* Contact & Aadhaar */}
+                      <td style={{ padding: "12px 14px" }}>
+                        <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink)" }}>
+                          📞 +91 {member.phone}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "var(--slate)" }}>
+                          ✉️ {member.email}
+                        </div>
+                        <div style={{ fontSize: 11, color: "var(--slate)", fontFamily: "monospace" }}>
+                          🪪 Aadhaar: {member.aadhaarId.slice(0, 4)} XXXX {member.aadhaarId.slice(-4)}
+                        </div>
+                      </td>
+
+                      {/* Shift & OPD Fee */}
+                      <td style={{ padding: "12px 14px" }}>
+                        <div style={{ fontSize: 12 }}>{member.shift.split(" ")[0]} Shift</div>
+                        {member.opdFeeInr !== undefined && (
+                          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--indigo)" }}>
+                            OPD: ₹{member.opdFeeInr}
+                          </div>
+                        )}
+                        {member.onCall247 && (
+                          <span style={{ fontSize: 10, background: "#FEF3C7", color: "#B45309", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>
+                            🚨 24/7 ON-CALL
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Status */}
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <StatusPill kind={member.active ? "success" : "danger"}>
+                          {member.active ? "ACTIVE" : "INACTIVE"}
+                        </StatusPill>
+                      </td>
+
+                      {/* Actions */}
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <div style={{ display: "inline-flex", gap: 6 }}>
+                          <button
+                            type="button"
+                            title="View Printable ID Badge"
+                            onClick={() => {
+                              setSelectedStaffForCard(member);
+                              setShowStaffIdCardModal(true);
+                            }}
+                            style={{ background: "#EEF2FF", border: "1px solid var(--indigo)", color: "var(--indigo)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}
+                          >
+                            🪪 ID Card
+                          </button>
+                          <button
+                            type="button"
+                            title="Edit Staff Member"
+                            onClick={() => {
+                              setEditingStaff(member);
+                              setShowEditStaffModal(true);
+                            }}
+                            style={{ background: "#F3F4F6", border: "1px solid #D1D5DB", color: "var(--ink)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 12 }}
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            type="button"
+                            title="Reset Login Password"
+                            onClick={() => {
+                              setResetStaffTarget(member);
+                              setResetStaffNewPass("");
+                              setShowResetPassModal(true);
+                            }}
+                            style={{ background: "#F3F4F6", border: "1px solid #D1D5DB", color: "var(--ink)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 12 }}
+                          >
+                            🔑
+                          </button>
+                          <button
+                            type="button"
+                            title={member.active ? "Deactivate Account" : "Activate Account"}
+                            onClick={() => handleToggleStaffStatus(member.id)}
+                            style={{ background: member.active ? "#FEF2F2" : "#ECFDF5", border: "none", color: member.active ? "#DC2626" : "#16A34A", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 12 }}
+                          >
+                            {member.active ? "🛑" : "✅"}
+                          </button>
+                          <button
+                            type="button"
+                            title="Delete Staff"
+                            onClick={() => handleDeleteStaff(member.id, member.name)}
+                            style={{ background: "#FEE2E2", border: "none", color: "#DC2626", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 12 }}
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {filteredStaffList.length === 0 && (
+                    <tr>
+                      <td colSpan={7} style={{ padding: 30, textAlign: "center", color: "var(--slate)" }}>
+                        No staff members found matching search query or active filters.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* MODAL 1: ONBOARD NEW HOSPITAL STAFF / DOCTOR */}
+          {showOnboardStaffModal && (
             <div
-              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "grid", placeItems: "center", zIndex: 9999, padding: 20 }}
-              onClick={() => setShowInviteModal(false)}
+              style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.6)", backdropFilter: "blur(5px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowOnboardStaffModal(false)}
             >
               <Card
-                style={{ width: "100%", maxWidth: 440, padding: 24, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
+                style={{ width: "100%", maxWidth: 640, maxHeight: "90vh", overflowY: "auto", padding: 26, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: 0 }}>
-                    Invite Hospital Staff
-                  </h3>
+                  <div>
+                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--indigo)", margin: 0 }}>
+                      + Onboard Hospital Personnel
+                    </h3>
+                    <span style={{ fontSize: 12.5, color: "var(--slate)" }}>
+                      Register practitioner profile, department chamber & Keycloak access
+                    </span>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setShowInviteModal(false)}
+                    onClick={() => setShowOnboardStaffModal(false)}
                     aria-label="Close modal"
-                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                    style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "var(--slate)" }}
                   >
                     ✕
                   </button>
                 </div>
+
                 <div style={{ display: "grid", gap: 14 }}>
-                  <div>
-                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Full Name</label>
-                    <Input
-                      autoFocus
-                      placeholder="e.g. Dr. A. Sharma"
-                      value={inviteName}
-                      onChange={(e) => setInviteName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && inviteEmail && !inviteStaffMutation.isPending) inviteStaffMutation.mutate();
-                      }}
+                  {/* Section A: Role & Designation */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Role / Privilege Level <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Select
+                        value={newStaffRole}
+                        onChange={(e) => {
+                          const r = e.target.value as any;
+                          setNewStaffRole(r);
+                          if (r === "doctor") {
+                            setNewStaffDesignation("Consultant Physician");
+                          } else if (r === "nurse") {
+                            setNewStaffDesignation("Staff Nurse");
+                          } else if (r === "receptionist") {
+                            setNewStaffDesignation("Front Desk Receptionist");
+                          } else if (r === "billing") {
+                            setNewStaffDesignation("Cashier & Till Officer");
+                          } else if (r === "pharmacist") {
+                            setNewStaffDesignation("Pharmacist");
+                          } else if (r === "lab_tech") {
+                            setNewStaffDesignation("Lab Technician");
+                          } else {
+                            setNewStaffDesignation("Hospital Administrator");
+                          }
+                        }}
+                      >
+                        <option value="doctor">🩺 Doctor / Medical Practitioner</option>
+                        <option value="nurse">👩‍⚕️ Nurse / Clinical Triage</option>
+                        <option value="receptionist">📋 Receptionist / Front-Desk</option>
+                        <option value="billing">💳 Billing & Cashier Clerk</option>
+                        <option value="pharmacist">💊 Pharmacist / Dispensary</option>
+                        <option value="lab_tech">🔬 Diagnostic Lab Technician</option>
+                        <option value="admin">🏢 Hospital Administrator</option>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Designation / Official Title <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Input
+                        value={newStaffDesignation}
+                        onChange={(e) => setNewStaffDesignation(e.target.value)}
+                        placeholder="e.g. Senior Consultant Cardiologist"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section B: Personal Demographics */}
+                  <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Full Legal Name <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Input
+                        autoFocus
+                        value={newStaffName}
+                        onChange={(e) => setNewStaffName(e.target.value)}
+                        placeholder="e.g. Dr. Ramesh Babu"
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Gender
+                      </label>
+                      <Select value={newStaffGender} onChange={(e) => setNewStaffGender(e.target.value as any)}>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Blood Group
+                      </label>
+                      <Select value={newStaffBloodGroup} onChange={(e) => setNewStaffBloodGroup(e.target.value)}>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Section C: Contact & Indian Aadhaar ID */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Mobile Phone Number <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Input
+                        value={newStaffPhone}
+                        onChange={(e) => setNewStaffPhone(e.target.value.replace(/[^0-9]/g, "").slice(0, 10))}
+                        placeholder="10-digit mobile"
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Official Email Address <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Input
+                        type="email"
+                        value={newStaffEmail}
+                        onChange={(e) => setNewStaffEmail(e.target.value)}
+                        placeholder="doctor@zenclinic.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        12-digit Aadhaar ID
+                      </label>
+                      <Input
+                        value={newStaffAadhaar}
+                        onChange={(e) => setNewStaffAadhaar(e.target.value.replace(/[^0-9]/g, "").slice(0, 12))}
+                        placeholder="XXXX XXXX XXXX"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section D: Clinical Credentials (for Doctors and Nurses) */}
+                  {(newStaffRole === "doctor" || newStaffRole === "nurse") && (
+                    <div style={{ background: "var(--wash-a)", padding: 14, borderRadius: 12, border: "1px solid var(--line)", display: "grid", gap: 12 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--indigo)" }}>
+                        🩺 Medical Council & Department Linking
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: 12 }}>
+                        <div>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Medical Council Reg No (NMC/APMC)
+                          </label>
+                          <Input
+                            value={newStaffCouncilRegNo}
+                            onChange={(e) => setNewStaffCouncilRegNo(e.target.value)}
+                            placeholder="e.g. APMC-2026-98124"
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Department / Specialty
+                          </label>
+                          <Select value={newStaffSpecialization} onChange={(e) => setNewStaffSpecialization(e.target.value)}>
+                            {(configData["specialization"] || []).map((s: any) => (
+                              <option key={s.id || s.code} value={s.name}>{s.name}</option>
+                            ))}
+                            {(!configData["specialization"] || configData["specialization"].length === 0) && (
+                              <>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                              </>
+                            )}
+                          </Select>
+                        </div>
+
+                        <div>
+                          <label style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                            Assigned Chamber / Room
+                          </label>
+                          <Select value={newStaffChamber} onChange={(e) => setNewStaffChamber(e.target.value)}>
+                            {(configData["room_type"] || []).map((r: any) => (
+                              <option key={r.id || r.code} value={r.name}>{r.name}</option>
+                            ))}
+                            {(!configData["room_type"] || configData["room_type"].length === 0) && (
+                              <>
+                                <option value="Chamber 101">Chamber 101</option>
+                                <option value="Chamber 102">Chamber 102</option>
+                                <option value="OPD Room 1">OPD Room 1</option>
+                              </>
+                            )}
+                          </Select>
+                        </div>
+                      </div>
+
+                      {newStaffRole === "doctor" && (
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "center" }}>
+                          <div>
+                            <label style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                              Standard OPD Consultation Fee (₹)
+                            </label>
+                            <Input
+                              type="number"
+                              value={newStaffOpdFee}
+                              onChange={(e) => setNewStaffOpdFee(e.target.value)}
+                              placeholder="500"
+                            />
+                          </div>
+
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16 }}>
+                            <input
+                              type="checkbox"
+                              id="staff-oncall-chk"
+                              checked={newStaffOnCall}
+                              onChange={(e) => setNewStaffOnCall(e.target.checked)}
+                              style={{ width: 16, height: 16 }}
+                            />
+                            <label htmlFor="staff-oncall-chk" style={{ fontSize: 12, fontWeight: 600, color: "var(--ink)" }}>
+                              Available for 24/7 On-Call Emergency Consultation
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Section E: Work Shift & Login Credentials */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Assigned Duty Shift
+                      </label>
+                      <Select value={newStaffShift} onChange={(e) => setNewStaffShift(e.target.value)}>
+                        <option value="General (09:00 AM - 05:00 PM)">General (09:00 AM - 05:00 PM)</option>
+                        <option value="Morning (08:00 AM - 02:00 PM)">Morning (08:00 AM - 02:00 PM)</option>
+                        <option value="Evening (02:00 PM - 08:00 PM)">Evening (02:00 PM - 08:00 PM)</option>
+                        <option value="Night (08:00 PM - 08:00 AM)">Night (08:00 PM - 08:00 AM)</option>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>
+                        Initial Passcode (Keycloak OIDC)
+                      </label>
+                      <Input
+                        value={newStaffPassword}
+                        onChange={(e) => setNewStaffPassword(e.target.value)}
+                        placeholder="Temporary Password"
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+                    <input
+                      type="checkbox"
+                      id="staff-invite-chk"
+                      checked={newStaffSendInvite}
+                      onChange={(e) => setNewStaffSendInvite(e.target.checked)}
+                      style={{ width: 16, height: 16 }}
                     />
+                    <label htmlFor="staff-invite-chk" style={{ fontSize: 12, color: "var(--slate)" }}>
+                      Send onboarding notification and login credentials via SMS & Email
+                    </label>
                   </div>
-                  <div>
-                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Email Address <span style={{ color: "var(--danger)" }}>*</span></label>
-                    <Input
-                      placeholder="e.g. doctor@zen_clinic.com"
-                      type="email"
-                      value={inviteEmail}
-                      onChange={(e) => setInviteEmail(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && inviteEmail && !inviteStaffMutation.isPending) inviteStaffMutation.mutate();
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 6 }}>Role Assignment</label>
-                    <Select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}>
-                      <option value="doctor">Doctor / Clinician (OPD & EMR)</option>
-                      <option value="nurse">Nurse (Triage & Vitals)</option>
-                      <option value="receptionist">Receptionist (Check-in & Scheduling)</option>
-                      <option value="billing">Billing Clerk (Cashier & Invoicing)</option>
-                      <option value="admin">Tenant Administrator</option>
-                    </Select>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 10 }}>
-                    <Button ghost type="button" onClick={() => setShowInviteModal(false)}>Cancel</Button>
-                    <Button
-                      type="button"
-                      disabled={!inviteEmail || inviteStaffMutation.isPending}
-                      onClick={() => inviteStaffMutation.mutate()}
-                    >
-                      {inviteStaffMutation.isPending ? "Sending..." : "Send Invitation"}
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 12 }}>
+                    <Button ghost type="button" onClick={() => setShowOnboardStaffModal(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="button" onClick={handleOnboardStaff}>
+                      Complete Staff Onboarding ➔
                     </Button>
                   </div>
                 </div>
               </Card>
             </div>
           )}
-        </Card>
+
+          {/* MODAL 2: PRINTABLE HOSPITAL STAFF ID BADGE */}
+          {showStaffIdCardModal && selectedStaffForCard && (
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.6)", backdropFilter: "blur(5px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowStaffIdCardModal(false)}
+            >
+              <Card
+                style={{ width: "100%", maxWidth: 420, padding: 24, borderRadius: 20, boxShadow: "var(--shadow-pop)", background: "#fff" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: 0 }}>
+                    🪪 Hospital Staff ID Lanyard Card
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowStaffIdCardModal(false)}
+                    aria-label="Close modal"
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Printable ID Card Container */}
+                <div
+                  id="printable-staff-id-badge"
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: 16,
+                    border: "2px solid #0A1166",
+                    overflow: "hidden",
+                    boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+                    textAlign: "center",
+                  }}
+                >
+                  {/* Top Navy Header */}
+                  <div style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", padding: "14px 16px" }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "0.05em" }}>
+                      🏥 {brandName.toUpperCase()}
+                    </div>
+                    <div style={{ fontSize: 11, opacity: 0.85 }}>
+                      Andhra Pradesh, India · ABDM Empaneled Hospital
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div style={{ padding: "20px 16px" }}>
+                    {/* Avatar Circle */}
+                    <div
+                      style={{
+                        width: 72,
+                        height: 72,
+                        borderRadius: "50%",
+                        background: selectedStaffForCard.gender === "Female" ? "#FDF2F8" : "#EFF6FF",
+                        color: selectedStaffForCard.gender === "Female" ? "#DB2777" : "var(--indigo)",
+                        border: "3px solid var(--indigo)",
+                        display: "grid",
+                        placeItems: "center",
+                        fontSize: 32,
+                        margin: "0 auto 12px",
+                      }}
+                    >
+                      {selectedStaffForCard.gender === "Female" ? "👩‍⚕️" : selectedStaffForCard.role === "doctor" ? "👨‍⚕️" : "👤"}
+                    </div>
+
+                    <h4 style={{ margin: "0 0 2px", fontSize: 18, color: "var(--ink)", fontWeight: 800 }}>
+                      {selectedStaffForCard.name}
+                    </h4>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--indigo)", textTransform: "uppercase", marginBottom: 8 }}>
+                      {selectedStaffForCard.designation}
+                    </div>
+
+                    <div style={{ display: "inline-block", background: "var(--indigo-soft)", color: "var(--indigo)", padding: "3px 12px", borderRadius: 12, fontSize: 11.5, fontWeight: 800, textTransform: "uppercase", marginBottom: 14 }}>
+                      {selectedStaffForCard.role} · {selectedStaffForCard.specialization || "Operations"}
+                    </div>
+
+                    {/* Metadata Table */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, textAlign: "left", background: "var(--wash-a)", padding: 12, borderRadius: 10, fontSize: 11.5 }}>
+                      <div>
+                        <span style={{ color: "var(--slate)", display: "block" }}>Employee ID:</span>
+                        <strong style={{ fontFamily: "monospace" }}>{selectedStaffForCard.id}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: "var(--slate)", display: "block" }}>Blood Group:</span>
+                        <strong style={{ color: "#DC2626" }}>{selectedStaffForCard.bloodGroup || "O+"}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: "var(--slate)", display: "block" }}>Council Reg No:</span>
+                        <strong style={{ fontFamily: "monospace" }}>{selectedStaffForCard.councilRegNo || "N/A"}</strong>
+                      </div>
+                      <div>
+                        <span style={{ color: "var(--slate)", display: "block" }}>Chamber / Room:</span>
+                        <strong>{selectedStaffForCard.chamberRoom || "General Counter"}</strong>
+                      </div>
+                    </div>
+
+                    {/* Barcode Stub */}
+                    <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px dashed var(--line)" }}>
+                      <div style={{ fontFamily: "monospace", letterSpacing: 6, fontWeight: 800, fontSize: 16 }}>
+                        ||| | |||| ||| ||||| |||| | ||
+                      </div>
+                      <div style={{ fontSize: 10.5, color: "var(--slate)", marginTop: 2 }}>
+                        Valid Thru: 31-DEC-2027 · MediGo SmartPass
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 18 }}>
+                  <Button ghost type="button" onClick={() => setShowStaffIdCardModal(false)}>
+                    Close
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => window.print()}
+                    style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                  >
+                    🖨️ Print ID Card Badge
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* MODAL 3: EDIT STAFF RECORD */}
+          {showEditStaffModal && editingStaff && (
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.6)", backdropFilter: "blur(5px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowEditStaffModal(false)}
+            >
+              <Card
+                style={{ width: "100%", maxWidth: 520, padding: 26, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <div>
+                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--indigo)", margin: 0 }}>
+                      Edit Staff Record: {editingStaff.name}
+                    </h3>
+                    <span style={{ fontSize: 12, color: "var(--slate)" }}>Update designation, room allocation & fee</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowEditStaffModal(false)}
+                    aria-label="Close modal"
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div style={{ display: "grid", gap: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>Designation</label>
+                    <Input
+                      value={editingStaff.designation}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, designation: e.target.value })}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>Mobile Phone</label>
+                      <Input
+                        value={editingStaff.phone}
+                        onChange={(e) => setEditingStaff({ ...editingStaff, phone: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>Chamber / Room</label>
+                      <Select
+                        value={editingStaff.chamberRoom || "Chamber 101"}
+                        onChange={(e) => setEditingStaff({ ...editingStaff, chamberRoom: e.target.value })}
+                      >
+                        {(configData["room_type"] || []).map((r: any) => (
+                          <option key={r.id || r.code} value={r.name}>{r.name}</option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+
+                  {editingStaff.role === "doctor" && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>OPD Fee (₹)</label>
+                        <Input
+                          type="number"
+                          value={String(editingStaff.opdFeeInr ?? 500)}
+                          onChange={(e) => setEditingStaff({ ...editingStaff, opdFeeInr: Number(e.target.value) || 0 })}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>Council Reg No</label>
+                        <Input
+                          value={editingStaff.councilRegNo || ""}
+                          onChange={(e) => setEditingStaff({ ...editingStaff, councilRegNo: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label style={{ fontSize: 11.5, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 4 }}>Shift Timing</label>
+                    <Select
+                      value={editingStaff.shift}
+                      onChange={(e) => setEditingStaff({ ...editingStaff, shift: e.target.value })}
+                    >
+                      <option value="General (09:00 AM - 05:00 PM)">General (09:00 AM - 05:00 PM)</option>
+                      <option value="Morning (08:00 AM - 02:00 PM)">Morning (08:00 AM - 02:00 PM)</option>
+                      <option value="Evening (02:00 PM - 08:00 PM)">Evening (02:00 PM - 08:00 PM)</option>
+                      <option value="Night (08:00 PM - 08:00 AM)">Night (08:00 PM - 08:00 AM)</option>
+                    </Select>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
+                    <Button ghost type="button" onClick={() => setShowEditStaffModal(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="button" onClick={handleUpdateStaff}>
+                      Save Changes
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* MODAL 4: RESET KEYCLOAK PASSWORD */}
+          {showResetPassModal && resetStaffTarget && (
+            <div
+              style={{ position: "fixed", inset: 0, background: "rgba(10,17,102,0.6)", backdropFilter: "blur(5px)", display: "grid", placeItems: "center", zIndex: 99999, padding: 20 }}
+              onClick={() => setShowResetPassModal(false)}
+            >
+              <Card
+                style={{ width: "100%", maxWidth: 420, padding: 24, borderRadius: 20, boxShadow: "var(--shadow-pop)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <h3 style={{ margin: 0, fontSize: 18, color: "var(--indigo)" }}>
+                    🔑 Reset Login Passcode
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassModal(false)}
+                    aria-label="Close modal"
+                    style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "var(--slate)" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <p style={{ fontSize: 13, color: "var(--slate)", margin: "0 0 14px" }}>
+                  Generate new login credentials for <strong style={{ color: "var(--ink)" }}>{resetStaffTarget.name}</strong> ({resetStaffTarget.email}):
+                </p>
+
+                <div style={{ position: "relative", marginBottom: 16 }}>
+                  <input
+                    autoFocus
+                    type={resetStaffShowPass ? "text" : "password"}
+                    value={resetStaffNewPass}
+                    onChange={(e) => setResetStaffNewPass(e.target.value)}
+                    placeholder="Enter new temporary password"
+                    style={{
+                      width: "100%",
+                      padding: "10px 40px 10px 12px",
+                      borderRadius: 8,
+                      border: "1px solid var(--line)",
+                      fontSize: 14,
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setResetStaffShowPass(!resetStaffShowPass)}
+                    style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: 15 }}
+                  >
+                    {resetStaffShowPass ? "👁️" : "🙈"}
+                  </button>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                  <Button ghost type="button" onClick={() => setShowResetPassModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="button" disabled={!resetStaffNewPass.trim()} onClick={handleSaveResetPass}>
+                    Update Passcode
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          )}
+        </div>
       )}
+
 
       {/* TAB 7: PAYMENT SETTINGS */}
       {activeTab === "payment" && (
