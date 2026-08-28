@@ -92,6 +92,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 🏷️ **Bilingual Thermal Pill Bottle Labels (`PillBottleLabelPrintModal`)**: 50mm × 25mm barcode stickers with English & Telugu patient dosage instructions (*"ఉదయం, రాత్రి భోజనం తర్వాత"*).
 - 🧾 **GST Tax Invoices & Till Settlement**: 12% GST tax breakdown, UPI QR generator, Aarogyasri 100% cashless rules, and 80mm thermal receipt printing.
 
+## 1.9 Emergency Casualty & Acute Trauma Triage (`/emergency`)
+- 🚨 **Rapid Trauma Intake & John Doe Support**: Emergency intake mode for identified patients and unconscious accident victims (`UNKNOWN MALE #9021`) brought by 108 Ambulances / Police.
+- 🧠 **Glasgow Coma Scale (GCS) Calculator**: Digital E+V+M scoring (`3-15`) with automated triage category determination (🔴 RED Immediate Resuscitation, 🟡 YELLOW Urgent Emergent, 🟢 GREEN Walking Wounded).
+- 🛏️ **1-Click Critical Care ICU Escalation**: Rapid transfer workflow from casualty bays directly to Floor 4 ICU ventilator beds (`ICU-01` to `ICU-03`) with SBAR clinical handover notes.
+- 🩸 **Emergency STAT Requisitions**: Uncrossmatched O-negative blood release and bedside FAST ultrasound / trauma CT requests.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
