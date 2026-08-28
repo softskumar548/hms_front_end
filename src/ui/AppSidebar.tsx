@@ -37,6 +37,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
   // Operations specific to non-admin clinical staff
   const staffNavItems = [
     { label: "Patients", path: "/patients", icon: "👥", show: !isAdmin },
+    { label: "Emergency", path: "/emergency", icon: "🚨", show: !isAdmin },
     { label: "My Schedule", path: "/my-schedule", icon: "🩺", show: isPhysician },
     { label: "Scheduling", path: "/scheduling", icon: "🗓️", show: isReceptionist },
     { label: "Queue Board", path: "/queue", icon: "📋", show: isReceptionist || isPhysician },
@@ -121,7 +122,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Top Item: Dashboard, Inpatient, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
+        {/* Top Item: Dashboard, Emergency, Inpatient, Lab, Pharmacy, HR & Print Station (for Admin or Overview) */}
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Link
             to="/dashboard"
@@ -148,6 +149,29 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
 
           {isAdmin && (
             <>
+              <Link
+                to="/emergency"
+                title={collapsed ? "Emergency Casualty" : undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: collapsed ? "9px 0" : "9px 12px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  background: isCurrent("/emergency") ? "#FEF2F2" : "transparent",
+                  color: isCurrent("/emergency") ? "#DC2626" : "var(--ink, #23263B)",
+                  fontWeight: isCurrent("/emergency") ? 800 : 600,
+                  fontSize: 13.5,
+                  borderLeft: isCurrent("/emergency") ? "3px solid #DC2626" : "3px solid transparent",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span style={{ fontSize: 16 }}>🚨</span>
+                {!collapsed && <span>Emergency</span>}
+              </Link>
+
               <Link
                 to="/inpatient"
                 title={collapsed ? "Inpatient Wards" : undefined}
