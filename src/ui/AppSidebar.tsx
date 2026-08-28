@@ -43,6 +43,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     { label: "EMR / Clinical", path: "/emr", icon: "📑", show: isPhysician },
     { label: "Inpatient Wards", path: "/inpatient", icon: "🛏️", show: isPhysician || isReceptionist },
     { label: "Billing", path: "/billing", icon: "💳", show: isBiller },
+    { label: "HR & Payroll", path: "/hr", icon: "👥", show: isBiller || isReceptionist },
     { label: "Referrals", path: "/reports/referrals", icon: "🔄", show: isBiller || isPhysician },
   ].filter((item) => item.show);
 
@@ -117,7 +118,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
       </div>
 
       <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Top Item: Dashboard & Inpatient (for Admin or Overview) */}
+        {/* Top Item: Dashboard, Inpatient & HR (for Admin or Overview) */}
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Link
             to="/dashboard"
@@ -143,28 +144,53 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           </Link>
 
           {isAdmin && (
-            <Link
-              to="/inpatient"
-              title={collapsed ? "Inpatient Wards" : undefined}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: collapsed ? "9px 0" : "9px 12px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                borderRadius: 10,
-                textDecoration: "none",
-                background: isCurrent("/inpatient") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                color: isCurrent("/inpatient") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
-                fontWeight: isCurrent("/inpatient") ? 800 : 600,
-                fontSize: 13.5,
-                borderLeft: isCurrent("/inpatient") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
-                transition: "all 0.15s ease",
-              }}
-            >
-              <span style={{ fontSize: 16 }}>🛏️</span>
-              {!collapsed && <span>Inpatient Wards</span>}
-            </Link>
+            <>
+              <Link
+                to="/inpatient"
+                title={collapsed ? "Inpatient Wards" : undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: collapsed ? "9px 0" : "9px 12px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  background: isCurrent("/inpatient") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
+                  color: isCurrent("/inpatient") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  fontWeight: isCurrent("/inpatient") ? 800 : 600,
+                  fontSize: 13.5,
+                  borderLeft: isCurrent("/inpatient") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span style={{ fontSize: 16 }}>🛏️</span>
+                {!collapsed && <span>Inpatient Wards</span>}
+              </Link>
+
+              <Link
+                to="/hr"
+                title={collapsed ? "HR & Payroll" : undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: collapsed ? "9px 0" : "9px 12px",
+                  justifyContent: collapsed ? "center" : "flex-start",
+                  borderRadius: 10,
+                  textDecoration: "none",
+                  background: isCurrent("/hr") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
+                  color: isCurrent("/hr") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  fontWeight: isCurrent("/hr") ? 800 : 600,
+                  fontSize: 13.5,
+                  borderLeft: isCurrent("/hr") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <span style={{ fontSize: 16 }}>👥</span>
+                {!collapsed && <span>HR & Payroll</span>}
+              </Link>
+            </>
           )}
         </div>
 
