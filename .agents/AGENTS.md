@@ -73,6 +73,13 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 💼 **Salary Structure & CTC Configurator (`SalaryStructureModal`)**: Custom earnings breakdown (Basic 50%, HRA 40%, Medical, Special Allowances, Doctor OPD revenue share) and statutory enrollment controls.
 - 📄 **Official Printable Pay Slips (`PaySlipPrintModal`)**: A4 printer-friendly pay slips with hospital letterhead, side-by-side earnings vs deductions breakdown, net take-home in Indian currency words, and digital HR stamp seal.
 
+## 1.6 Universal Hospital Print Station & Barcode Label Engine (`/print-station`)
+- 🖨️ **Multi-Hardware Printer Profiles**:
+  - 🏷️ **Thermal Patient ID Wristbands (`WristbandPrintModal`)**: Zebra/TSC 100mm × 25mm waterproof inpatient wristband roll with high-contrast UHID, IP number, bed, blood group badge, and scannable 2D QR/barcode.
+  - 🧪 **Diagnostic Specimen Vacutainer Tube Barcodes (`SpecimenBarcodeModal`)**: 50mm × 25mm tube stickers for Purple EDTA (CBC/ESR), Red Serum (LFT/RFT), Grey Fluoride (Glucose), and Urine containers with 1-click batch printing.
+  - 📄 **A4 Standard Laser/Inkjet Hub**: Direct launcher for MediPass Prescriptions, Discharge Summaries, Employee Pay Slips, and Admission Undertakings.
+  - 🧾 **80mm POS Thermal Receipts**: Cashier till receipts, OPD token calling slips, and pharmacy dispensing tags.
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
