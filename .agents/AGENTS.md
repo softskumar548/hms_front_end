@@ -110,6 +110,12 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 📋 **Virtual Waiting Room Queue**: Real-time waiting room with device readiness checks (Camera, Mic, Network throughput).
 - 💬 **Instant WhatsApp & SMS Video Link Dispatch**: 1-click video invitation dispatching direct join URLs to patient mobile phones.
 
+## 1.12 Inpatient Dietary & Clinical Nutrition (`/dietary`)
+- 🥗 **Floor Meal Tray Delivery Board**: Real-time tray delivery tracker across hospital floors for breakfast, lunch, snacks, and dinner.
+- 📝 **Therapeutic Clinical Diet Prescriptions**: Tailored nutrition planning (Diabetic, Renal Low-Salt, Cardiac DASH, Enteral Ryle's Tube, Soft Post-Op) with calorie/protein targets.
+- 🍳 **Central Kitchen Batch Aggregation**: Recipe quantities aggregated for hospital chefs.
+- 🏷️ **Thermal Meal Tray Stickers (`MealTrayLabelModal`)**: 50mm × 25mm barcode stickers with English & Telugu dietary precautions (*"చక్కెర పూర్తిగా నిషిద్ధం, ఉప్పు తక్కువగా తీసుకోవాలి"*).
+
 ---
 
 # PART 2 — THEME & DESIGN TOKENS (MediGo)
