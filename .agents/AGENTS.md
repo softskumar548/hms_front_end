@@ -59,6 +59,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 🚨 **Persistent Allergy Warning Banner (`EMR-005`)**: High-visibility contraindication alert across clinical records.
   - 💊 **Bilingual Rx Medication Composer (`RX-002` / `RX-003`)**: Indian pharmaceutical brand catalog, structured frequency/route/food-timing matrix, Telugu patient instructions, and hard-stop allergy overrides.
   - 🖨️ **MediPass Printable Stub (`/emr/patients/:id/print`)**: A4 printer-friendly prescription and visit summary with hospital letterhead and physician registration credentials.
+  - 🛏️ **Inpatient Bed Matrix & Ward Transfer (`/inpatient`)**: Interactive visual bed grid across 4 hospital floors, 1-click ward transfers with live daily tariff adjustment, admission intake, and 4-point discharge clearance.
 - **Biller**:
   - 💳 **Invoicing & Ledger (`/billing`)**: Itemized charge sheets, gross invoice totals, PMJAY/Aarogyasri eligibility indicators, and invoice locking.
   - 💵 **Daily Till Drawer Reconciliation (`TillReconciliationModal`)**: Physical currency denomination breakdown (`₹500`...`₹1`), opening float, cash refunds, and live till variance/shortage audits.
