@@ -258,7 +258,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <div>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 2px" }}>
-            💊 E-Prescription & Medication Composer (RX-002)
+            💊 E-Prescription & Medication Composer
           </h3>
           <span style={{ fontSize: 12, color: "var(--slate)" }}>
             Bilingual Rx stub with Indian brand names & dosage timings
@@ -549,7 +549,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
           {/* Drug-Allergy Warning safety display alerts (RX-003 / EMR-005) */}
           {hasAllergyConflict && !isRxSigned && (
             <div data-testid="rx-alert-danger" style={{ background: "#fbe3e3", border: "2px solid var(--danger)", color: "#b22b2b", padding: 14, borderRadius: "14px", fontSize: 13 }}>
-              <strong style={{ display: "block", marginBottom: 6, fontSize: 14 }}>⚠️ CRITICAL ALLERGY CONTRAINDICATION (RX-003 / EMR-005)</strong>
+              <strong style={{ display: "block", marginBottom: 6, fontSize: 14 }}>⚠️ CRITICAL ALLERGY CONTRAINDICATION</strong>
               Patient has a documented <strong>Penicillin Allergy</strong>. Prescribing <strong>Amoxicillin</strong> is strictly contraindicated.
               To override and proceed, you must provide an authorized clinical justification.
 

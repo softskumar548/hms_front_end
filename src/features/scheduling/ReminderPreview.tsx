@@ -35,7 +35,7 @@ export default function ReminderPreview() {
     <div style={{ display: "grid", gap: 20 }}>
       <Card>
         <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 16px", color: "var(--indigo)" }}>
-          Patient Notification Template Preview (UI-305 / SCH-006)
+          Patient Notification Template Preview
         </h2>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -184,7 +184,7 @@ export default function ReminderPreview() {
             <div>
               <strong>Confirm Action Placeholders:</strong>
               <div style={{ color: "var(--slate)" }}>
-                Validates appointment check-in pre-clearance directly from SMS notification clicks (POR-009).
+                Validates appointment check-in pre-clearance directly from SMS notification clicks.
               </div>
             </div>
             <div>

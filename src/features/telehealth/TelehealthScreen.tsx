@@ -499,7 +499,7 @@ export default function TelehealthScreen() {
               <span style={{ fontSize: 16 }}>⚠️</span>
               <div>
                 <strong style={{ fontSize: 12, color: "#B45309", display: "block" }}>
-                  Persistent Allergy Alert (EMR-005):
+                  Persistent Allergy Alert:
                 </strong>
                 <span style={{ fontSize: 11, color: "#92400E" }}>
                   Patient has known allergy to <strong>PENICILLIN</strong> (Severe Urticaria).

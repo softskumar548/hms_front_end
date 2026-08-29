@@ -173,7 +173,7 @@ export default function BookingModal({
           {showPrereqs && (
             <Card style={{ border: "1px solid var(--line)" }}>
               <strong style={{ fontSize: 13, color: "var(--indigo)", display: "block", marginBottom: 8 }}>
-                Required Service Prerequisites (UI-302 / REF-060)
+                Required Service Prerequisites
               </strong>
               <div style={{ display: "grid", gap: 8 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

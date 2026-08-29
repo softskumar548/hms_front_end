@@ -303,7 +303,7 @@ export default function EncounterNote() {
             <span style={{ fontSize: 22 }}>🚨</span>
             <div>
               <strong style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: "0.05em", color: "#B91C1C" }}>
-                Active Allergy Warning (EMR-005)
+                Active Allergy Warning
               </strong>
               <div style={{ fontSize: 13, marginTop: 2, color: "#7F1D1D" }}>
                 Patient has documented contraindications:{" "}

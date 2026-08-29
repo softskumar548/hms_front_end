@@ -84,7 +84,7 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
   return (
     <Card style={{ border: "1px solid var(--line)", background: "#fff" }}>
       <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 14px" }}>
-        Next-Visit Follow-Up Panel (EMR-013 / Flag F1)
+        Next-Visit Follow-Up Panel
       </h3>
 
       <div style={{ display: "grid", gap: 16 }}>
@@ -190,7 +190,7 @@ export default function NextVisitPanel({ encounterId, patientId, isLocked }: Nex
         {/* Prerequisites selection Checklist */}
         <div>
           <span style={{ fontSize: 12, fontWeight: 700, color: "var(--slate)", display: "block", marginBottom: 8 }}>
-            Prerequisites Checklist for Next Visit (REF-060)
+            Prerequisites Checklist for Next Visit
           </span>
           <div style={{ display: "grid", gap: 8 }}>
             {prereqsLibrary.map((p) => {

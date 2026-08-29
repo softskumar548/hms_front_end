@@ -4663,7 +4663,7 @@ export default function TenantSettings() {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <strong>Referral Fee Commissions (REF-010)</strong>
+                  <strong>Referral Fee Commissions</strong>
                   <div style={{ fontSize: 12, color: "var(--danger)" }}>Prohibited under NMC medical ethics rules</div>
                 </div>
                 <StatusPill kind="danger">LOCKED OFF</StatusPill>

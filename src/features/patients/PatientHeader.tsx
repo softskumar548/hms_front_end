@@ -144,7 +144,7 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
             ) : allergies.length === 0 ? (
               "No allergy assertion has been declared for this patient."
             ) : hasNoKnown ? (
-              "Confirmed: No known allergies (EMR-005)"
+              "Confirmed: No known allergies"
             ) : (
               `ACTIVE CLINICAL ALLERGIES: ${allergyList.map((a) => `${a.substance_display} (${a.severity || "unknown"})`).join(", ")}`
             )}
@@ -167,7 +167,7 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
       </div>
 
       {/* ALLERGY ASSERTION MODAL */}
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Assert Allergy Status (EMR-005)">
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Assert Allergy Status">
         <div style={{ display: "grid", gap: 16, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input

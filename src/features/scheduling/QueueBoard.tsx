@@ -245,7 +245,7 @@ export default function QueueBoard() {
       {(role === "receptionist" || role === "admin") && (
         <Card>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 14px" }}>
-            Scheduled Arrivals Awaiting Check-In (REG-061)
+            Scheduled Arrivals Awaiting Check-In
           </h3>
 
           {loadingAppts ? (

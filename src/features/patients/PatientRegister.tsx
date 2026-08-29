@@ -215,7 +215,7 @@ export default function PatientRegister() {
 
   return (
     <div>
-      <PageTitle>Patient Registration (REG-001)</PageTitle>
+      <PageTitle>Patient Registration</PageTitle>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div style={{ display: "grid", gap: 20 }}>
@@ -460,10 +460,10 @@ export default function PatientRegister() {
             </div>
           </Card>
 
-          {/* Card 5: Referrer attribution (UI-203) */}
+          {/* Card 5: Referrer attribution */}
           <Card>
             <h2 style={{ fontFamily: "var(--font-display)", fontSize: 20, margin: "0 0 16px", color: "var(--indigo)" }}>
-              5. Referrer Attribution (REF-061)
+              5. Referrer Attribution
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
@@ -520,7 +520,7 @@ export default function PatientRegister() {
                     Referrer Type (India Lock - Fee Payout Ineligible)
                   </label>
                   <StatusPill kind="info">
-                    {refType ? refType.toUpperCase() : "UNKNOWN"} (Payout Blocked REF-010)
+                    {refType ? refType.toUpperCase() : "UNKNOWN"} (Payout Ineligible)
                   </StatusPill>
                 </div>
               )}
@@ -543,7 +543,7 @@ export default function PatientRegister() {
                 <Controller
                   name="requested_service"
                   control={control}
-                  render={({ field }) => <Input placeholder="e.g. Echocardiogram (ECG)" {...field} />}
+                  render={({ field }) => <Input data-testid="requested-service" placeholder="e.g. Cardiology OPD Consult" {...field} />}
                 />
               </div>
             </div>
@@ -651,8 +651,8 @@ export default function PatientRegister() {
         </div>
       </form>
 
-      {/* DUPLICATE DETECTION INTERSTITIAL PANEL (UI-202) */}
-      <Modal isOpen={duplicateOpen} onClose={() => setDuplicateOpen(false)} title="Duplicate Match Detected (REG-003)">
+      {/* DUPLICATE DETECTION INTERSTITIAL PANEL */}
+      <Modal isOpen={duplicateOpen} onClose={() => setDuplicateOpen(false)} title="Duplicate Match Detected">
         <p style={{ margin: "0 0 16px 0", color: "var(--ink)", fontSize: 14.5, lineHeight: 1.5 }}>
           Potential matches found in the Master Patient Index (MPI). Please verify before creating a new record.
         </p>

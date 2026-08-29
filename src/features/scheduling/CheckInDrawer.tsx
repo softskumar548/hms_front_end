@@ -81,7 +81,7 @@ export default function CheckInDrawer({ isOpen, onClose, appointmentId }: CheckI
   const checkInEnabled = !isBlocked && (!showWarning || acknowledged);
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} title="Patient Check-In (REF-061)">
+    <Drawer isOpen={isOpen} onClose={onClose} title="Patient Check-In">
       <div style={{ display: "grid", gap: 18, paddingBottom: 60 }}>
         {/* Patient header card */}
         <Card style={{ background: "var(--indigo-soft)", border: "none" }}>
@@ -150,7 +150,7 @@ export default function CheckInDrawer({ isOpen, onClose, appointmentId }: CheckI
           )}
         </div>
 
-        {/* Hard-stop block display (REF-061) */}
+        {/* Hard-stop block display */}
         {isBlocked && (
           <div
             data-testid="checkin-blocked-panel"
@@ -164,7 +164,7 @@ export default function CheckInDrawer({ isOpen, onClose, appointmentId }: CheckI
               fontWeight: 600,
             }}
           >
-            <strong style={{ display: "block", marginBottom: 4 }}>⚠️ CHECK-IN BLOCKED (REF-061)</strong>
+            <strong style={{ display: "block", marginBottom: 4 }}>⚠️ CHECK-IN BLOCKED</strong>
             Cannot proceed. The patient has unmet hard-stop clinical prerequisites ({unmetHardStops.map((h) => h.code).join(", ")}).
             Please resolve the items above to clear the check-in lock.
           </div>

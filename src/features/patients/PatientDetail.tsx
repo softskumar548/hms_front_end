@@ -128,7 +128,7 @@ export default function PatientDetail() {
         <Card style={{ gridColumn: "span 2" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 19, color: "var(--indigo)", margin: 0 }}>
-              Referrer Attribution & History (REF-061)
+              Referrer Attribution & History
             </h3>
             <Button data-testid="tab-referral-timeline" type="button" ghost style={{ fontSize: 12 }}>
               View Timeline

@@ -143,7 +143,7 @@ export default function PatientSummary() {
           {/* Vitals Trend Visual Card (UI-401) */}
           <Card>
             <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 14px" }}>
-              Vitals Historical Trend (EMR-007)
+              Vitals Historical Trend
             </h3>
             {recent_vitals.length === 0 ? (
               <p style={{ fontSize: 13, color: "var(--slate)", fontStyle: "italic", margin: 0 }}>

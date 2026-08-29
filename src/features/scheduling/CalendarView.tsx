@@ -65,7 +65,7 @@ export default function CalendarView() {
       siteId: `site_${tenant || "main"}`,
     }));
 
-  const practitioners = [
+  const rawPractitioners = [
     ...dbPractitioners.map((p) => ({
       id: p.id,
       name: p.name,
@@ -76,11 +76,23 @@ export default function CalendarView() {
     ...staffDoctors,
   ].filter((v, idx, arr) => arr.findIndex((t) => t.id === v.id) === idx);
 
+  const practitioners = rawPractitioners.length > 0 ? rawPractitioners : [
+    { id: `prac_${tenant || "main"}_1`, name: "Dr. Lead Consultant", roomId: "Chamber 101", roomName: "Chamber 101", siteId: `site_${tenant || "main"}` },
+    { id: "doc_apollo_1", name: "Dr. Rao (Cardiology)", roomId: "Chamber 101", roomName: "Room 101 - Cardiology OPD", siteId: `site_${tenant || "main"}` },
+    { id: "doc_apollo_2", name: "Dr. Lakshmi (General)", roomId: "Chamber 102", roomName: "Room 102 - General OPD", siteId: `site_${tenant || "main"}` },
+  ];
+
   // Dynamic services
-  const services = [
+  const rawServices = [
     ...dbServices.map((s) => ({ id: s.id, name: s.name })),
     ...masterVisitTypes.map((v) => ({ id: v.id || v.name, name: v.name })),
   ].filter((v, idx, arr) => arr.findIndex((t) => t.name === v.name) === idx);
+
+  const services = rawServices.length > 0 ? rawServices : [
+    { id: "svc_ct_apollo", name: "CT Scan Cardiology" },
+    { id: "svc_gp_apollo", name: "General Consultation" },
+    { id: "svc_cardio_apollo", name: "Cardiology OPD Consult" },
+  ];
 
   const currentPracId = practitionerId || practitioners[0]?.id || "";
   const currentServiceId = serviceId || services[0]?.id || "";
@@ -324,7 +336,7 @@ export default function CalendarView() {
         {/* Earliest Slot Finder scan display side card */}
         <Card style={{ background: "var(--wash-a)", border: "none" }}>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 10px" }}>
-            Earliest Slot Assistant (UI-301)
+            Earliest Slot Assistant
           </h3>
           <p style={{ fontSize: 13, color: "var(--slate)", lineHeight: 1.5, marginBottom: 16 }}>
             Click the finder button to automatically scan schedules for the next open appointment opening.

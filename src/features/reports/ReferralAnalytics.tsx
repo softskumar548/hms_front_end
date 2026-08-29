@@ -38,7 +38,7 @@ export default function ReferralAnalytics() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
         <div>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: 24, color: "var(--indigo)", margin: 0 }}>
-            Referrer Attributions & Volumes Report (UI-604)
+            Referrer Attributions & Volumes Report
           </h2>
           <span style={{ fontSize: 13, color: "var(--slate)" }}>
             Evaluate patient volumes, diagnostics attribution counts, and clinical site distribution from external referrers.

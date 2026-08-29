@@ -102,7 +102,7 @@ export default function ReferralTimeline() {
         {/* Left: Timeline flowchart */}
         <Card>
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: 18, color: "var(--indigo)", margin: "0 0 20px" }}>
-            Care Coordination Lifecycle (REF-064)
+            Care Coordination Lifecycle
           </h3>
 
           <div style={{ position: "relative", paddingLeft: 30, borderLeft: "3px solid var(--indigo-soft)", display: "grid", gap: 24, marginLeft: 10 }}>
