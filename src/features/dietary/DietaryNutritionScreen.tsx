@@ -28,88 +28,21 @@ export interface InpatientDiet {
   dinner: "DELIVERED" | "PENDING";
 }
 
-const initialInpatientDiets: InpatientDiet[] = [
-  {
-    id: "diet-01",
-    patientName: "K. Venkateswara Rao",
-    patientUhid: "UHID-2026-90841",
-    bedLocation: "Bed 204 (Floor 2 - Ortho Post-Op)",
-    dietCategory: "DIABETIC",
-    macros: { calories: 1800, protein: 65, fluidLimit: 1500 },
-    feedingRoute: "ORAL_NORMAL",
-    foodType: "VEG",
-    allergies: "No Simple Sugar · Low Salt",
-    instructionsTe: "చక్కెర పూర్తిగా నిషిద్ధం, ఉప్పు తక్కువగా తీసుకోవాలి",
-    prescribedDate: "29-Aug-2026",
-    status: "ACTIVE",
-    breakfast: "DELIVERED",
-    lunch: "DISPATCHING",
-    snacks: "PENDING",
-    dinner: "PENDING",
-  },
-  {
-    id: "diet-02",
-    patientName: "Sita Devi",
-    patientUhid: "UHID-2026-90813",
-    bedLocation: "Bed 308 (Floor 3 - Semi-Private)",
-    dietCategory: "RENAL_LOW_SALT",
-    macros: { calories: 1600, protein: 45, fluidLimit: 1200 },
-    feedingRoute: "ORAL_SOFT",
-    foodType: "VEG",
-    allergies: "Strict Sodium < 2g · Potassium < 40 mEq",
-    instructionsTe: "ఉప్పు చాలా తక్కువగా ఉండాలి, పండ్ల రసాలు నిషిద్ధం",
-    prescribedDate: "29-Aug-2026",
-    status: "ACTIVE",
-    breakfast: "DELIVERED",
-    lunch: "DISPATCHING",
-    snacks: "PENDING",
-    dinner: "PENDING",
-  },
-  {
-    id: "diet-03",
-    patientName: "UNKNOWN MALE #9021 (108 BROUGHT)",
-    patientUhid: "ER-2026-9011",
-    bedLocation: "Bed 401 (Floor 4 - ICU Bed 01)",
-    dietCategory: "ENTERAL_RYLES_TUBE",
-    macros: { calories: 2000, protein: 80, fluidLimit: 1800 },
-    feedingRoute: "ENTERAL_RYLES_TUBE",
-    foodType: "VEG",
-    allergies: "High Calorie Enteral Formula · 2-Hourly 100mL Bolus",
-    instructionsTe: "రైల్స్ ట్యూబ్ ద్వారా ప్రతి 2 గంటలకు 100ml ఇవ్వాలి",
-    prescribedDate: "29-Aug-2026",
-    status: "ACTIVE",
-    breakfast: "DELIVERED",
-    lunch: "DELIVERED",
-    snacks: "PENDING",
-    dinner: "PENDING",
-  },
-  {
-    id: "diet-04",
-    patientName: "Lakshmi Prasanna",
-    patientUhid: "UHID-2026-90842",
-    bedLocation: "Bed 102 (Floor 1 - Daycare Ward)",
-    dietCategory: "SOFT_POST_OP",
-    macros: { calories: 1500, protein: 55, fluidLimit: 1500 },
-    feedingRoute: "ORAL_SOFT",
-    foodType: "VEG",
-    allergies: "Post-Laparoscopic Cholecystectomy · Low Fat Khichdi",
-    instructionsTe: "సులభంగా జీర్ణమయ్యే మృదువైన కిచిడీ, మజ్జిగ మాత్రమే",
-    prescribedDate: "29-Aug-2026",
-    status: "ACTIVE",
-    breakfast: "DELIVERED",
-    lunch: "DISPATCHING",
-    snacks: "PENDING",
-    dinner: "PENDING",
-  },
-];
-
 export default function DietaryNutritionScreen() {
   const { tenant } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "board"; // board, prescriptions, kitchen, labels
 
-  const [diets, setDiets] = useState<InpatientDiet[]>(initialInpatientDiets);
+  const [diets, setDiets] = useState<InpatientDiet[]>(() => {
+    const saved = localStorage.getItem(`hms-diet-orders-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const saveDiets = (nextDiets: InpatientDiet[]) => {
+    setDiets(nextDiets);
+    localStorage.setItem(`hms-diet-orders-${tenant || "default"}`, JSON.stringify(nextDiets));
+  };
 
   // Modals state
   const [prescribeModalOpen, setPrescribeModalOpen] = useState(false);
@@ -146,16 +79,16 @@ export default function DietaryNutritionScreen() {
 
   // Action: Add new diet prescription
   const handlePrescribeSuccess = (newDiet: InpatientDiet) => {
-    setDiets((prev) => [newDiet, ...prev]);
+    const next = [newDiet, ...diets];
+    saveDiets(next);
     setPrescribeModalOpen(false);
     triggerToast(`Prescribed ${newDiet.dietCategory.replace(/_/g, " ")} for ${newDiet.patientName}.`);
   };
 
   // Action: Mark lunch delivered
   const handleMarkDelivered = (dietId: string) => {
-    setDiets((prev) =>
-      prev.map((d) => (d.id === dietId ? { ...d, lunch: "DELIVERED" } : d))
-    );
+    const next = diets.map((d) => (d.id === dietId ? { ...d, lunch: "DELIVERED" as const } : d));
+    saveDiets(next);
     triggerToast("Lunch meal tray marked as DELIVERED to patient bedside.");
   };
 
@@ -297,96 +230,111 @@ export default function DietaryNutritionScreen() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16 }}>
-            {filteredDiets.map((diet) => (
-              <div
-                key={diet.id}
-                style={{
-                  background: "var(--wash-a)",
-                  border: "1.5px solid var(--line)",
-                  borderRadius: 14,
-                  padding: "16px 18px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div>
-                  {/* Bed & Diet Badge Header */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                    <strong style={{ fontSize: 13, color: "var(--indigo)" }}>
-                      🛏️ {diet.bedLocation}
+            {filteredDiets.length === 0 ? (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "48px 24px", background: "var(--wash-a)", borderRadius: 14, border: "1px dashed var(--line)" }}>
+                <span style={{ fontSize: 36, display: "block", marginBottom: 12 }}>🥗</span>
+                <strong style={{ fontSize: 16, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                  No Active Inpatient Meal Tray Orders
+                </strong>
+                <span style={{ fontSize: 13, color: "var(--slate)", maxWidth: 440, margin: "0 auto 18px", display: "block" }}>
+                  Clinical diet prescriptions ordered for admitted patients across hospital wards will appear here for kitchen preparation and bedside delivery.
+                </span>
+                <Button type="button" onClick={() => setPrescribeModalOpen(true)} style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontWeight: 800 }}>
+                  📝 Prescribe Clinical Diet Plan
+                </Button>
+              </div>
+            ) : (
+              filteredDiets.map((diet) => (
+                <div
+                  key={diet.id}
+                  style={{
+                    background: "var(--wash-a)",
+                    border: "1.5px solid var(--line)",
+                    borderRadius: 14,
+                    padding: "16px 18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    {/* Bed & Diet Badge Header */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <strong style={{ fontSize: 13, color: "var(--indigo)" }}>
+                        🛏️ {diet.bedLocation}
+                      </strong>
+                      <span style={{ fontSize: 11, fontWeight: 900, background: diet.dietCategory === "DIABETIC" ? "#FEF3C7" : diet.dietCategory === "RENAL_LOW_SALT" ? "#EFF6FF" : "#DCFCE7", color: diet.dietCategory === "DIABETIC" ? "#B45309" : diet.dietCategory === "RENAL_LOW_SALT" ? "#1D4ED8" : "#166534", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>
+                        {diet.dietCategory.replace(/_/g, " ")}
+                      </span>
+                    </div>
+
+                    <strong style={{ fontSize: 16, color: "var(--ink)", display: "block" }}>
+                      {diet.patientName}
                     </strong>
-                    <span style={{ fontSize: 11, fontWeight: 900, background: diet.dietCategory === "DIABETIC" ? "#FEF3C7" : diet.dietCategory === "RENAL_LOW_SALT" ? "#EFF6FF" : "#DCFCE7", color: diet.dietCategory === "DIABETIC" ? "#B45309" : diet.dietCategory === "RENAL_LOW_SALT" ? "#1D4ED8" : "#166534", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>
-                      {diet.dietCategory.replace(/_/g, " ")}
+                    <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                      {diet.patientUhid} · {diet.foodType} ({diet.feedingRoute.replace("_", " ")})
                     </span>
+
+                    {/* Macros & Telugu Instructions */}
+                    <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "10px 0", fontSize: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, color: "var(--indigo)", marginBottom: 4 }}>
+                        <span>🔥 {diet.macros.calories} kcal</span>
+                        <span>🥩 {diet.macros.protein}g Protein</span>
+                        <span>💧 {diet.macros.fluidLimit} mL Limit</span>
+                      </div>
+                      <span style={{ fontSize: 11.5, color: "#047857", fontWeight: 700, display: "block" }}>
+                        తెలుగు: {diet.instructionsTe}
+                      </span>
+                    </div>
+
+                    {/* 4-Meal Status Checkpoints */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, textAlign: "center", fontSize: 11, marginBottom: 12 }}>
+                      <div style={{ background: "#DCFCE7", color: "#166534", padding: "4px 2px", borderRadius: 4, fontWeight: 700 }}>
+                        ✓ Breakfast
+                      </div>
+                      <div style={{ background: diet.lunch === "DELIVERED" ? "#DCFCE7" : "#FEF3C7", color: diet.lunch === "DELIVERED" ? "#166534" : "#B45309", padding: "4px 2px", borderRadius: 4, fontWeight: 700 }}>
+                        {diet.lunch === "DELIVERED" ? "✓ Lunch" : "🟡 Lunch In-Transit"}
+                      </div>
+                      <div style={{ background: "#F1F5F9", color: "#64748B", padding: "4px 2px", borderRadius: 4 }}>
+                        ⏳ Snacks
+                      </div>
+                      <div style={{ background: "#F1F5F9", color: "#64748B", padding: "4px 2px", borderRadius: 4 }}>
+                        ⏳ Dinner
+                      </div>
+                    </div>
                   </div>
 
-                  <strong style={{ fontSize: 16, color: "var(--ink)", display: "block" }}>
-                    {diet.patientName}
-                  </strong>
-                  <span style={{ fontSize: 12, color: "var(--slate)" }}>
-                    {diet.patientUhid} · {diet.foodType} ({diet.feedingRoute.replace("_", " ")})
-                  </span>
+                  {/* Quick Action Buttons */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 8 }}>
+                    {diet.lunch === "DISPATCHING" ? (
+                      <Button
+                        type="button"
+                        onClick={() => handleMarkDelivered(diet.id)}
+                        style={{ background: "#16A34A", color: "#fff", fontSize: 11.5, padding: "7px 10px", fontWeight: 800 }}
+                      >
+                        ✓ Mark Lunch Delivered
+                      </Button>
+                    ) : (
+                      <span style={{ fontSize: 11.5, color: "#166534", fontWeight: 700, display: "flex", alignItems: "center" }}>
+                        ✓ Lunch Delivered
+                      </span>
+                    )}
 
-                  {/* Macros & Telugu Instructions */}
-                  <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "10px 0", fontSize: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, color: "var(--indigo)", marginBottom: 4 }}>
-                      <span>🔥 {diet.macros.calories} kcal</span>
-                      <span>🥩 {diet.macros.protein}g Protein</span>
-                      <span>💧 {diet.macros.fluidLimit} mL Limit</span>
-                    </div>
-                    <span style={{ fontSize: 11.5, color: "#047857", fontWeight: 700, display: "block" }}>
-                      తెలుగు: {diet.instructionsTe}
-                    </span>
-                  </div>
-
-                  {/* 4-Meal Status Checkpoints */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 6, textAlign: "center", fontSize: 11, marginBottom: 12 }}>
-                    <div style={{ background: "#DCFCE7", color: "#166534", padding: "4px 2px", borderRadius: 4, fontWeight: 700 }}>
-                      ✓ Breakfast
-                    </div>
-                    <div style={{ background: diet.lunch === "DELIVERED" ? "#DCFCE7" : "#FEF3C7", color: diet.lunch === "DELIVERED" ? "#166534" : "#B45309", padding: "4px 2px", borderRadius: 4, fontWeight: 700 }}>
-                      {diet.lunch === "DELIVERED" ? "✓ Lunch" : "🟡 Lunch In-Transit"}
-                    </div>
-                    <div style={{ background: "#F1F5F9", color: "#64748B", padding: "4px 2px", borderRadius: 4 }}>
-                      ⏳ Snacks
-                    </div>
-                    <div style={{ background: "#F1F5F9", color: "#64748B", padding: "4px 2px", borderRadius: 4 }}>
-                      ⏳ Dinner
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Action Buttons */}
-                <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 8 }}>
-                  {diet.lunch === "DISPATCHING" ? (
                     <Button
                       type="button"
-                      onClick={() => handleMarkDelivered(diet.id)}
-                      style={{ background: "#16A34A", color: "#fff", fontSize: 11.5, padding: "7px 10px", fontWeight: 800 }}
+                      ghost
+                      onClick={() => {
+                        setSelectedDietForLabel(diet);
+                        setLabelModalOpen(true);
+                      }}
+                      style={{ fontSize: 11.5, padding: "7px 8px" }}
                     >
-                      ✓ Mark Lunch Delivered
+                      🏷️ Print Tray Label
                     </Button>
-                  ) : (
-                    <span style={{ fontSize: 11.5, color: "#166534", fontWeight: 700, display: "flex", alignItems: "center" }}>
-                      ✓ Lunch Delivered
-                    </span>
-                  )}
-
-                  <Button
-                    type="button"
-                    ghost
-                    onClick={() => {
-                      setSelectedDietForLabel(diet);
-                      setLabelModalOpen(true);
-                    }}
-                    style={{ fontSize: 11.5, padding: "7px 8px" }}
-                  >
-                    🏷️ Print Tray Label
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
       )}
@@ -418,36 +366,44 @@ export default function DietaryNutritionScreen() {
                 </tr>
               </thead>
               <tbody>
-                {filteredDiets.map((diet) => (
-                  <tr key={diet.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block" }}>{diet.patientName}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{diet.patientUhid}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong>{diet.bedLocation.split("(")[0]}</strong>
-                      <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{diet.bedLocation.split("(")[1]?.replace(")", "")}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ color: "var(--indigo)" }}>{diet.dietCategory.replace(/_/g, " ")}</strong>
-                      <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{diet.foodType} · {diet.feedingRoute.replace("_", " ")}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700 }}>
-                      {diet.macros.calories} kcal / {diet.macros.protein}g
-                    </td>
-
-                    <td style={{ padding: "12px 14px", color: "#047857", fontSize: 12 }}>
-                      {diet.instructionsTe}
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <StatusPill kind="success">ACTIVE</StatusPill>
+                {filteredDiets.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                      No clinical diet prescriptions recorded.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredDiets.map((diet) => (
+                    <tr key={diet.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block" }}>{diet.patientName}</strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{diet.patientUhid}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong>{diet.bedLocation.split("(")[0]}</strong>
+                        <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{diet.bedLocation.split("(")[1]?.replace(")", "")}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ color: "var(--indigo)" }}>{diet.dietCategory.replace(/_/g, " ")}</strong>
+                        <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{diet.foodType} · {diet.feedingRoute.replace("_", " ")}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700 }}>
+                        {diet.macros.calories} kcal / {diet.macros.protein}g
+                      </td>
+
+                      <td style={{ padding: "12px 14px", color: "#047857", fontSize: 12 }}>
+                        {diet.instructionsTe}
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <StatusPill kind="success">ACTIVE</StatusPill>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

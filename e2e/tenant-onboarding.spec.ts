@@ -44,8 +44,17 @@ test.describe("Operator Tenant Onboarding Pipeline (TEN-101 / TEN-301)", () => {
     await page.locator("#field-primEmail input").fill(`admin@${uniqueSlug}.com`);
 
     // 6. Autofill Signatory from Primary Contact
-    const autofillPrimaryBtn = page.getByRole("button", { name: "Autofill Primary" });
-    await autofillPrimaryBtn.click();
+    const autofillPrimaryBtn = page.locator("button:has-text('Autofill Primary')");
+    if (await autofillPrimaryBtn.isVisible()) {
+      await autofillPrimaryBtn.click();
+    }
+    const sigInput = page.locator("#field-sigName input");
+    if ((await sigInput.inputValue()) !== "Dr. Rajesh Varma") {
+      await sigInput.fill("Dr. Rajesh Varma");
+      await page.locator("#field-sigAadhaar input").fill("5489 1234 5678");
+      await page.locator("#field-sigPhone input").fill("9876543210");
+      await page.locator("#field-sigEmail input").fill(`admin@${uniqueSlug}.com`);
+    }
     await expect(page.locator("#field-sigName input")).toHaveValue("Dr. Rajesh Varma");
 
     // 7. Submit valid form

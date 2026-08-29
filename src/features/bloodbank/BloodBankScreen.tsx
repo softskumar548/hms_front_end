@@ -54,85 +54,39 @@ const initialStock: BloodGroupStock[] = [
   { group: "AB Negative (AB-)", prbc: 1, ffp: 1, platelets: 0, cryo: 0, status: "CRITICAL" },
 ];
 
-const initialRequisitions: TransfusionRequisition[] = [
-  {
-    id: "req-01",
-    reqNumber: "TX-2026-801",
-    patientName: "K. Venkateswara Rao",
-    patientUhid: "UHID-2026-90841",
-    bloodGroup: "B Positive (B+)",
-    department: "OT-01 (Orthopedics)",
-    requiredComponent: "PRBC (Packed Red Cells)",
-    unitsRequested: 2,
-    urgency: "ROUTINE_OT",
-    status: "PENDING_CROSSMATCH",
-  },
-  {
-    id: "req-02",
-    reqNumber: "TX-2026-802",
-    patientName: "UNKNOWN MALE #9021",
-    patientUhid: "ER-2026-9011",
-    bloodGroup: "O Negative (O-)",
-    department: "Emergency Casualty Bay 1",
-    requiredComponent: "PRBC (Uncrossmatched O-Neg)",
-    unitsRequested: 2,
-    urgency: "EMERGENCY_STAT",
-    status: "COMPATIBLE_RESERVED",
-    assignedUnitBag: "BB-2026-90814 (O- Neg STAT)",
-    reservedUntil: "STAT Emergency Issued",
-  },
-  {
-    id: "req-03",
-    reqNumber: "TX-2026-803",
-    patientName: "B. Satyanarayana",
-    patientUhid: "UHID-2026-90843",
-    bloodGroup: "O Positive (O+)",
-    department: "OT-03 (Cardiothoracic CTVS)",
-    requiredComponent: "PRBC + FFP",
-    unitsRequested: 4,
-    urgency: "ROUTINE_OT",
-    status: "PENDING_CROSSMATCH",
-  },
-];
-
-const initialDonors: DonorRecord[] = [
-  {
-    id: "dnr-01",
-    donorCode: "DNR-2026-9121",
-    unitBagNumber: "BB-2026-90812",
-    donorName: "K. Rajesh Naidu",
-    ageGender: "28Y / Male",
-    aadhaar: "7812 4589 1234",
-    phone: "+91 9848099887",
-    bloodGroup: "B Positive (B+)",
-    donationType: "VOLUNTARY",
-    donatedAt: "29-Aug-2026",
-    status: "5-SEROLOGY CLEAN · STOCKED",
-  },
-  {
-    id: "dnr-02",
-    donorCode: "DNR-2026-9122",
-    unitBagNumber: "BB-2026-90813",
-    donorName: "T. Suresh Babu",
-    ageGender: "32Y / Male",
-    aadhaar: "8912 3456 7890",
-    phone: "+91 9848011224",
-    bloodGroup: "O Positive (O+)",
-    donationType: "VOLUNTARY",
-    donatedAt: "28-Aug-2026",
-    status: "5-SEROLOGY CLEAN · STOCKED",
-  },
-];
-
 export default function BloodBankScreen() {
   const { tenant } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "inventory"; // inventory, crossmatch, donors, emergency
 
-  const [stocks, setStocks] = useState<BloodGroupStock[]>(initialStock);
-  const [requisitions, setRequisitions] = useState<TransfusionRequisition[]>(initialRequisitions);
-  const [donors, setDonors] = useState<DonorRecord[]>(initialDonors);
+  const [stocks, setStocks] = useState<BloodGroupStock[]>(() => {
+    const saved = localStorage.getItem(`hms-blood-stocks-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : initialStock;
+  });
+  const [requisitions, setRequisitions] = useState<TransfusionRequisition[]>(() => {
+    const saved = localStorage.getItem(`hms-blood-requisitions-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [donors, setDonors] = useState<DonorRecord[]>(() => {
+    const saved = localStorage.getItem(`hms-blood-donors-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const saveStocks = (nextStocks: BloodGroupStock[]) => {
+    setStocks(nextStocks);
+    localStorage.setItem(`hms-blood-stocks-${tenant || "default"}`, JSON.stringify(nextStocks));
+  };
+
+  const saveRequisitions = (nextReqs: TransfusionRequisition[]) => {
+    setRequisitions(nextReqs);
+    localStorage.setItem(`hms-blood-requisitions-${tenant || "default"}`, JSON.stringify(nextReqs));
+  };
+
+  const saveDonors = (nextDonors: DonorRecord[]) => {
+    setDonors(nextDonors);
+    localStorage.setItem(`hms-blood-donors-${tenant || "default"}`, JSON.stringify(nextDonors));
+  };
 
   // Modals state
   const [donorModalOpen, setDonorModalOpen] = useState(false);
@@ -166,23 +120,24 @@ export default function BloodBankScreen() {
 
   // Action: Add new donor
   const handleDonorSuccess = (donorRecord: DonorRecord) => {
-    setDonors((prev) => [donorRecord, ...prev]);
+    const nextDonors = [donorRecord, ...donors];
+    saveDonors(nextDonors);
     // Auto increment stock
-    setStocks((prev) =>
-      prev.map((s) => {
-        if (s.group.includes(donorRecord.bloodGroup)) {
-          return { ...s, prbc: s.prbc + 1, ffp: s.ffp + 1, platelets: s.platelets + 1 };
-        }
-        return s;
-      })
-    );
+    const nextStocks = stocks.map((s) => {
+      if (s.group.includes(donorRecord.bloodGroup)) {
+        return { ...s, prbc: s.prbc + 1, ffp: s.ffp + 1, platelets: s.platelets + 1 };
+      }
+      return s;
+    });
+    saveStocks(nextStocks);
     setDonorModalOpen(false);
     triggerToast(`Donation registered for ${donorRecord.donorName}. 3 Components stocked in blood bank.`);
   };
 
   // Action: Cross-match completed
   const handleCrossMatchSuccess = (updatedReq: TransfusionRequisition) => {
-    setRequisitions((prev) => prev.map((r) => (r.id === updatedReq.id ? updatedReq : r)));
+    const nextReqs = requisitions.map((r) => (r.id === updatedReq.id ? updatedReq : r));
+    saveRequisitions(nextReqs);
     setCrossMatchModalOpen(false);
     triggerToast(`Compatibility confirmed. Unit ${updatedReq.assignedUnitBag} reserved for ${updatedReq.patientName}.`);
   };
@@ -411,55 +366,63 @@ export default function BloodBankScreen() {
                 </tr>
               </thead>
               <tbody>
-                {requisitions.map((req) => (
-                  <tr key={req.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
-                      {req.reqNumber}
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block" }}>{req.patientName}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{req.patientUhid}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ color: "#DC2626" }}>{req.bloodGroup}</strong>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <div>{req.department}</div>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong>{req.requiredComponent}</strong> ({req.unitsRequested} Units)
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <StatusPill kind={req.status === "COMPATIBLE_RESERVED" ? "success" : "warn"}>
-                        {req.status.replace(/_/g, " ")}
-                      </StatusPill>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                      {req.status === "PENDING_CROSSMATCH" ? (
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            setSelectedRequisition(req);
-                            setCrossMatchModalOpen(true);
-                          }}
-                          style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 11.5, padding: "6px 12px" }}
-                        >
-                          🧪 Perform Cross-Match
-                        </Button>
-                      ) : (
-                        <span style={{ fontSize: 11, color: "#166534", fontWeight: 700 }}>
-                          ✓ Reserved: {req.assignedUnitBag}
-                        </span>
-                      )}
+                {requisitions.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                      No pending transfusion cross-match requisitions. Clinical requests from OT and ICU will appear here.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  requisitions.map((req) => (
+                    <tr key={req.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
+                        {req.reqNumber}
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block" }}>{req.patientName}</strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{req.patientUhid}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ color: "#DC2626" }}>{req.bloodGroup}</strong>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <div>{req.department}</div>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong>{req.requiredComponent}</strong> ({req.unitsRequested} Units)
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <StatusPill kind={req.status === "COMPATIBLE_RESERVED" ? "success" : "warn"}>
+                          {req.status.replace(/_/g, " ")}
+                        </StatusPill>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                        {req.status === "PENDING_CROSSMATCH" ? (
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              setSelectedRequisition(req);
+                              setCrossMatchModalOpen(true);
+                            }}
+                            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 11.5, padding: "6px 12px" }}
+                          >
+                            🧪 Perform Cross-Match
+                          </Button>
+                        ) : (
+                          <span style={{ fontSize: 11, color: "#166534", fontWeight: 700 }}>
+                            ✓ Reserved: {req.assignedUnitBag}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -494,40 +457,48 @@ export default function BloodBankScreen() {
                 </tr>
               </thead>
               <tbody>
-                {donors.map((d) => (
-                  <tr key={d.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
-                      {d.donorCode}
-                    </td>
-
-                    <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "#DC2626", fontWeight: 700 }}>
-                      {d.unitBagNumber}
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block" }}>{d.donorName}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{d.ageGender} · {d.phone}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", fontFamily: "monospace" }}>
-                      {d.aadhaar}
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <strong style={{ color: "#DC2626" }}>{d.bloodGroup}</strong>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
-                        ✓ 5/5 Serology Clean
-                      </span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "right", color: "var(--slate)" }}>
-                      {d.donatedAt}
+                {donors.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                      No voluntary donors registered yet. Register intake using "+ New Blood Donor Intake".
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  donors.map((d) => (
+                    <tr key={d.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
+                        {d.donorCode}
+                      </td>
+
+                      <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "#DC2626", fontWeight: 700 }}>
+                        {d.unitBagNumber}
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block" }}>{d.donorName}</strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{d.ageGender} · {d.phone}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", fontFamily: "monospace" }}>
+                        {d.aadhaar}
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <strong style={{ color: "#DC2626" }}>{d.bloodGroup}</strong>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
+                          ✓ 5/5 Serology Clean
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "right", color: "var(--slate)" }}>
+                        {d.donatedAt}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

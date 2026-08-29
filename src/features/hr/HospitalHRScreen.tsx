@@ -35,225 +35,6 @@ export interface HospitalEmployee {
   paymentStatus: "PAID" | "PENDING" | "ON_HOLD";
 }
 
-const initialHospitalStaff: HospitalEmployee[] = [
-  {
-    id: "emp-001",
-    employeeId: "EMP-1001",
-    name: "Dr. K R Murali",
-    role: "doctor",
-    designation: "Dean & Chief Consultant Physician",
-    department: "General Medicine",
-    regNo: "APMC-2026-98124",
-    phone: "9848022338",
-    email: "dean@zensynq.com",
-    joiningDate: "2022-01-15",
-    salary: 180000,
-    basicSalary: 90000,
-    hra: 36000,
-    medicalAllowance: 2500,
-    specialAllowance: 16500,
-    dutyAllowance: 20000,
-    incentive: 15000,
-    isEpfEligible: true,
-    isEsicEligible: false,
-    epfDeduction: 10800,
-    esicDeduction: 0,
-    tdsDeduction: 15000,
-    presentDays: 31,
-    lopDays: 0,
-    nightShifts: 4,
-    paymentStatus: "PAID",
-  },
-  {
-    id: "emp-002",
-    employeeId: "EMP-1002",
-    name: "Dr. Sreenivasulu",
-    role: "doctor",
-    designation: "Senior Interventional Cardiologist",
-    department: "Cardiology",
-    regNo: "APMC-2026-89104",
-    phone: "9848033449",
-    email: "cardio@zensynq.com",
-    joiningDate: "2022-03-01",
-    salary: 210000,
-    basicSalary: 105000,
-    hra: 42000,
-    medicalAllowance: 2500,
-    specialAllowance: 20500,
-    dutyAllowance: 25000,
-    incentive: 15000,
-    isEpfEligible: true,
-    isEsicEligible: false,
-    epfDeduction: 12600,
-    esicDeduction: 0,
-    tdsDeduction: 18000,
-    presentDays: 30,
-    lopDays: 1,
-    nightShifts: 6,
-    paymentStatus: "PAID",
-  },
-  {
-    id: "emp-003",
-    employeeId: "EMP-1003",
-    name: "Dr. V Ramana",
-    role: "doctor",
-    designation: "Consultant Orthopedic Surgeon",
-    department: "Orthopedics",
-    regNo: "APMC-2026-78213",
-    phone: "9848044550",
-    email: "ortho@zensynq.com",
-    joiningDate: "2022-06-10",
-    salary: 165000,
-    basicSalary: 82500,
-    hra: 33000,
-    medicalAllowance: 2500,
-    specialAllowance: 17000,
-    dutyAllowance: 18000,
-    incentive: 12000,
-    isEpfEligible: true,
-    isEsicEligible: false,
-    epfDeduction: 9900,
-    esicDeduction: 0,
-    tdsDeduction: 12000,
-    presentDays: 31,
-    lopDays: 0,
-    nightShifts: 2,
-    paymentStatus: "PAID",
-  },
-  {
-    id: "emp-004",
-    employeeId: "EMP-1004",
-    name: "Dr. Ananya Reddy",
-    role: "doctor",
-    designation: "Consultant Pediatrician",
-    department: "Pediatrics",
-    regNo: "APMC-2026-67345",
-    phone: "9848055661",
-    email: "pediatrics@zensynq.com",
-    joiningDate: "2023-02-15",
-    salary: 150000,
-    basicSalary: 75000,
-    hra: 30000,
-    medicalAllowance: 2500,
-    specialAllowance: 17500,
-    dutyAllowance: 15000,
-    incentive: 10000,
-    isEpfEligible: true,
-    isEsicEligible: false,
-    epfDeduction: 9000,
-    esicDeduction: 0,
-    tdsDeduction: 10000,
-    presentDays: 29,
-    lopDays: 2,
-    nightShifts: 3,
-    paymentStatus: "PENDING",
-  },
-  {
-    id: "emp-005",
-    employeeId: "EMP-1005",
-    name: "Staff Nurse Lakshmi",
-    role: "nurse",
-    designation: "Head Nursing Supervisor (ICU)",
-    department: "Critical Care Nursing",
-    phone: "9848066772",
-    email: "nurse.lakshmi@zensynq.com",
-    joiningDate: "2022-04-10",
-    salary: 42000,
-    basicSalary: 21000,
-    hra: 8400,
-    medicalAllowance: 2000,
-    specialAllowance: 5600,
-    dutyAllowance: 5000,
-    isEpfEligible: true,
-    isEsicEligible: false,
-    epfDeduction: 2520,
-    esicDeduction: 0,
-    tdsDeduction: 0,
-    presentDays: 31,
-    lopDays: 0,
-    nightShifts: 10,
-    paymentStatus: "PAID",
-  },
-  {
-    id: "emp-006",
-    employeeId: "EMP-1006",
-    name: "Staff Nurse Bhavani",
-    role: "nurse",
-    designation: "Staff Nurse (Ward 2)",
-    department: "Inpatient Wards",
-    phone: "9848077883",
-    email: "nurse.bhavani@zensynq.com",
-    joiningDate: "2023-01-20",
-    salary: 32000,
-    basicSalary: 16000,
-    hra: 6400,
-    medicalAllowance: 2000,
-    specialAllowance: 4600,
-    dutyAllowance: 3000,
-    isEpfEligible: true,
-    isEsicEligible: true,
-    epfDeduction: 1920,
-    esicDeduction: 240,
-    tdsDeduction: 0,
-    presentDays: 30,
-    lopDays: 1,
-    nightShifts: 8,
-    paymentStatus: "PENDING",
-  },
-  {
-    id: "emp-007",
-    employeeId: "EMP-1007",
-    name: "Venkata Rao",
-    role: "billing",
-    designation: "Senior Cashier & Billing Officer",
-    department: "Finance & Accounts",
-    phone: "9848088994",
-    email: "cashier.venkat@zensynq.com",
-    joiningDate: "2022-02-01",
-    salary: 35000,
-    basicSalary: 17500,
-    hra: 7000,
-    medicalAllowance: 2000,
-    specialAllowance: 5500,
-    dutyAllowance: 3000,
-    isEpfEligible: true,
-    isEsicEligible: true,
-    epfDeduction: 2100,
-    esicDeduction: 262,
-    tdsDeduction: 0,
-    presentDays: 31,
-    lopDays: 0,
-    nightShifts: 0,
-    paymentStatus: "PAID",
-  },
-  {
-    id: "emp-008",
-    employeeId: "EMP-1008",
-    name: "Suresh Kumar",
-    role: "lab_tech",
-    designation: "Chief Medical Lab Technologist",
-    department: "Diagnostic Pathology",
-    phone: "9848099005",
-    email: "lab.suresh@zensynq.com",
-    joiningDate: "2022-05-15",
-    salary: 38000,
-    basicSalary: 19000,
-    hra: 7600,
-    medicalAllowance: 2000,
-    specialAllowance: 5400,
-    dutyAllowance: 4000,
-    isEpfEligible: true,
-    isEsicEligible: true,
-    epfDeduction: 2280,
-    esicDeduction: 285,
-    tdsDeduction: 0,
-    presentDays: 31,
-    lopDays: 0,
-    nightShifts: 4,
-    paymentStatus: "PENDING",
-  },
-];
-
 interface LeaveRequest {
   id: string;
   staffName: string;
@@ -265,49 +46,32 @@ interface LeaveRequest {
   status: "PENDING" | "APPROVED" | "REJECTED";
 }
 
-const initialLeaveRequests: LeaveRequest[] = [
-  {
-    id: "leave-01",
-    staffName: "Dr. Ananya Reddy",
-    role: "Consultant Pediatrician",
-    leaveType: "Casual Leave",
-    dates: "01 Sep 2026 - 02 Sep 2026",
-    days: 2,
-    reason: "Attending National Pediatric Conference in Hyderabad",
-    status: "PENDING",
-  },
-  {
-    id: "leave-02",
-    staffName: "Staff Nurse Bhavani",
-    role: "Staff Nurse (Ward 2)",
-    leaveType: "Sick Leave",
-    dates: "28 Aug 2026 - 28 Aug 2026",
-    days: 1,
-    reason: "Viral fever and acute headache",
-    status: "PENDING",
-  },
-  {
-    id: "leave-03",
-    staffName: "Suresh Kumar",
-    role: "Chief Lab Technologist",
-    leaveType: "Earned Leave",
-    dates: "05 Sep 2026 - 07 Sep 2026",
-    days: 3,
-    reason: "Family pilgrimage travel",
-    status: "PENDING",
-  },
-];
-
 export default function HospitalHRScreen() {
   const { tenant } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "payroll"; // payroll, attendance, salary-structure, payslips
 
-  const [staffList, setStaffList] = useState<HospitalEmployee[]>(initialHospitalStaff);
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(initialLeaveRequests);
+  const [staffList, setStaffList] = useState<HospitalEmployee[]>(() => {
+    const saved = localStorage.getItem(`hms-staff-roster-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(() => {
+    const saved = localStorage.getItem(`hms-leave-requests-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [selectedMonth, setSelectedMonth] = useState("August 2026");
   const [searchQuery, setSearchQuery] = useState("");
   const [isPayrollLocked, setIsPayrollLocked] = useState(false);
+
+  const saveStaffList = (nextStaff: HospitalEmployee[]) => {
+    setStaffList(nextStaff);
+    localStorage.setItem(`hms-staff-roster-${tenant || "default"}`, JSON.stringify(nextStaff));
+  };
+
+  const saveLeaveRequests = (nextLeaves: LeaveRequest[]) => {
+    setLeaveRequests(nextLeaves);
+    localStorage.setItem(`hms-leave-requests-${tenant || "default"}`, JSON.stringify(nextLeaves));
+  };
 
   // Modals state
   const [paySlipModalOpen, setPaySlipModalOpen] = useState(false);
@@ -352,42 +116,39 @@ export default function HospitalHRScreen() {
 
   // Handle Salary Structure Update
   const handleSalaryStructureSuccess = (updated: any) => {
-    setStaffList((prev) =>
-      prev.map((s) =>
-        s.id === updated.staffId
-          ? {
-              ...s,
-              salary: updated.monthlyCtc,
-              basicSalary: updated.basicSalary,
-              hra: updated.hra,
-              medicalAllowance: updated.medicalAllowance,
-              specialAllowance: updated.specialAllowance,
-              dutyAllowance: updated.dutyAllowance,
-              isEpfEligible: updated.isEpfEligible,
-              isEsicEligible: updated.isEsicEligible,
-              epfDeduction: updated.epfDeduction,
-              esicDeduction: updated.esicDeduction,
-              tdsDeduction: updated.tdsDeduction,
-            }
-          : s
-      )
+    const nextStaff = staffList.map((s) =>
+      s.id === updated.staffId
+        ? {
+            ...s,
+            salary: updated.monthlyCtc,
+            basicSalary: updated.basicSalary,
+            hra: updated.hra,
+            medicalAllowance: updated.medicalAllowance,
+            specialAllowance: updated.specialAllowance,
+            dutyAllowance: updated.dutyAllowance,
+            isEpfEligible: updated.isEpfEligible,
+            isEsicEligible: updated.isEsicEligible,
+            epfDeduction: updated.epfDeduction,
+            esicDeduction: updated.esicDeduction,
+            tdsDeduction: updated.tdsDeduction,
+          }
+        : s
     );
+    saveStaffList(nextStaff);
     setSalaryStructureModalOpen(false);
     triggerToast("Salary compensation package updated successfully.");
   };
 
   // Handle Leave Approval
   const handleApproveLeave = (id: string) => {
-    setLeaveRequests((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status: "APPROVED" } : l))
-    );
+    const next = leaveRequests.map((l) => (l.id === id ? { ...l, status: "APPROVED" as const } : l));
+    saveLeaveRequests(next);
     triggerToast("Leave request approved.");
   };
 
   const handleRejectLeave = (id: string) => {
-    setLeaveRequests((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status: "REJECTED" } : l))
-    );
+    const next = leaveRequests.map((l) => (l.id === id ? { ...l, status: "REJECTED" as const } : l));
+    saveLeaveRequests(next);
     triggerToast("Leave request rejected.");
   };
 
@@ -567,76 +328,84 @@ export default function HospitalHRScreen() {
                   </tr>
                 </thead>
                 <tbody>
-                  {staffList.map((s) => {
-                    const basic = s.basicSalary || Math.floor(s.salary * 0.5);
-                    const epf = s.epfDeduction || 0;
-                    const esic = s.esicDeduction || 0;
-                    const tds = s.tdsDeduction || 0;
-                    const pt = 200;
-                    const totalDed = epf + esic + pt + tds + 750;
-                    const netSalary = s.salary - totalDed;
+                  {staffList.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                        No staff members configured in hospital payroll. Add personnel in User & Staff Directory to run payroll.
+                      </td>
+                    </tr>
+                  ) : (
+                    staffList.map((s) => {
+                      const basic = s.basicSalary || Math.floor(s.salary * 0.5);
+                      const epf = s.epfDeduction || 0;
+                      const esic = s.esicDeduction || 0;
+                      const tds = s.tdsDeduction || 0;
+                      const pt = 200;
+                      const totalDed = epf + esic + pt + tds + 750;
+                      const netSalary = s.salary - totalDed;
 
-                    return (
-                      <tr key={s.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                        <td style={{ padding: "12px 14px" }}>
-                          <strong style={{ display: "block", color: "var(--ink)", fontSize: 13.5 }}>{s.name}</strong>
-                          <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--indigo)" }}>{s.employeeId}</span>
-                        </td>
+                      return (
+                        <tr key={s.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                          <td style={{ padding: "12px 14px" }}>
+                            <strong style={{ display: "block", color: "var(--ink)", fontSize: 13.5 }}>{s.name}</strong>
+                            <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--indigo)" }}>{s.employeeId}</span>
+                          </td>
 
-                        <td style={{ padding: "12px 14px" }}>
-                          <div style={{ fontWeight: 600 }}>{s.designation}</div>
-                          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{s.department}</span>
-                        </td>
+                          <td style={{ padding: "12px 14px" }}>
+                            <div style={{ fontWeight: 600 }}>{s.designation}</div>
+                            <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{s.department}</span>
+                          </td>
 
-                        <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 700 }}>
-                          ₹{s.salary.toLocaleString("en-IN")}
-                        </td>
+                          <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 700 }}>
+                            ₹{s.salary.toLocaleString("en-IN")}
+                          </td>
 
-                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                          <span style={{ fontWeight: 700 }}>{s.presentDays}d</span>
-                          {s.lopDays > 0 && (
-                            <span style={{ fontSize: 11, color: "#DC2626", display: "block" }}>
-                              -{s.lopDays}d LOP
+                          <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                            <span style={{ fontWeight: 700 }}>{s.presentDays}d</span>
+                            {s.lopDays > 0 && (
+                              <span style={{ fontSize: 11, color: "#DC2626", display: "block" }}>
+                                -{s.lopDays}d LOP
+                              </span>
+                            )}
+                          </td>
+
+                          <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12 }}>
+                            <span style={{ color: "#991B1B", fontWeight: 700 }}>-₹{totalDed.toLocaleString("en-IN")}</span>
+                            <span style={{ fontSize: 10.5, color: "var(--slate)", display: "block" }}>
+                              EPF: ₹{epf} · TDS: ₹{tds}
                             </span>
-                          )}
-                        </td>
+                          </td>
 
-                        <td style={{ padding: "12px 14px", textAlign: "right", fontSize: 12 }}>
-                          <span style={{ color: "#991B1B", fontWeight: 700 }}>-₹{totalDed.toLocaleString("en-IN")}</span>
-                          <span style={{ fontSize: 10.5, color: "var(--slate)", display: "block" }}>
-                            EPF: ₹{epf} · TDS: ₹{tds}
-                          </span>
-                        </td>
+                          <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                            <strong style={{ fontSize: 14, color: "#16A34A" }}>
+                              ₹{netSalary.toLocaleString("en-IN")}
+                            </strong>
+                          </td>
 
-                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                          <strong style={{ fontSize: 14, color: "#16A34A" }}>
-                            ₹{netSalary.toLocaleString("en-IN")}
-                          </strong>
-                        </td>
+                          <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                            <StatusPill kind={s.paymentStatus === "PAID" ? "success" : s.paymentStatus === "PENDING" ? "warn" : "info"}>
+                              {s.paymentStatus}
+                            </StatusPill>
+                          </td>
 
-                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                          <StatusPill kind={s.paymentStatus === "PAID" ? "success" : s.paymentStatus === "PENDING" ? "warn" : "info"}>
-                            {s.paymentStatus}
-                          </StatusPill>
-                        </td>
-
-                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                          <div style={{ display: "inline-flex", gap: 6 }}>
-                            <Button
-                              type="button"
-                              onClick={() => {
-                                setSelectedStaffForPaySlip(s);
-                                setPaySlipModalOpen(true);
-                              }}
-                              style={{ fontSize: 11.5, padding: "5px 10px" }}
-                            >
-                              🖨️ Pay Slip
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                            <div style={{ display: "inline-flex", gap: 6 }}>
+                              <Button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedStaffForPaySlip(s);
+                                  setPaySlipModalOpen(true);
+                                }}
+                                style={{ fontSize: 11.5, padding: "5px 10px" }}
+                              >
+                                🖨️ Pay Slip
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
@@ -664,61 +433,67 @@ export default function HospitalHRScreen() {
             </div>
 
             <div style={{ display: "grid", gap: 10 }}>
-              {leaveRequests.map((l) => (
-                <div
-                  key={l.id}
-                  style={{
-                    background: "var(--wash-a)",
-                    border: "1px solid var(--line)",
-                    padding: "12px 16px",
-                    borderRadius: 12,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: 10,
-                  }}
-                >
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <strong style={{ fontSize: 14, color: "var(--ink)" }}>{l.staffName}</strong>
-                      <span style={{ fontSize: 11.5, background: "var(--indigo-soft)", color: "var(--indigo)", padding: "2px 8px", borderRadius: 6, fontWeight: 700 }}>
-                        {l.leaveType}
-                      </span>
-                      <span style={{ fontSize: 12, color: "var(--slate)" }}>({l.days} Days · {l.dates})</span>
-                    </div>
-                    <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--slate)" }}>
-                      Reason: <em>"{l.reason}"</em>
-                    </p>
-                  </div>
-
-                  <div>
-                    {l.status === "PENDING" ? (
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <Button
-                          type="button"
-                          onClick={() => handleApproveLeave(l.id)}
-                          style={{ background: "#16A34A", color: "#fff", fontSize: 12, padding: "6px 14px" }}
-                        >
-                          ✓ Approve Leave
-                        </Button>
-                        <Button
-                          type="button"
-                          ghost
-                          onClick={() => handleRejectLeave(l.id)}
-                          style={{ borderColor: "#DC2626", color: "#DC2626", fontSize: 12, padding: "6px 12px" }}
-                        >
-                          ✕ Reject
-                        </Button>
-                      </div>
-                    ) : (
-                      <StatusPill kind={l.status === "APPROVED" ? "success" : "danger"}>
-                        {l.status}
-                      </StatusPill>
-                    )}
-                  </div>
+              {leaveRequests.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "28px 14px", background: "var(--wash-a)", borderRadius: 12, border: "1px dashed var(--line)", color: "var(--slate)", fontStyle: "italic" }}>
+                  No pending leave applications.
                 </div>
-              ))}
+              ) : (
+                leaveRequests.map((l) => (
+                  <div
+                    key={l.id}
+                    style={{
+                      background: "var(--wash-a)",
+                      border: "1px solid var(--line)",
+                      padding: "12px 16px",
+                      borderRadius: 12,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: 10,
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <strong style={{ fontSize: 14, color: "var(--ink)" }}>{l.staffName}</strong>
+                        <span style={{ fontSize: 11.5, background: "var(--indigo-soft)", color: "var(--indigo)", padding: "2px 8px", borderRadius: 6, fontWeight: 700 }}>
+                          {l.leaveType}
+                        </span>
+                        <span style={{ fontSize: 12, color: "var(--slate)" }}>({l.days} Days · {l.dates})</span>
+                      </div>
+                      <p style={{ margin: "4px 0 0", fontSize: 12.5, color: "var(--slate)" }}>
+                        Reason: <em>"{l.reason}"</em>
+                      </p>
+                    </div>
+
+                    <div>
+                      {l.status === "PENDING" ? (
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <Button
+                            type="button"
+                            onClick={() => handleApproveLeave(l.id)}
+                            style={{ background: "#16A34A", color: "#fff", fontSize: 12, padding: "6px 14px" }}
+                          >
+                            ✓ Approve Leave
+                          </Button>
+                          <Button
+                            type="button"
+                            ghost
+                            onClick={() => handleRejectLeave(l.id)}
+                            style={{ borderColor: "#DC2626", color: "#DC2626", fontSize: 12, padding: "6px 12px" }}
+                          >
+                            ✕ Reject
+                          </Button>
+                        </div>
+                      ) : (
+                        <StatusPill kind={l.status === "APPROVED" ? "success" : "danger"}>
+                          {l.status}
+                        </StatusPill>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </Card>
 
@@ -740,23 +515,31 @@ export default function HospitalHRScreen() {
                   </tr>
                 </thead>
                 <tbody>
-                  {staffList.map((s) => (
-                    <tr key={s.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                      <td style={{ padding: "12px 14px" }}>
-                        <strong style={{ display: "block", color: "var(--ink)" }}>{s.name}</strong>
-                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{s.designation}</span>
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "center" }}>31 Days</td>
-                      <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700, color: "#16A34A" }}>{s.presentDays} Days</td>
-                      <td style={{ padding: "12px 14px", textAlign: "center" }}>{31 - s.presentDays - s.lopDays} Days</td>
-                      <td style={{ padding: "12px 14px", textAlign: "center", color: s.lopDays > 0 ? "#DC2626" : "var(--slate)", fontWeight: s.lopDays > 0 ? 700 : 400 }}>
-                        {s.lopDays} Days
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700, color: "var(--indigo)" }}>
-                        🌙 {s.nightShifts} Shifts
+                  {staffList.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                        No staff attendance recorded for {selectedMonth}.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    staffList.map((s) => (
+                      <tr key={s.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "12px 14px" }}>
+                          <strong style={{ display: "block", color: "var(--ink)" }}>{s.name}</strong>
+                          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{s.designation}</span>
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>31 Days</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700, color: "#16A34A" }}>{s.presentDays} Days</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>{31 - s.presentDays - s.lopDays} Days</td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", color: s.lopDays > 0 ? "#DC2626" : "var(--slate)", fontWeight: s.lopDays > 0 ? 700 : 400 }}>
+                          {s.lopDays} Days
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "center", fontWeight: 700, color: "var(--indigo)" }}>
+                          🌙 {s.nightShifts} Shifts
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -792,45 +575,53 @@ export default function HospitalHRScreen() {
                   </tr>
                 </thead>
                 <tbody>
-                  {staffList.map((s) => (
-                    <tr key={s.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                      <td style={{ padding: "12px 14px" }}>
-                        <strong style={{ display: "block", color: "var(--ink)" }}>{s.name}</strong>
-                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{s.designation} · {s.department}</span>
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 700, color: "var(--indigo)" }}>
-                        ₹{s.salary.toLocaleString("en-IN")}
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                        ₹{(s.basicSalary || Math.floor(s.salary * 0.5)).toLocaleString("en-IN")}
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                        ₹{(s.hra || Math.floor(s.salary * 0.2)).toLocaleString("en-IN")}
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                        <span style={{ fontSize: 11, background: s.isEpfEligible !== false ? "#DCFCE7" : "#F1F5F9", color: s.isEpfEligible !== false ? "#166534" : "#64748B", padding: "2px 8px", borderRadius: 4, fontWeight: 700, marginRight: 4 }}>
-                          EPF 12%
-                        </span>
-                        {s.isEsicEligible && (
-                          <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                            ESIC
-                          </span>
-                        )}
-                      </td>
-                      <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            setSelectedStaffForStructure(s);
-                            setSalaryStructureModalOpen(true);
-                          }}
-                          style={{ fontSize: 11.5, padding: "5px 12px" }}
-                        >
-                          ⚙️ Adjust Structure
-                        </Button>
+                  {staffList.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                        No staff compensation structures defined yet.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    staffList.map((s) => (
+                      <tr key={s.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                        <td style={{ padding: "12px 14px" }}>
+                          <strong style={{ display: "block", color: "var(--ink)" }}>{s.name}</strong>
+                          <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{s.designation} · {s.department}</span>
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 700, color: "var(--indigo)" }}>
+                          ₹{s.salary.toLocaleString("en-IN")}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          ₹{(s.basicSalary || Math.floor(s.salary * 0.5)).toLocaleString("en-IN")}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          ₹{(s.hra || Math.floor(s.salary * 0.2)).toLocaleString("en-IN")}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                          <span style={{ fontSize: 11, background: s.isEpfEligible !== false ? "#DCFCE7" : "#F1F5F9", color: s.isEpfEligible !== false ? "#166534" : "#64748B", padding: "2px 8px", borderRadius: 4, fontWeight: 700, marginRight: 4 }}>
+                            EPF 12%
+                          </span>
+                          {s.isEsicEligible && (
+                            <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                              ESIC
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              setSelectedStaffForStructure(s);
+                              setSalaryStructureModalOpen(true);
+                            }}
+                            style={{ fontSize: 11.5, padding: "5px 12px" }}
+                          >
+                            ⚙️ Adjust Structure
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -856,36 +647,41 @@ export default function HospitalHRScreen() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
-              {filteredStaff.map((s) => {
-                const basic = s.basicSalary || Math.floor(s.salary * 0.5);
-                const epf = s.epfDeduction || 0;
-                const netSalary = s.salary - epf - (s.tdsDeduction || 0) - 200 - 750;
+              {filteredStaff.length === 0 ? (
+                <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "36px 14px", background: "var(--wash-a)", borderRadius: 12, border: "1px dashed var(--line)", color: "var(--slate)", fontStyle: "italic" }}>
+                  No pay slips generated for {selectedMonth}.
+                </div>
+              ) : (
+                filteredStaff.map((s) => {
+                  const basic = s.basicSalary || Math.floor(s.salary * 0.5);
+                  const epf = s.epfDeduction || 0;
+                  const netSalary = s.salary - epf - (s.tdsDeduction || 0) - 200 - 750;
 
-                return (
-                  <div
-                    key={s.id}
-                    style={{
-                      background: "var(--wash-a)",
-                      border: "1px solid var(--line)",
-                      borderRadius: 14,
-                      padding: "16px 18px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                        <span style={{ fontSize: 11, fontFamily: "monospace", fontWeight: 700, color: "var(--indigo)" }}>
-                          {s.employeeId}
-                        </span>
-                        <StatusPill kind={s.paymentStatus === "PAID" ? "success" : "warn"}>
-                          {s.paymentStatus}
-                        </StatusPill>
-                      </div>
+                  return (
+                    <div
+                      key={s.id}
+                      style={{
+                        background: "var(--wash-a)",
+                        border: "1px solid var(--line)",
+                        borderRadius: 14,
+                        padding: "16px 18px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                          <span style={{ fontSize: 11, fontFamily: "monospace", fontWeight: 700, color: "var(--indigo)" }}>
+                            {s.employeeId}
+                          </span>
+                          <StatusPill kind={s.paymentStatus === "PAID" ? "success" : "warn"}>
+                            {s.paymentStatus}
+                          </StatusPill>
+                        </div>
 
-                      <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>{s.name}</strong>
-                      <span style={{ fontSize: 12, color: "var(--slate)" }}>{s.designation} ({s.department})</span>
+                        <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>{s.name}</strong>
+                        <span style={{ fontSize: 12, color: "var(--slate)" }}>{s.designation} ({s.department})</span>
 
                       <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "12px 0" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
@@ -911,8 +707,9 @@ export default function HospitalHRScreen() {
                     </Button>
                   </div>
                 );
-              })}
-            </div>
+              })
+            )}
+          </div>
           </Card>
         </div>
       )}

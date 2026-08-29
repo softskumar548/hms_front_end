@@ -27,51 +27,59 @@ export interface InpatientBed {
   primaryDiagnosis?: string;
 }
 
-const initialBedsList: InpatientBed[] = [
+const initialCleanBedsList: InpatientBed[] = [
   // Floor 1: Ground Floor - Emergency & Day Care
   { id: "b-dc-01", bedNumber: "DC-01", floor: 1, wing: "Wing A (Day Care)", category: "Day Care Surgery", tariffPerDay: 1200, status: "AVAILABLE" },
-  { id: "b-dc-02", bedNumber: "DC-02", floor: 1, wing: "Wing A (Day Care)", category: "Day Care Surgery", tariffPerDay: 1200, status: "OCCUPIED", patientName: "Venkata Rao", ipNumber: "IPD-2026-9011", doctorName: "Dr. K. Venkateswarlu", department: "General Surgery", admissionDate: "2026-08-28T09:00:00Z", primaryDiagnosis: "Laparoscopic Hernia Repair" },
-  { id: "b-dc-03", bedNumber: "DC-03", floor: 1, wing: "Wing A (Day Care)", category: "Day Care Surgery", tariffPerDay: 1200, status: "CLEANING" },
-  { id: "b-em-01", bedNumber: "EM-01", floor: 1, wing: "Wing B (Emergency)", category: "Emergency Observation", tariffPerDay: 1500, status: "OCCUPIED", patientName: "Kishore Kumar", ipNumber: "IPD-2026-9012", doctorName: "Dr. K R Murali", department: "Emergency Medicine", admissionDate: "2026-08-28T18:30:00Z", primaryDiagnosis: "Acute Bronchospasm & Asthma" },
+  { id: "b-dc-02", bedNumber: "DC-02", floor: 1, wing: "Wing A (Day Care)", category: "Day Care Surgery", tariffPerDay: 1200, status: "AVAILABLE" },
+  { id: "b-dc-03", bedNumber: "DC-03", floor: 1, wing: "Wing A (Day Care)", category: "Day Care Surgery", tariffPerDay: 1200, status: "AVAILABLE" },
+  { id: "b-em-01", bedNumber: "EM-01", floor: 1, wing: "Wing B (Emergency)", category: "Emergency Observation", tariffPerDay: 1500, status: "AVAILABLE" },
   { id: "b-em-02", bedNumber: "EM-02", floor: 1, wing: "Wing B (Emergency)", category: "Emergency Observation", tariffPerDay: 1500, status: "AVAILABLE" },
 
   // Floor 2: Medical & Surgical Wards
-  { id: "b-gmw-101", bedNumber: "GMW-101", floor: 2, wing: "Wing A (Male Ward)", category: "General Male Ward", tariffPerDay: 1000, status: "OCCUPIED", patientName: "Ramesh Babu", ipNumber: "IPD-2026-9013", doctorName: "Dr. V Ramana", department: "Orthopedics", admissionDate: "2026-08-26T10:00:00Z", primaryDiagnosis: "Closed Fracture Right Femur" },
+  { id: "b-gmw-101", bedNumber: "GMW-101", floor: 2, wing: "Wing A (Male Ward)", category: "General Male Ward", tariffPerDay: 1000, status: "AVAILABLE" },
   { id: "b-gmw-102", bedNumber: "GMW-102", floor: 2, wing: "Wing A (Male Ward)", category: "General Male Ward", tariffPerDay: 1000, status: "AVAILABLE" },
-  { id: "b-gmw-103", bedNumber: "GMW-103", floor: 2, wing: "Wing A (Male Ward)", category: "General Male Ward", tariffPerDay: 1000, status: "OCCUPIED", patientName: "Satyanarayana P", ipNumber: "IPD-2026-9014", doctorName: "Dr. K R Murali", department: "General Medicine", admissionDate: "2026-08-27T11:00:00Z", primaryDiagnosis: "Type 2 Diabetes with Cellulitis" },
+  { id: "b-gmw-103", bedNumber: "GMW-103", floor: 2, wing: "Wing A (Male Ward)", category: "General Male Ward", tariffPerDay: 1000, status: "AVAILABLE" },
   { id: "b-gmw-104", bedNumber: "GMW-104", floor: 2, wing: "Wing A (Male Ward)", category: "General Male Ward", tariffPerDay: 1000, status: "AVAILABLE" },
 
-  { id: "b-gfw-105", bedNumber: "GFW-105", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "OCCUPIED", patientName: "Sita Devi", ipNumber: "IPD-2026-9015", doctorName: "Dr. Sreenivasulu", department: "Cardiology", admissionDate: "2026-08-25T14:00:00Z", primaryDiagnosis: "Hypertensive Heart Disease" },
+  { id: "b-gfw-105", bedNumber: "GFW-105", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "AVAILABLE" },
   { id: "b-gfw-106", bedNumber: "GFW-106", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "AVAILABLE" },
-  { id: "b-gfw-107", bedNumber: "GFW-107", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "OCCUPIED", patientName: "Lakshmi Prasanna", ipNumber: "IPD-2026-9016", doctorName: "Dr. Shanti Kumari", department: "Obstetrics & Gynaecology", admissionDate: "2026-08-27T08:00:00Z", primaryDiagnosis: "Antenatal Observation" },
-  { id: "b-gfw-108", bedNumber: "GFW-108", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "CLEANING" },
+  { id: "b-gfw-107", bedNumber: "GFW-107", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "AVAILABLE" },
+  { id: "b-gfw-108", bedNumber: "GFW-108", floor: 2, wing: "Wing B (Female Ward)", category: "General Female Ward", tariffPerDay: 1000, status: "AVAILABLE" },
 
-  { id: "b-sp-201a", bedNumber: "SP-201A", floor: 2, wing: "Wing C (Semi-Private)", category: "Semi-Private Twin", tariffPerDay: 2200, status: "OCCUPIED", patientName: "Narayana Swamy", ipNumber: "IPD-2026-9017", doctorName: "Dr. K R Murali", department: "General Medicine", admissionDate: "2026-08-26T16:00:00Z", primaryDiagnosis: "Acute Pyelonephritis" },
+  { id: "b-sp-201a", bedNumber: "SP-201A", floor: 2, wing: "Wing C (Semi-Private)", category: "Semi-Private Twin", tariffPerDay: 2200, status: "AVAILABLE" },
   { id: "b-sp-201b", bedNumber: "SP-201B", floor: 2, wing: "Wing C (Semi-Private)", category: "Semi-Private Twin", tariffPerDay: 2200, status: "AVAILABLE" },
   { id: "b-sp-202a", bedNumber: "SP-202A", floor: 2, wing: "Wing C (Semi-Private)", category: "Semi-Private Twin", tariffPerDay: 2200, status: "AVAILABLE" },
-  { id: "b-sp-202b", bedNumber: "SP-202B", floor: 2, wing: "Wing C (Semi-Private)", category: "Semi-Private Twin", tariffPerDay: 2200, status: "MAINTENANCE" },
+  { id: "b-sp-202b", bedNumber: "SP-202B", floor: 2, wing: "Wing C (Semi-Private)", category: "Semi-Private Twin", tariffPerDay: 2200, status: "AVAILABLE" },
 
   // Floor 3: Executive & Deluxe Suites
-  { id: "b-dx-301", bedNumber: "DX-301", floor: 3, wing: "Wing A (Deluxe Suite)", category: "Deluxe Single Suite", tariffPerDay: 4500, status: "OCCUPIED", patientName: "Chandra Sekhar", ipNumber: "IPD-2026-9018", doctorName: "Dr. Sreenivasulu", department: "Cardiology", admissionDate: "2026-08-24T12:00:00Z", primaryDiagnosis: "Post-Angiography Observation" },
+  { id: "b-dx-301", bedNumber: "DX-301", floor: 3, wing: "Wing A (Deluxe Suite)", category: "Deluxe Single Suite", tariffPerDay: 4500, status: "AVAILABLE" },
   { id: "b-dx-302", bedNumber: "DX-302", floor: 3, wing: "Wing A (Deluxe Suite)", category: "Deluxe Single Suite", tariffPerDay: 4500, status: "AVAILABLE" },
   { id: "b-dx-303", bedNumber: "DX-303", floor: 3, wing: "Wing A (Deluxe Suite)", category: "Deluxe Single Suite", tariffPerDay: 4500, status: "AVAILABLE" },
-  { id: "b-sdx-304", bedNumber: "SDX-304", floor: 3, wing: "Wing B (Super Deluxe)", category: "Super Deluxe Suite", tariffPerDay: 7500, status: "OCCUPIED", patientName: "Vijaya Bhaskar", ipNumber: "IPD-2026-9019", doctorName: "Dr. K. Venkateswarlu", department: "General Surgery", admissionDate: "2026-08-25T09:30:00Z", primaryDiagnosis: "Laparoscopic Cholecystectomy Post-Op" },
+  { id: "b-sdx-304", bedNumber: "SDX-304", floor: 3, wing: "Wing B (Super Deluxe)", category: "Super Deluxe Suite", tariffPerDay: 7500, status: "AVAILABLE" },
 
   // Floor 4: Critical Care ICU & CCU
-  { id: "b-icu-01", bedNumber: "ICU-01", floor: 4, wing: "Critical Care ICU", category: "ICU Ventilator Bed", tariffPerDay: 8500, status: "OCCUPIED", isIcu: true, hasVentilator: true, patientName: "Appa Rao G", ipNumber: "IPD-2026-9020", doctorName: "Dr. K R Murali", department: "Critical Care / Pulmonology", admissionDate: "2026-08-25T02:00:00Z", primaryDiagnosis: "Severe ARDS on Mechanical Ventilation" },
+  { id: "b-icu-01", bedNumber: "ICU-01", floor: 4, wing: "Critical Care ICU", category: "ICU Ventilator Bed", tariffPerDay: 8500, status: "AVAILABLE", isIcu: true, hasVentilator: true },
   { id: "b-icu-02", bedNumber: "ICU-02", floor: 4, wing: "Critical Care ICU", category: "ICU Ventilator Bed", tariffPerDay: 8500, status: "AVAILABLE", isIcu: true, hasVentilator: true },
-  { id: "b-icu-03", bedNumber: "ICU-03", floor: 4, wing: "Critical Care ICU", category: "ICU Ventilator Bed", tariffPerDay: 8500, status: "OCCUPIED", isIcu: true, hasVentilator: true, patientName: "Baby Aaradhya", ipNumber: "IPD-2026-9021", doctorName: "Dr. Ananya Reddy", department: "Pediatrics", admissionDate: "2026-08-27T20:00:00Z", primaryDiagnosis: "Severe Bronchiolitis with Hypoxia" },
-  { id: "b-ccu-01", bedNumber: "CCU-01", floor: 4, wing: "Coronary Care Unit", category: "CCU Cardiac Bed", tariffPerDay: 9000, status: "OCCUPIED", isIcu: true, patientName: "Krishna Murthy", ipNumber: "IPD-2026-9022", doctorName: "Dr. Sreenivasulu", department: "Cardiology", admissionDate: "2026-08-26T04:30:00Z", primaryDiagnosis: "Acute STEMI Anterior Wall Infarct" },
+  { id: "b-icu-03", bedNumber: "ICU-03", floor: 4, wing: "Critical Care ICU", category: "ICU Ventilator Bed", tariffPerDay: 8500, status: "AVAILABLE", isIcu: true, hasVentilator: true },
+  { id: "b-ccu-01", bedNumber: "CCU-01", floor: 4, wing: "Coronary Care Unit", category: "CCU Cardiac Bed", tariffPerDay: 9000, status: "AVAILABLE", isIcu: true },
   { id: "b-ccu-02", bedNumber: "CCU-02", floor: 4, wing: "Coronary Care Unit", category: "CCU Cardiac Bed", tariffPerDay: 9000, status: "AVAILABLE", isIcu: true },
 ];
 
 export default function InpatientBedMatrixScreen() {
   const { token, tenant } = useAuth();
 
-  const [beds, setBeds] = useState<InpatientBed[]>(initialBedsList);
+  const [beds, setBeds] = useState<InpatientBed[]>(() => {
+    const saved = localStorage.getItem(`hms-inpatient-beds-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : initialCleanBedsList;
+  });
   const [selectedFloor, setSelectedFloor] = useState<number | "all">("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const saveBeds = (nextBeds: InpatientBed[]) => {
+    setBeds(nextBeds);
+    localStorage.setItem(`hms-inpatient-beds-${tenant || "default"}`, JSON.stringify(nextBeds));
+  };
 
   // Modals state
   const [admissionModalOpen, setAdmissionModalOpen] = useState(false);
@@ -101,23 +109,23 @@ export default function InpatientBedMatrixScreen() {
   const totalBedsCount = beds.length;
   const occupiedCount = beds.filter((b) => b.status === "OCCUPIED").length;
   const availableCount = beds.filter((b) => b.status === "AVAILABLE").length;
-  const cleaningCount = beds.filter((b) => b.status === "CLEANING").length;
+  const cleaningCount = beds.filter((b) => b.status === "CLEANING" || b.status === "MAINTENANCE").length;
   const icuBeds = beds.filter((b) => b.isIcu);
   const icuOccupied = icuBeds.filter((b) => b.status === "OCCUPIED").length;
-  const occupancyPercent = ((occupiedCount / totalBedsCount) * 100).toFixed(1);
+  const occupancyRate = totalBedsCount > 0 ? Math.round((occupiedCount / totalBedsCount) * 100) : 0;
 
-  // Filtered beds
+  // Filtered list
   const filteredBeds = beds.filter((b) => {
     if (selectedFloor !== "all" && b.floor !== selectedFloor) return false;
     if (statusFilter !== "all" && b.status !== statusFilter) return false;
-    if (searchQuery) {
+    if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchNum = b.bedNumber.toLowerCase().includes(q);
       const matchCat = b.category.toLowerCase().includes(q);
-      const matchPatient = (b.patientName || "").toLowerCase().includes(q);
-      const matchIp = (b.ipNumber || "").toLowerCase().includes(q);
-      const matchDoc = (b.doctorName || "").toLowerCase().includes(q);
-      return matchNum || matchCat || matchPatient || matchIp || matchDoc;
+      const matchPatient = b.patientName && b.patientName.toLowerCase().includes(q);
+      const matchIp = b.ipNumber && b.ipNumber.toLowerCase().includes(q);
+      const matchDoc = b.doctorName && b.doctorName.toLowerCase().includes(q);
+      return !!(matchNum || matchCat || matchPatient || matchIp || matchDoc);
     }
     return true;
   });
@@ -126,35 +134,68 @@ export default function InpatientBedMatrixScreen() {
 
   // Handle Admission Confirmation
   const handleAdmissionSuccess = (admData: any) => {
-    setBeds((prev) =>
-      prev.map((b) =>
-        b.id === admData.bedId
-          ? {
-              ...b,
-              status: "OCCUPIED",
-              patientId: admData.patientId,
-              patientName: admData.patientName,
-              ipNumber: admData.ipNumber,
-              doctorName: admData.doctorName,
-              department: admData.department,
-              admissionDate: admData.admissionDate,
-              primaryDiagnosis: admData.primaryDiagnosis,
-            }
-          : b
-      )
+    const nextBeds = beds.map((b) =>
+      b.id === admData.bedId
+        ? {
+            ...b,
+            status: "OCCUPIED" as const,
+            patientId: admData.patientId,
+            patientName: admData.patientName,
+            ipNumber: admData.ipNumber,
+            doctorName: admData.doctorName,
+            department: admData.department,
+            admissionDate: admData.admissionDate,
+            primaryDiagnosis: admData.primaryDiagnosis,
+          }
+        : b
     );
+    saveBeds(nextBeds);
     setAdmissionModalOpen(false);
     triggerToast(`Patient ${admData.patientName} admitted to Bed ${selectedBedForAdmission?.bedNumber}.`);
   };
 
   // Handle Ward Transfer Confirmation
   const handleTransferSuccess = (transferData: any) => {
-    setBeds((prev) =>
-      prev.map((b) => {
-        if (b.id === transferData.sourceBedId) {
-          return {
+    const nextBeds = beds.map((b) => {
+      if (b.id === transferData.sourceBedId) {
+        return {
+          ...b,
+          status: "CLEANING" as const,
+          patientId: undefined,
+          patientName: undefined,
+          ipNumber: undefined,
+          doctorName: undefined,
+          department: undefined,
+          admissionDate: undefined,
+          primaryDiagnosis: undefined,
+        };
+      }
+      if (b.id === transferData.targetBedId) {
+        return {
+          ...b,
+          status: "OCCUPIED" as const,
+          patientName: transferData.patientName,
+          ipNumber: transferData.ipNumber,
+          admissionDate: transferData.admissionDate,
+          doctorName: transferData.doctorName,
+          department: transferData.department,
+          primaryDiagnosis: transferData.primaryDiagnosis,
+        };
+      }
+      return b;
+    });
+    saveBeds(nextBeds);
+    setTransferModalOpen(false);
+    triggerToast(`Patient ${transferData.patientName} shifted to new bed.`);
+  };
+
+  // Handle Discharge Confirmation
+  const handleDischargeSuccess = (dischargeData: any) => {
+    const nextBeds = beds.map((b) =>
+      b.id === dischargeData.bedId
+        ? {
             ...b,
-            status: "CLEANING",
+            status: "CLEANING" as const,
             patientId: undefined,
             patientName: undefined,
             ipNumber: undefined,
@@ -162,55 +203,18 @@ export default function InpatientBedMatrixScreen() {
             department: undefined,
             admissionDate: undefined,
             primaryDiagnosis: undefined,
-          };
-        }
-        if (b.id === transferData.targetBedId) {
-          return {
-            ...b,
-            status: "OCCUPIED",
-            patientName: transferData.patientName,
-            ipNumber: transferData.ipNumber,
-            admissionDate: transferData.admissionDate,
-            doctorName: transferData.doctorName,
-            department: transferData.department,
-            primaryDiagnosis: transferData.primaryDiagnosis,
-          };
-        }
-        return b;
-      })
+          }
+        : b
     );
-    setTransferModalOpen(false);
-    triggerToast(`Patient ${transferData.patientName} shifted to new bed.`);
-  };
-
-  // Handle Discharge Confirmation
-  const handleDischargeSuccess = (dischargeData: any) => {
-    setBeds((prev) =>
-      prev.map((b) =>
-        b.id === dischargeData.bedId
-          ? {
-              ...b,
-              status: "CLEANING",
-              patientId: undefined,
-              patientName: undefined,
-              ipNumber: undefined,
-              doctorName: undefined,
-              department: undefined,
-              admissionDate: undefined,
-              primaryDiagnosis: undefined,
-            }
-          : b
-      )
-    );
+    saveBeds(nextBeds);
     setDischargeModalOpen(false);
     triggerToast(`Discharge complete for ${dischargeData.patientName}. Bed moved to cleaning.`);
   };
 
   // Mark Cleaning Bed Ready
   const handleMarkCleaned = (bedId: string) => {
-    setBeds((prev) =>
-      prev.map((b) => (b.id === bedId ? { ...b, status: "AVAILABLE" } : b))
-    );
+    const nextBeds = beds.map((b) => (b.id === bedId ? { ...b, status: "AVAILABLE" as const } : b));
+    saveBeds(nextBeds);
     triggerToast("Bed sanitized and marked ready for admission.");
   };
 
@@ -255,7 +259,7 @@ export default function InpatientBedMatrixScreen() {
           <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Occupied Beds</span>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
             <strong style={{ fontSize: 24, color: "#DC2626" }}>{occupiedCount}</strong>
-            <span style={{ fontSize: 12, color: "#DC2626", fontWeight: 700 }}>{occupancyPercent}%</span>
+            <span style={{ fontSize: 12, color: "#DC2626", fontWeight: 700 }}>{occupancyRate}%</span>
           </div>
         </Card>
 

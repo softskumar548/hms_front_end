@@ -38,129 +38,21 @@ export interface SurgeryCase {
   dischargedAt?: string;
 }
 
-const initialSurgeries: SurgeryCase[] = [
-  {
-    id: "surg-101",
-    otNumber: "OT-2026-801",
-    patientName: "K. Venkateswara Rao",
-    patientUhid: "UHID-2026-90841",
-    ageGender: "56Y / Male",
-    procedure: "Total Knee Arthroplasty (TKR Right)",
-    specialty: "Orthopedics",
-    theatre: "OT-01 (Major Orthopedic & Joints)",
-    team: {
-      leadSurgeon: "Dr. V Ramana (Senior Ortho Surgeon)",
-      assistantSurgeon: "Dr. Praveen Kumar",
-      anesthesiologist: "Dr. K R Murali (Chief Anesthesiologist)",
-      scrubNurse: "Sister Sunitha",
-    },
-    anesthesiaType: "Spinal + Epidural",
-    scheduledDate: "29-Aug-2026",
-    scheduledTime: "08:00 AM - 10:30 AM",
-    preOpStatus: {
-      pacCleared: true,
-      consentSigned: true,
-      npoConfirmed: true,
-      bloodArranged: true,
-    },
-    status: "IN_SURGERY",
-    whoChecklistDone: false,
-    aldreteScore: null,
-  },
-  {
-    id: "surg-102",
-    otNumber: "OT-2026-802",
-    patientName: "Lakshmi Prasanna",
-    patientUhid: "UHID-2026-90842",
-    ageGender: "42Y / Female",
-    procedure: "Laparoscopic Cholecystectomy",
-    specialty: "General & Laparoscopic",
-    theatre: "OT-02 (Advanced Laparoscopic & General)",
-    team: {
-      leadSurgeon: "Dr. K R Murali (Dean & General Surgeon)",
-      assistantSurgeon: "Dr. Sandeep Reddy",
-      anesthesiologist: "Dr. Anusha Rao",
-      scrubNurse: "Sister Swapna",
-    },
-    anesthesiaType: "General Anesthesia (ET Tube)",
-    scheduledDate: "29-Aug-2026",
-    scheduledTime: "10:30 AM - 12:30 PM",
-    preOpStatus: {
-      pacCleared: true,
-      consentSigned: true,
-      npoConfirmed: true,
-      bloodArranged: true,
-    },
-    status: "PACU_RECOVERY",
-    whoChecklistDone: true,
-    aldreteScore: 8,
-    whoCertifiedAt: "10:15 AM",
-  },
-  {
-    id: "surg-103",
-    otNumber: "OT-2026-803",
-    patientName: "B. Satyanarayana",
-    patientUhid: "UHID-2026-90843",
-    ageGender: "64Y / Male",
-    procedure: "Off-Pump Coronary Artery Bypass (OPCAB x 3)",
-    specialty: "Cardiothoracic & Vascular",
-    theatre: "OT-03 (Cardiothoracic & Vascular OT)",
-    team: {
-      leadSurgeon: "Dr. Sreenivasulu (Senior CTVS Surgeon)",
-      assistantSurgeon: "Dr. Rajesh Varma",
-      anesthesiologist: "Dr. K R Murali",
-      scrubNurse: "Brother David",
-    },
-    anesthesiaType: "General Anesthesia + Invasive Arterial Line",
-    scheduledDate: "29-Aug-2026",
-    scheduledTime: "01:30 PM - 05:30 PM",
-    preOpStatus: {
-      pacCleared: true,
-      consentSigned: true,
-      npoConfirmed: true,
-      bloodArranged: true,
-    },
-    status: "PRE_OP",
-    whoChecklistDone: false,
-    aldreteScore: null,
-  },
-  {
-    id: "surg-104",
-    otNumber: "OT-2026-804",
-    patientName: "UNKNOWN MALE #9021 (108 BROUGHT)",
-    patientUhid: "ER-2026-9011",
-    ageGender: "35Y / Male",
-    procedure: "Emergency Exploratory Laparotomy & Splenectomy",
-    specialty: "Emergency Trauma",
-    theatre: "OT-04 (Emergency Trauma OT 24/7)",
-    team: {
-      leadSurgeon: "Dr. V Ramana / Dr. Murali",
-      assistantSurgeon: "Dr. Praveen Kumar",
-      anesthesiologist: "Dr. Anusha Rao",
-      scrubNurse: "Sister Sunitha",
-    },
-    anesthesiaType: "Rapid Sequence Induction GA",
-    scheduledDate: "29-Aug-2026",
-    scheduledTime: "EMERGENCY STAT",
-    preOpStatus: {
-      pacCleared: true,
-      consentSigned: true,
-      npoConfirmed: false,
-      bloodArranged: true,
-    },
-    status: "IN_SURGERY",
-    whoChecklistDone: false,
-    aldreteScore: null,
-  },
-];
-
 export default function OperationTheatreScreen() {
   const { tenant } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "grid"; // grid, booking, who, pacu
 
-  const [surgeries, setSurgeries] = useState<SurgeryCase[]>(initialSurgeries);
+  const [surgeries, setSurgeries] = useState<SurgeryCase[]>(() => {
+    const saved = localStorage.getItem(`hms-surgeries-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const saveSurgeries = (nextSurgeries: SurgeryCase[]) => {
+    setSurgeries(nextSurgeries);
+    localStorage.setItem(`hms-surgeries-${tenant || "default"}`, JSON.stringify(nextSurgeries));
+  };
 
   // Modals state
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -200,21 +92,24 @@ export default function OperationTheatreScreen() {
 
   // Action: Add new surgery
   const handleBookingSuccess = (newSurgery: SurgeryCase) => {
-    setSurgeries((prev) => [newSurgery, ...prev]);
+    const next = [newSurgery, ...surgeries];
+    saveSurgeries(next);
     setBookingModalOpen(false);
     triggerToast(`Surgery scheduled in ${newSurgery.theatre.split(" ")[0]} for ${newSurgery.patientName}.`);
   };
 
   // Action: WHO Checklist completed
   const handleWhoSuccess = (updated: SurgeryCase) => {
-    setSurgeries((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    const next = surgeries.map((s) => (s.id === updated.id ? updated : s));
+    saveSurgeries(next);
     setWhoModalOpen(false);
     triggerToast(`WHO Surgical Safety certified. Patient moved to PACU Recovery.`);
   };
 
   // Action: PACU Discharge
   const handlePacuSuccess = (updated: SurgeryCase) => {
-    setSurgeries((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    const next = surgeries.map((s) => (s.id === updated.id ? updated : s));
+    saveSurgeries(next);
     setPacuModalOpen(false);
     triggerToast(`Aldrete Score ${updated.aldreteScore}/10 verified. Patient discharged to ${updated.targetWard}.`);
   };
@@ -358,95 +253,110 @@ export default function OperationTheatreScreen() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 16 }}>
-            {filteredSurgeries.map((surg) => {
-              const isInSurgery = surg.status === "IN_SURGERY";
-              const isPacu = surg.status === "PACU_RECOVERY";
-              const isPreOp = surg.status === "PRE_OP";
+            {filteredSurgeries.length === 0 ? (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "48px 24px", background: "var(--wash-a)", borderRadius: 14, border: "1px dashed var(--line)" }}>
+                <span style={{ fontSize: 36, display: "block", marginBottom: 12 }}>🏥</span>
+                <strong style={{ fontSize: 16, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                  No Surgical Cases Scheduled for Today
+                </strong>
+                <span style={{ fontSize: 13, color: "var(--slate)", maxWidth: 440, margin: "0 auto 18px", display: "block" }}>
+                  All 4 operation theatre suites (Ortho, Laparoscopy, CTVS, Trauma) are currently unbooked. Click '+ Schedule Surgical Case' to schedule an elective or emergency procedure.
+                </span>
+                <Button type="button" onClick={() => setBookingModalOpen(true)} style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontWeight: 800 }}>
+                  📅 Schedule Surgical Case
+                </Button>
+              </div>
+            ) : (
+              filteredSurgeries.map((surg) => {
+                const isInSurgery = surg.status === "IN_SURGERY";
+                const isPacu = surg.status === "PACU_RECOVERY";
+                const isPreOp = surg.status === "PRE_OP";
 
-              return (
-                <div
-                  key={surg.id}
-                  style={{
-                    background: isInSurgery ? "#FEF2F2" : isPacu ? "#FFFBEB" : "var(--wash-a)",
-                    border: isInSurgery ? "2px solid #DC2626" : isPacu ? "2px solid #F59E0B" : "1.5px solid var(--line)",
-                    borderRadius: 14,
-                    padding: "16px 18px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    boxShadow: isInSurgery ? "0 4px 14px rgba(220, 38, 38, 0.15)" : "none",
-                  }}
-                >
-                  <div>
-                    {/* Header */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <span style={{ fontSize: 12, fontWeight: 900, background: isInSurgery ? "#DC2626" : isPacu ? "#D97706" : "var(--indigo)", color: "#fff", padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
-                        {surg.theatre.split(" ")[0]} · {surg.status.replace("_", " ")}
-                      </span>
-                      <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
-                        {surg.otNumber}
-                      </span>
-                    </div>
+                return (
+                  <div
+                    key={surg.id}
+                    style={{
+                      background: isInSurgery ? "#FEF2F2" : isPacu ? "#FFFBEB" : "var(--wash-a)",
+                      border: isInSurgery ? "2px solid #DC2626" : isPacu ? "2px solid #F59E0B" : "1.5px solid var(--line)",
+                      borderRadius: 14,
+                      padding: "16px 18px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      boxShadow: isInSurgery ? "0 4px 14px rgba(220, 38, 38, 0.15)" : "none",
+                    }}
+                  >
+                    <div>
+                      {/* Header */}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: 12, fontWeight: 900, background: isInSurgery ? "#DC2626" : isPacu ? "#D97706" : "var(--indigo)", color: "#fff", padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
+                          {surg.theatre.split(" ")[0]} · {surg.status.replace("_", " ")}
+                        </span>
+                        <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
+                          {surg.otNumber}
+                        </span>
+                      </div>
 
-                    <strong style={{ fontSize: 16, color: "var(--ink)", display: "block" }}>
-                      {surg.patientName}
-                    </strong>
-                    <span style={{ fontSize: 12, color: "var(--slate)" }}>
-                      {surg.patientUhid} · {surg.ageGender} · Slot: {surg.scheduledTime}
-                    </span>
-
-                    {/* Surgical Procedure */}
-                    <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "10px 0" }}>
-                      <strong style={{ fontSize: 13, color: "var(--indigo)", display: "block" }}>
-                        🔪 {surg.procedure}
+                      <strong style={{ fontSize: 16, color: "var(--ink)", display: "block" }}>
+                        {surg.patientName}
                       </strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)", display: "block", marginTop: 2 }}>
-                        Specialty: <strong>{surg.specialty}</strong> · Anesthesia: {surg.anesthesiaType}
+                      <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                        {surg.patientUhid} · {surg.ageGender} · Slot: {surg.scheduledTime}
                       </span>
+
+                      {/* Surgical Procedure */}
+                      <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "10px 0" }}>
+                        <strong style={{ fontSize: 13, color: "var(--indigo)", display: "block" }}>
+                          🔪 {surg.procedure}
+                        </strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)", display: "block", marginTop: 2 }}>
+                          Specialty: <strong>{surg.specialty}</strong> · Anesthesia: {surg.anesthesiaType}
+                        </span>
+                      </div>
+
+                      {/* Team Details */}
+                      <div style={{ fontSize: 12, color: "var(--ink)", background: "rgba(255,255,255,0.7)", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--line)", marginBottom: 12 }}>
+                        <div>👨‍⚕️ <strong>Surgeon:</strong> {surg.team.leadSurgeon}</div>
+                        <div>🩺 <strong>Anesthetist:</strong> {surg.team.anesthesiologist}</div>
+                        <div>👩‍⚕️ <strong>Scrub Nurse:</strong> {surg.team.scrubNurse}</div>
+                      </div>
                     </div>
 
-                    {/* Team Details */}
-                    <div style={{ fontSize: 12, color: "var(--ink)", background: "rgba(255,255,255,0.7)", padding: "8px 10px", borderRadius: 8, border: "1px solid var(--line)", marginBottom: 12 }}>
-                      <div>👨‍⚕️ <strong>Surgeon:</strong> {surg.team.leadSurgeon}</div>
-                      <div>🩺 <strong>Anesthetist:</strong> {surg.team.anesthesiologist}</div>
-                      <div>👩‍⚕️ <strong>Scrub Nurse:</strong> {surg.team.scrubNurse}</div>
+                    {/* Quick Action Buttons */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSurgery(surg);
+                          setWhoModalOpen(true);
+                        }}
+                        style={{
+                          background: surg.whoChecklistDone ? "#16A34A" : "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
+                          color: "#fff",
+                          fontSize: 11.5,
+                          padding: "7px 10px",
+                          fontWeight: 800,
+                        }}
+                      >
+                        {surg.whoChecklistDone ? "✓ WHO Certified" : "📋 WHO Checklist"}
+                      </Button>
+
+                      <Button
+                        type="button"
+                        ghost
+                        onClick={() => {
+                          setSelectedSurgery(surg);
+                          setPacuModalOpen(true);
+                        }}
+                        style={{ fontSize: 11.5, padding: "7px 8px" }}
+                      >
+                        🛏️ PACU Aldrete ({surg.aldreteScore !== null ? `${surg.aldreteScore}/10` : "Evaluate"})
+                      </Button>
                     </div>
                   </div>
-
-                  {/* Quick Action Buttons */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setSelectedSurgery(surg);
-                        setWhoModalOpen(true);
-                      }}
-                      style={{
-                        background: surg.whoChecklistDone ? "#16A34A" : "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
-                        color: "#fff",
-                        fontSize: 11.5,
-                        padding: "7px 10px",
-                        fontWeight: 800,
-                      }}
-                    >
-                      {surg.whoChecklistDone ? "✓ WHO Certified" : "📋 WHO Checklist"}
-                    </Button>
-
-                    <Button
-                      type="button"
-                      ghost
-                      onClick={() => {
-                        setSelectedSurgery(surg);
-                        setPacuModalOpen(true);
-                      }}
-                      style={{ fontSize: 11.5, padding: "7px 8px" }}
-                    >
-                      🛏️ PACU Aldrete ({surg.aldreteScore !== null ? `${surg.aldreteScore}/10` : "Evaluate"})
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </Card>
       )}
@@ -479,44 +389,52 @@ export default function OperationTheatreScreen() {
                 </tr>
               </thead>
               <tbody>
-                {filteredSurgeries.map((surg) => (
-                  <tr key={surg.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
-                      {surg.otNumber}
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block" }}>{surg.patientName}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{surg.patientUhid} · {surg.ageGender}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong>{surg.procedure}</strong>
-                      <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{surg.specialty}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <div>{surg.theatre.split(" ")[0]}</div>
-                      <span style={{ fontSize: 11, color: "var(--slate)" }}>{surg.scheduledTime}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      {surg.team.leadSurgeon.split("(")[0]}
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
-                        ✓ PAC Cleared · Consent OK
-                      </span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <StatusPill kind={surg.status === "IN_SURGERY" ? "danger" : surg.status === "PACU_RECOVERY" ? "warn" : "info"}>
-                        {surg.status}
-                      </StatusPill>
+                {filteredSurgeries.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "32px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                      No surgical bookings recorded for today.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredSurgeries.map((surg) => (
+                    <tr key={surg.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px", fontFamily: "monospace", color: "var(--indigo)", fontWeight: 700 }}>
+                        {surg.otNumber}
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block" }}>{surg.patientName}</strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{surg.patientUhid} · {surg.ageGender}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong>{surg.procedure}</strong>
+                        <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{surg.specialty}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <div>{surg.theatre.split(" ")[0]}</div>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{surg.scheduledTime}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        {surg.team.leadSurgeon.split("(")[0]}
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
+                          ✓ PAC Cleared · Consent OK
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <StatusPill kind={surg.status === "IN_SURGERY" ? "danger" : surg.status === "PACU_RECOVERY" ? "warn" : "info"}>
+                          {surg.status}
+                        </StatusPill>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -32,15 +32,7 @@ export default function PrintStationScreen() {
     queryFn: () => api.listPatients(token),
   });
 
-  const activePatient = patients.find((p) => p.id === selectedPatientId) || patients[0] || {
-    id: "pat-demo-01",
-    given_name: "Ramesh",
-    family_name: "Babu",
-    gender: "male",
-    dob: "1978-05-12",
-    national_id: "UHID-2026-90812",
-    phone: "9876543210",
-  };
+  const activePatient = patients.find((p) => p.id === selectedPatientId) || patients[0] || null;
 
   const handleTabChange = (profileKey: string) => {
     setSearchParams({ profile: profileKey });
@@ -85,22 +77,33 @@ export default function PrintStationScreen() {
               👤 Active Patient:
             </label>
             <Select
-              value={selectedPatientId || activePatient.id}
+              value={selectedPatientId || activePatient?.id || ""}
               onChange={(e) => setSelectedPatientId(e.target.value)}
               style={{ flex: 1 }}
+              disabled={patients.length === 0}
             >
-              {patients.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.given_name} {p.family_name} (Phone: {p.phone || "N/A"}) · {p.national_id || p.id.slice(0, 8)}
-                </option>
-              ))}
+              {patients.length === 0 ? (
+                <option value="">No patients registered</option>
+              ) : (
+                patients.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.given_name} {p.family_name} (Phone: {p.phone || "N/A"}) · {p.national_id || p.id.slice(0, 8)}
+                  </option>
+                ))
+              )}
             </Select>
           </div>
 
           <div style={{ display: "flex", gap: 10 }}>
-            <span style={{ fontSize: 12, color: "var(--slate)", background: "var(--wash-a)", padding: "6px 12px", borderRadius: 8, border: "1px solid var(--line)" }}>
-              UHID: <strong>{activePatient.national_id || `UHID-${activePatient.id?.slice(0, 6)}`}</strong>
-            </span>
+            {activePatient ? (
+              <span style={{ fontSize: 12, color: "var(--slate)", background: "var(--wash-a)", padding: "6px 12px", borderRadius: 8, border: "1px solid var(--line)" }}>
+                UHID: <strong>{activePatient.national_id || `UHID-${activePatient.id?.slice(0, 6)}`}</strong>
+              </span>
+            ) : (
+              <span style={{ fontSize: 12, color: "var(--slate)", background: "var(--wash-a)", padding: "6px 12px", borderRadius: 8, border: "1px solid var(--line)" }}>
+                No active patient selected
+              </span>
+            )}
             <span style={{ fontSize: 12, color: "#16A34A", background: "#DCFCE7", padding: "6px 12px", borderRadius: 8, fontWeight: 700 }}>
               🟢 Spooler Active
             </span>
@@ -168,38 +171,44 @@ export default function PrintStationScreen() {
 
           {/* Quick Preview Card */}
           <div style={{ background: "var(--wash-a)", padding: 20, borderRadius: 12, border: "1px solid var(--line)" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 16, alignItems: "center" }}>
-              <div>
-                <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>
-                  {activePatient.given_name} {activePatient.family_name}
-                </strong>
-                <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
-                  UHID: {activePatient.national_id || `UHID-${activePatient.id?.slice(0, 6)}`} · {activePatient.gender}, {activePatient.dob || "Adult"}
-                </span>
+            {activePatient ? (
+              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 16, alignItems: "center" }}>
+                <div>
+                  <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>
+                    {activePatient.given_name} {activePatient.family_name}
+                  </strong>
+                  <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
+                    UHID: {activePatient.national_id || `UHID-${activePatient.id?.slice(0, 6)}`} · {activePatient.gender}, {activePatient.dob || "Adult"}
+                  </span>
 
-                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                  <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                    Bed: GMW-101 (Floor 2)
-                  </span>
-                  <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                    Dr. V Ramana (Orthopedics)
-                  </span>
-                  <span style={{ fontSize: 11, background: "#FEF2F2", color: "#DC2626", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                    Blood Group: O +ve
-                  </span>
+                  <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                    <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      Bed: Inpatient Ward
+                    </span>
+                    <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      General Medicine
+                    </span>
+                    <span style={{ fontSize: 11, background: "#FEF2F2", color: "#DC2626", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      Blood Group: AP-Verified
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "right" }}>
+                  <Button
+                    type="button"
+                    onClick={() => setWristbandModalOpen(true)}
+                    style={{ fontSize: 12, padding: "8px 18px" }}
+                  >
+                    🏷️ Print 1-Click Wristband
+                  </Button>
                 </div>
               </div>
-
-              <div style={{ textAlign: "right" }}>
-                <Button
-                  type="button"
-                  onClick={() => setWristbandModalOpen(true)}
-                  style={{ fontSize: 12, padding: "8px 18px" }}
-                >
-                  🏷️ Print 1-Click Wristband
-                </Button>
+            ) : (
+              <div style={{ textAlign: "center", padding: "16px 0", color: "var(--slate)", fontStyle: "italic" }}>
+                No patient selected. Register or select a patient to print thermal wristbands.
               </div>
-            </div>
+            )}
           </div>
         </Card>
       )}
@@ -281,11 +290,17 @@ export default function PrintStationScreen() {
                   A4 visit prescription with APMC doctor credentials and Telugu bilingual instructions.
                 </span>
               </div>
-              <Link to={`/emr/patients/${activePatient.id}/print`} style={{ textDecoration: "none", marginTop: 14 }}>
-                <Button type="button" style={{ width: "100%", fontSize: 12 }}>
-                  🖨️ Launch MediPass Rx Print
+              {activePatient ? (
+                <Link to={`/emr/patients/${activePatient.id}/print`} style={{ textDecoration: "none", marginTop: 14 }}>
+                  <Button type="button" style={{ width: "100%", fontSize: 12 }}>
+                    🖨️ Launch MediPass Rx Print
+                  </Button>
+                </Link>
+              ) : (
+                <Button type="button" disabled style={{ width: "100%", fontSize: 12, marginTop: 14 }}>
+                  Select patient to print
                 </Button>
-              </Link>
+              )}
             </div>
 
             {/* 2. Employee Pay Slip */}

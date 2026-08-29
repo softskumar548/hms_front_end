@@ -12,7 +12,7 @@ test.describe("Clinical Operations & Surgical Suites Suite", () => {
     await expect(page.getByText(/Live Casualty Bays/i)).toBeVisible();
 
     // Verify Rapid Emergency Intake Modal opens and closes cleanly
-    await page.getByRole("button", { name: /Rapid Emergency Intake/i }).click();
+    await page.getByRole("button", { name: /Rapid Emergency Intake/i }).first().click();
     await expect(page.getByText(/Rapid Emergency Casualty & Trauma Intake/i)).toBeVisible();
     await page.getByRole("button", { name: /Cancel/i }).click();
 

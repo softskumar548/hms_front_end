@@ -51,124 +51,6 @@ export interface InventoryDrug {
   }>;
 }
 
-const initialPrescriptions: PrescriptionOrder[] = [
-  {
-    id: "rx-101",
-    rxNumber: "RX-2026-981",
-    patientName: "Ramesh Babu",
-    patientUhid: "UHID-2026-90812",
-    ageGender: "48Y / Male",
-    doctorName: "Dr. K R Murali",
-    department: "General Medicine",
-    date: "29-Aug-2026",
-    status: "PENDING",
-    items: [
-      {
-        name: "Tab. Augmentin 625mg",
-        generic: "Amoxicillin + Clavulanate",
-        dosage: "625mg",
-        frequency: "1-0-1 (Twice Daily)",
-        instructionsEn: "Take after food for 5 days",
-        instructionsTe: "ఉదయం, రాత్రి భోజనం తర్వాత 5 రోజులు తీసుకోండి",
-        batch: "AUG-26A",
-        exp: "10/2026",
-        qty: 10,
-        unitPrice: 22,
-      },
-      {
-        name: "Tab. Pan-D",
-        generic: "Pantoprazole + Domperidone",
-        dosage: "40mg/30mg",
-        frequency: "1-0-0 (Morning Empty Stomach)",
-        instructionsEn: "Take 30 mins before breakfast",
-        instructionsTe: "ఉదయం పరిగడుపున టిఫిన్ ముందు వేసుకోండి",
-        batch: "PAN-26C",
-        exp: "11/2026",
-        qty: 10,
-        unitPrice: 14,
-      },
-      {
-        name: "Tab. Dolo 650mg",
-        generic: "Paracetamol",
-        dosage: "650mg",
-        frequency: "1-0-1 (SOS Fever/Pain)",
-        instructionsEn: "Take when having fever or body pain",
-        instructionsTe: "జ్వరం లేదా ఒంటి నొప్పులు ఉన్నప్పుడు మాత్రమే",
-        batch: "DOL-27A",
-        exp: "04/2027",
-        qty: 15,
-        unitPrice: 3.5,
-      },
-    ],
-  },
-  {
-    id: "rx-102",
-    rxNumber: "RX-2026-982",
-    patientName: "Sita Devi",
-    patientUhid: "UHID-2026-90813",
-    ageGender: "42Y / Female",
-    doctorName: "Dr. Sreenivasulu",
-    department: "Cardiology",
-    date: "29-Aug-2026",
-    status: "PENDING",
-    items: [
-      {
-        name: "Tab. Telma-AM",
-        generic: "Telmisartan 40mg + Amlodipine 5mg",
-        dosage: "40/5mg",
-        frequency: "1-0-0 (Morning After Food)",
-        instructionsEn: "Take regularly for BP control",
-        instructionsTe: "రక్తపోటు నియంత్రణకు ప్రతిరోజూ ఉదయం వేసుకోండి",
-        batch: "TEL-26D",
-        exp: "09/2026",
-        qty: 30,
-        unitPrice: 12,
-      },
-      {
-        name: "Tab. Ecosprin 75mg",
-        generic: "Aspirin 75mg",
-        dosage: "75mg",
-        frequency: "0-0-1 (Night After Dinner)",
-        instructionsEn: "Take after dinner with water",
-        instructionsTe: "రాత్రి భోజనం తర్వాత నీళ్లతో తీసుకోండి",
-        batch: "ECO-27B",
-        exp: "06/2027",
-        qty: 30,
-        unitPrice: 1.8,
-      },
-    ],
-  },
-  {
-    id: "rx-103",
-    rxNumber: "RX-2026-983",
-    patientName: "Venkatesh Rao",
-    patientUhid: "UHID-2026-90814",
-    ageGender: "55Y / Male",
-    doctorName: "Dr. V Ramana",
-    department: "Orthopedics",
-    date: "29-Aug-2026",
-    status: "DISPENSED",
-    items: [
-      {
-        name: "Tab. Zerodol-SP",
-        generic: "Aceclofenac + Paracetamol + Serratiopeptidase",
-        dosage: "100/325/15mg",
-        frequency: "1-0-1 (After Food)",
-        instructionsEn: "For joint inflammation & pain",
-        instructionsTe: "కీళ్ల వాపు మరియు నొప్పుల నివారణకు",
-        batch: "ZER-26B",
-        exp: "08/2026",
-        qty: 10,
-        unitPrice: 13.5,
-      },
-    ],
-    totalAmount: 151.2,
-    paymentMode: "UPI",
-    receiptNumber: "PH-REC-901248",
-    dispensedAt: "08:45 AM",
-  },
-];
-
 const initialDrugInventory: InventoryDrug[] = [
   {
     id: "med-01",
@@ -250,9 +132,17 @@ export default function HospitalPharmacyScreen() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "dispense"; // dispense, inventory, labels, sales
 
-  const [prescriptions, setPrescriptions] = useState<PrescriptionOrder[]>(initialPrescriptions);
+  const [prescriptions, setPrescriptions] = useState<PrescriptionOrder[]>(() => {
+    const saved = localStorage.getItem(`hms-pharmacy-rx-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [inventory, setInventory] = useState<InventoryDrug[]>(initialDrugInventory);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const savePrescriptions = (nextRx: PrescriptionOrder[]) => {
+    setPrescriptions(nextRx);
+    localStorage.setItem(`hms-pharmacy-rx-${tenant || "default"}`, JSON.stringify(nextRx));
+  };
 
   // Modals state
   const [dispenseModalOpen, setDispenseModalOpen] = useState(false);
@@ -302,20 +192,19 @@ export default function HospitalPharmacyScreen() {
 
   // Handle Dispense Success
   const handleDispenseSuccess = (dispensedResult: any) => {
-    setPrescriptions((prev) =>
-      prev.map((p) =>
-        p.id === dispensedResult.prescriptionId
-          ? {
-              ...p,
-              status: "DISPENSED",
-              totalAmount: dispensedResult.totalAmount,
-              paymentMode: dispensedResult.paymentMode,
-              receiptNumber: dispensedResult.receiptNumber,
-              dispensedAt: dispensedResult.dispensedAt,
-            }
-          : p
-      )
+    const nextRx = prescriptions.map((p) =>
+      p.id === dispensedResult.prescriptionId
+        ? {
+            ...p,
+            status: "DISPENSED" as const,
+            totalAmount: dispensedResult.totalAmount,
+            paymentMode: dispensedResult.paymentMode,
+            receiptNumber: dispensedResult.receiptNumber,
+            dispensedAt: dispensedResult.dispensedAt,
+          }
+        : p
     );
+    savePrescriptions(nextRx);
 
     // Auto deduct inventory
     setInventory((prev) =>
@@ -332,7 +221,7 @@ export default function HospitalPharmacyScreen() {
     );
 
     setDispenseModalOpen(false);
-    triggerToast(`Prescription dispensed. Receipt #${dispensedResult.receiptNumber} generated.`);
+    triggerToast(`Prescription ${dispensedResult.receiptNumber} dispensed & GST receipt issued.`);
   };
 
   return (
@@ -461,111 +350,123 @@ export default function HospitalPharmacyScreen() {
           </div>
 
           <div style={{ display: "grid", gap: 14 }}>
-            {filteredPrescriptions.map((rx) => (
-              <div
-                key={rx.id}
-                style={{
-                  background: rx.status === "PENDING" ? "#fff" : "var(--wash-a)",
-                  border: rx.status === "PENDING" ? "1.5px solid var(--indigo)" : "1px solid var(--line)",
-                  borderRadius: 14,
-                  padding: "16px 20px",
-                  boxShadow: rx.status === "PENDING" ? "0 4px 12px rgba(19, 26, 143, 0.08)" : "none",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <strong style={{ fontSize: 16, color: "var(--ink)" }}>{rx.patientName}</strong>
-                      <span style={{ fontSize: 12, color: "var(--slate)" }}>({rx.patientUhid} · {rx.ageGender})</span>
-                      <span style={{ fontSize: 11, fontFamily: "monospace", background: "var(--indigo-soft)", color: "var(--indigo)", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                        {rx.rxNumber}
+            {filteredPrescriptions.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--wash-a)", borderRadius: 14, border: "1px dashed var(--line)" }}>
+                <span style={{ fontSize: 36, display: "block", marginBottom: 12 }}>💊</span>
+                <strong style={{ fontSize: 16, color: "var(--ink)", display: "block", marginBottom: 6 }}>
+                  No Prescriptions in Dispensing Queue
+                </strong>
+                <span style={{ fontSize: 13, color: "var(--slate)", maxWidth: 440, margin: "0 auto", display: "block" }}>
+                  E-prescriptions submitted by physicians during Doctor EMR Outpatient or Inpatient encounters will appear here for FEFO batch allocation.
+                </span>
+              </div>
+            ) : (
+              filteredPrescriptions.map((rx) => (
+                <div
+                  key={rx.id}
+                  style={{
+                    background: rx.status === "PENDING" ? "#fff" : "var(--wash-a)",
+                    border: rx.status === "PENDING" ? "1.5px solid var(--indigo)" : "1px solid var(--line)",
+                    borderRadius: 14,
+                    padding: "16px 20px",
+                    boxShadow: rx.status === "PENDING" ? "0 4px 12px rgba(19, 26, 143, 0.08)" : "none",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <strong style={{ fontSize: 16, color: "var(--ink)" }}>{rx.patientName}</strong>
+                        <span style={{ fontSize: 12, color: "var(--slate)" }}>({rx.patientUhid} · {rx.ageGender})</span>
+                        <span style={{ fontSize: 11, fontFamily: "monospace", background: "var(--indigo-soft)", color: "var(--indigo)", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                          {rx.rxNumber}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
+                        Prescribed by <strong>{rx.doctorName}</strong> ({rx.department}) · {rx.date}
                       </span>
                     </div>
-                    <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
-                      Prescribed by <strong>{rx.doctorName}</strong> ({rx.department}) · {rx.date}
-                    </span>
+
+                    <div>
+                      <StatusPill kind={rx.status === "DISPENSED" ? "success" : "warn"}>
+                        {rx.status}
+                      </StatusPill>
+                    </div>
                   </div>
 
-                  <div>
-                    <StatusPill kind={rx.status === "DISPENSED" ? "success" : "warn"}>
-                      {rx.status}
-                    </StatusPill>
-                  </div>
-                </div>
+                  {/* Prescribed Items Breakdown */}
+                  <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)", marginBottom: 12 }}>
+                    <strong style={{ fontSize: 11.5, color: "var(--indigo)", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+                      Prescribed Medicines ({rx.items.length} Items):
+                    </strong>
 
-                {/* Prescribed Items Breakdown */}
-                <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)", marginBottom: 12 }}>
-                  <strong style={{ fontSize: 11.5, color: "var(--indigo)", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
-                    Prescribed Medicines ({rx.items.length} Items):
-                  </strong>
+                    <div style={{ display: "grid", gap: 6 }}>
+                      {rx.items.map((item, idx) => (
+                        <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12.5, borderBottom: idx < rx.items.length - 1 ? "1px dashed var(--line)" : "none", paddingBottom: 4 }}>
+                          <div>
+                            <strong style={{ color: "var(--ink)" }}>{item.name}</strong>
+                            <span style={{ color: "var(--slate)", marginLeft: 6 }}>({item.frequency})</span>
+                            <span style={{ fontSize: 11, color: "#047857", display: "block" }}>
+                              తెలుగు: {item.instructionsTe}
+                            </span>
+                          </div>
 
-                  <div style={{ display: "grid", gap: 6 }}>
-                    {rx.items.map((item, idx) => (
-                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12.5, borderBottom: idx < rx.items.length - 1 ? "1px dashed var(--line)" : "none", paddingBottom: 4 }}>
-                        <div>
-                          <strong style={{ color: "var(--ink)" }}>{item.name}</strong>
-                          <span style={{ color: "var(--slate)", marginLeft: 6 }}>({item.frequency})</span>
-                          <span style={{ fontSize: 11, color: "#047857", display: "block" }}>
-                            తెలుగు: {item.instructionsTe}
-                          </span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 11, background: "#fff", border: "1px solid var(--line)", padding: "2px 6px", borderRadius: 4 }}>
+                              Qty: <strong>{item.qty}</strong>
+                            </span>
+                            <Button
+                              type="button"
+                              ghost
+                              onClick={() => {
+                                setSelectedMedForLabel({
+                                  brandName: item.name,
+                                  dosage: item.dosage,
+                                  frequency: item.frequency,
+                                  instructionsEn: item.instructionsEn,
+                                  instructionsTe: item.instructionsTe,
+                                  batchNumber: item.batch,
+                                  expiryDate: item.exp,
+                                  quantity: item.qty,
+                                });
+                                setSelectedPatientForLabel({
+                                  given_name: rx.patientName.split(" ")[0],
+                                  family_name: rx.patientName.split(" ")[1] || "",
+                                  national_id: rx.patientUhid,
+                                });
+                                setLabelModalOpen(true);
+                              }}
+                              style={{ fontSize: 11, padding: "3px 8px" }}
+                            >
+                              🏷️ Print Bottle Label
+                            </Button>
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                  </div>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <span style={{ fontSize: 11, background: "#fff", border: "1px solid var(--line)", padding: "2px 6px", borderRadius: 4 }}>
-                            Qty: <strong>{item.qty}</strong>
-                          </span>
-                          <Button
-                            type="button"
-                            ghost
-                            onClick={() => {
-                              setSelectedMedForLabel({
-                                brandName: item.name,
-                                dosage: item.dosage,
-                                frequency: item.frequency,
-                                instructionsEn: item.instructionsEn,
-                                instructionsTe: item.instructionsTe,
-                                batchNumber: item.batch,
-                                expiryDate: item.exp,
-                                quantity: item.qty,
-                              });
-                              setSelectedPatientForLabel({
-                                given_name: rx.patientName.split(" ")[0],
-                                family_name: rx.patientName.split(" ")[1] || "",
-                                national_id: rx.patientUhid,
-                              });
-                              setLabelModalOpen(true);
-                            }}
-                            style={{ fontSize: 11, padding: "3px 8px" }}
-                          >
-                            🏷️ Print Bottle Label
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                  {/* Actions */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                    {rx.status === "PENDING" ? (
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setSelectedRxForDispense(rx);
+                          setDispenseModalOpen(true);
+                        }}
+                        style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5, padding: "8px 18px" }}
+                      >
+                        💊 Dispense & Bill Prescription (FEFO)
+                      </Button>
+                    ) : (
+                      <span style={{ fontSize: 12, color: "#16A34A", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                        ✓ Dispensed at {rx.dispensedAt} · Receipt #{rx.receiptNumber} (₹{rx.totalAmount})
+                      </span>
+                    )}
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                  {rx.status === "PENDING" ? (
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setSelectedRxForDispense(rx);
-                        setDispenseModalOpen(true);
-                      }}
-                      style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5, padding: "8px 18px" }}
-                    >
-                      💊 Dispense & Bill Prescription (FEFO)
-                    </Button>
-                  ) : (
-                    <span style={{ fontSize: 12, color: "#16A34A", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
-                      ✓ Dispensed at {rx.dispensedAt} · Receipt #{rx.receiptNumber} (₹{rx.totalAmount})
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
       )}
@@ -702,39 +603,47 @@ export default function HospitalPharmacyScreen() {
                 </tr>
               </thead>
               <tbody>
-                {prescriptions.filter((p) => p.status === "DISPENSED").map((rx) => (
-                  <tr key={rx.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ fontFamily: "monospace", color: "var(--indigo)", fontSize: 13 }}>
-                        {rx.receiptNumber || "PH-REC-901248"}
-                      </strong>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block", color: "var(--ink)" }}>{rx.patientName}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{rx.patientUhid}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <div>{rx.doctorName}</div>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{rx.department}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                        {rx.paymentMode || "UPI"}
-                      </span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, color: "#16A34A" }}>
-                      ₹{(rx.totalAmount || 151.2).toFixed(2)}
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "right", color: "var(--slate)" }}>
-                      {rx.dispensedAt || "Today"}
+                {prescriptions.filter((p) => p.status === "DISPENSED").length === 0 ? (
+                  <tr>
+                    <td colSpan={6} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                      No pharmacy sales receipts settled yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  prescriptions.filter((p) => p.status === "DISPENSED").map((rx) => (
+                    <tr key={rx.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ fontFamily: "monospace", color: "var(--indigo)", fontSize: 13 }}>
+                          {rx.receiptNumber || "PH-REC-901248"}
+                        </strong>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block", color: "var(--ink)" }}>{rx.patientName}</strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{rx.patientUhid}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <div>{rx.doctorName}</div>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{rx.department}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                          {rx.paymentMode || "UPI"}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "right", fontWeight: 800, color: "#16A34A" }}>
+                        ₹{(rx.totalAmount || 151.2).toFixed(2)}
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "right", color: "var(--slate)" }}>
+                        {rx.dispensedAt || "Today"}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -30,129 +30,21 @@ export interface LabOrder {
   parameters?: any[];
 }
 
-const initialLabOrders: LabOrder[] = [
-  {
-    id: "ord-101",
-    orderNumber: "LAB-2026-901",
-    patientName: "Ramesh Babu",
-    patientUhid: "UHID-2026-90812",
-    ageGender: "48Y / Male",
-    bedNumber: "GMW-101 (Floor 2)",
-    doctorName: "Dr. K R Murali (Dean)",
-    department: "General Medicine",
-    testName: "Complete Blood Count (CBC)",
-    sampleId: "SMP-2026-8901",
-    specimenType: "Whole Blood (EDTA K2)",
-    tubeCapColor: "#7C3AED",
-    tubeCapLabel: "EDTA Purple",
-    status: "VERIFIED",
-    priority: "STAT_EMERGENCY",
-    orderedAt: "29-Aug-2026 08:00 AM",
-    collectedAt: "29-Aug-2026 08:15 AM",
-    reportedAt: "29-Aug-2026 08:45 AM",
-    hasPanicAlert: true,
-    comments: "Severe thrombocytopenia (Platelets 28,000/mcL). Attending physician notified telephonically.",
-    parameters: [
-      { name: "Hemoglobin (Hb)", value: "10.4", unit: "g/dL", reference: "13.0 - 17.0", flag: "LOW" },
-      { name: "Total Leukocyte Count (WBC)", value: "14,800", unit: "/mcL", reference: "4,000 - 11,000", flag: "HIGH" },
-      { name: "Platelet Count", value: "28,000", unit: "/mcL", reference: "1,50,000 - 4,50,000", flag: "CRITICAL" },
-      { name: "Packed Cell Volume (PCV)", value: "32.0", unit: "%", reference: "40.0 - 50.0", flag: "LOW" },
-      { name: "Neutrophils", value: "78", unit: "%", reference: "40 - 75", flag: "HIGH" },
-      { name: "Lymphocytes", value: "16", unit: "%", reference: "20 - 45", flag: "LOW" },
-    ],
-  },
-  {
-    id: "ord-102",
-    orderNumber: "LAB-2026-902",
-    patientName: "Sita Devi",
-    patientUhid: "UHID-2026-90813",
-    ageGender: "42Y / Female",
-    bedNumber: "SP-201A (Floor 2)",
-    doctorName: "Dr. Sreenivasulu",
-    department: "Cardiology",
-    testName: "Liver Function Test (LFT)",
-    sampleId: "SMP-2026-8902",
-    specimenType: "Serum Gel Clot",
-    tubeCapColor: "#DC2626",
-    tubeCapLabel: "Serum Red",
-    status: "IN_ANALYSIS",
-    priority: "URGENT",
-    orderedAt: "29-Aug-2026 08:30 AM",
-    collectedAt: "29-Aug-2026 08:45 AM",
-  },
-  {
-    id: "ord-103",
-    orderNumber: "LAB-2026-903",
-    patientName: "Venkatesh Rao",
-    patientUhid: "UHID-2026-90814",
-    ageGender: "55Y / Male",
-    bedNumber: "ICU-01 (Floor 4)",
-    doctorName: "Dr. V Ramana",
-    department: "Critical Care",
-    testName: "Renal Function Test (RFT)",
-    sampleId: "SMP-2026-8903",
-    specimenType: "Serum Gel Clot",
-    tubeCapColor: "#DC2626",
-    tubeCapLabel: "Serum Red",
-    status: "VERIFIED",
-    priority: "STAT_EMERGENCY",
-    orderedAt: "29-Aug-2026 08:15 AM",
-    collectedAt: "29-Aug-2026 08:20 AM",
-    reportedAt: "29-Aug-2026 08:50 AM",
-    hasPanicAlert: true,
-    comments: "Hyperkalemia noted (K+ 6.4 mEq/L) with elevated creatinine. Critical call logged.",
-    parameters: [
-      { name: "Blood Urea", value: "48", unit: "mg/dL", reference: "15 - 45", flag: "HIGH" },
-      { name: "Serum Creatinine", value: "3.8", unit: "mg/dL", reference: "0.7 - 1.3", flag: "CRITICAL" },
-      { name: "Serum Sodium (Na+)", value: "138", unit: "mEq/L", reference: "135 - 145", flag: "NORMAL" },
-      { name: "Serum Potassium (K+)", value: "6.4", unit: "mEq/L", reference: "3.5 - 5.0", flag: "CRITICAL" },
-    ],
-  },
-  {
-    id: "ord-104",
-    orderNumber: "LAB-2026-904",
-    patientName: "Lakshmi Kumari",
-    patientUhid: "UHID-2026-90815",
-    ageGender: "29Y / Female",
-    doctorName: "Dr. Ananya Reddy",
-    department: "Pediatrics & OPD",
-    testName: "Fasting Blood Sugar (FBS)",
-    sampleId: "SMP-2026-8904",
-    specimenType: "Sodium Fluoride Plasma",
-    tubeCapColor: "#64748B",
-    tubeCapLabel: "Fluoride Grey",
-    status: "ORDERED",
-    priority: "ROUTINE",
-    orderedAt: "29-Aug-2026 09:00 AM",
-  },
-  {
-    id: "ord-105",
-    orderNumber: "LAB-2026-905",
-    patientName: "Kishore Kumar",
-    patientUhid: "UHID-2026-90816",
-    ageGender: "61Y / Male",
-    bedNumber: "DX-301 (Floor 3)",
-    doctorName: "Dr. Sreenivasulu",
-    department: "Cardiology",
-    testName: "Complete Blood Count (CBC)",
-    sampleId: "SMP-2026-8905",
-    specimenType: "Whole Blood (EDTA K2)",
-    tubeCapColor: "#7C3AED",
-    tubeCapLabel: "EDTA Purple",
-    status: "COLLECTED",
-    priority: "URGENT",
-    orderedAt: "29-Aug-2026 09:10 AM",
-    collectedAt: "29-Aug-2026 09:20 AM",
-  },
-];
-
 export default function LaboratoryWorkstationScreen() {
   const { tenant } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "queue"; // queue, results, verify, reports
 
-  const [orders, setOrders] = useState<LabOrder[]>(initialLabOrders);
+  const [orders, setOrders] = useState<LabOrder[]>(() => {
+    const saved = localStorage.getItem(`hms-lab-orders-${tenant || "default"}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const saveOrders = (nextOrders: LabOrder[]) => {
+    setOrders(nextOrders);
+    localStorage.setItem(`hms-lab-orders-${tenant || "default"}`, JSON.stringify(nextOrders));
+  };
 
   // Modals state
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -196,17 +88,16 @@ export default function LaboratoryWorkstationScreen() {
 
   // Action: Mark Sample Collected
   const handleCollectSample = (order: LabOrder) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === order.id
-          ? {
-              ...o,
-              status: "COLLECTED",
-              collectedAt: new Date().toLocaleTimeString("en-IN", { timeStyle: "short" }),
-            }
-          : o
-      )
+    const nextOrders = orders.map((o) =>
+      o.id === order.id
+        ? {
+            ...o,
+            status: "COLLECTED" as const,
+            collectedAt: new Date().toLocaleTimeString("en-IN", { timeStyle: "short" }),
+          }
+        : o
     );
+    saveOrders(nextOrders);
     setSelectedPatientForBarcode({
       given_name: order.patientName.split(" ")[0],
       family_name: order.patientName.split(" ")[1] || "",
@@ -219,20 +110,19 @@ export default function LaboratoryWorkstationScreen() {
 
   // Action: Save Result Entry
   const handleResultEntrySuccess = (resultPayload: any) => {
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === resultPayload.orderId
-          ? {
-              ...o,
-              status: "VERIFIED",
-              hasPanicAlert: resultPayload.hasPanicAlert,
-              comments: resultPayload.comments,
-              parameters: resultPayload.parameters,
-              reportedAt: resultPayload.reportedAt,
-            }
-          : o
-      )
+    const nextOrders = orders.map((o) =>
+      o.id === resultPayload.orderId
+        ? {
+            ...o,
+            status: "VERIFIED" as const,
+            hasPanicAlert: resultPayload.hasPanicAlert,
+            comments: resultPayload.comments,
+            parameters: resultPayload.parameters,
+            reportedAt: resultPayload.reportedAt,
+          }
+        : o
     );
+    saveOrders(nextOrders);
     setResultEntryModalOpen(false);
     triggerToast("Lab result verified and official report released.");
   };
@@ -377,86 +267,94 @@ export default function LaboratoryWorkstationScreen() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOrders.map((ord) => (
-                  <tr key={ord.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ fontFamily: "monospace", color: "var(--indigo)", fontSize: 13 }}>
-                        {ord.sampleId}
-                      </strong>
-                      <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{ord.orderedAt}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block", color: "var(--ink)" }}>{ord.patientName}</strong>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>
-                        {ord.patientUhid} · {ord.ageGender} {ord.bedNumber ? `· ${ord.bedNumber}` : ""}
-                      </span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <strong style={{ display: "block", color: "var(--ink)" }}>{ord.testName}</strong>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
-                        <span style={{ width: 10, height: 10, borderRadius: "50%", background: ord.tubeCapColor }} />
-                        <span style={{ fontSize: 11, color: "var(--slate)", fontWeight: 700 }}>{ord.tubeCapLabel}</span>
-                      </div>
-                    </td>
-
-                    <td style={{ padding: "12px 14px" }}>
-                      <div>{ord.doctorName}</div>
-                      <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{ord.department}</span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <span
-                        style={{
-                          fontSize: 10.5,
-                          fontWeight: 800,
-                          padding: "2px 8px",
-                          borderRadius: 4,
-                          background: ord.priority === "STAT_EMERGENCY" ? "#FEF2F2" : ord.priority === "URGENT" ? "#FEF3C7" : "#F1F5F9",
-                          color: ord.priority === "STAT_EMERGENCY" ? "#DC2626" : ord.priority === "URGENT" ? "#B45309" : "#64748B",
-                        }}
-                      >
-                        {ord.priority}
-                      </span>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "center" }}>
-                      <StatusPill kind={ord.status === "VERIFIED" ? "success" : ord.status === "COLLECTED" ? "info" : "warn"}>
-                        {ord.status}
-                      </StatusPill>
-                    </td>
-
-                    <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                      {ord.status === "ORDERED" ? (
-                        <Button
-                          type="button"
-                          onClick={() => handleCollectSample(ord)}
-                          style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12, padding: "6px 14px" }}
-                        >
-                          🧪 Collect & Print Tube Sticker
-                        </Button>
-                      ) : (
-                        <Button
-                          type="button"
-                          ghost
-                          onClick={() => {
-                            setSelectedPatientForBarcode({
-                              given_name: ord.patientName.split(" ")[0],
-                              family_name: ord.patientName.split(" ")[1] || "",
-                              national_id: ord.patientUhid,
-                              gender: ord.ageGender.includes("Female") ? "female" : "male",
-                            });
-                            setBarcodeModalOpen(true);
-                          }}
-                          style={{ fontSize: 11.5, padding: "5px 10px" }}
-                        >
-                          🏷️ Re-print Barcode
-                        </Button>
-                      )}
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center", padding: "36px 14px", color: "var(--slate)", fontStyle: "italic" }}>
+                      No diagnostic orders currently in queue. Orders placed from Doctor EMR or Inpatient wards will appear here.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredOrders.map((ord) => (
+                    <tr key={ord.id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ fontFamily: "monospace", color: "var(--indigo)", fontSize: 13 }}>
+                          {ord.sampleId}
+                        </strong>
+                        <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>{ord.orderedAt}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block", color: "var(--ink)" }}>{ord.patientName}</strong>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>
+                          {ord.patientUhid} · {ord.ageGender} {ord.bedNumber ? `· ${ord.bedNumber}` : ""}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <strong style={{ display: "block", color: "var(--ink)" }}>{ord.testName}</strong>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                          <span style={{ width: 10, height: 10, borderRadius: "50%", background: ord.tubeCapColor }} />
+                          <span style={{ fontSize: 11, color: "var(--slate)", fontWeight: 700 }}>{ord.tubeCapLabel}</span>
+                        </div>
+                      </td>
+
+                      <td style={{ padding: "12px 14px" }}>
+                        <div>{ord.doctorName}</div>
+                        <span style={{ fontSize: 11.5, color: "var(--slate)" }}>{ord.department}</span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <span
+                          style={{
+                            fontSize: 10.5,
+                            fontWeight: 800,
+                            padding: "2px 8px",
+                            borderRadius: 4,
+                            background: ord.priority === "STAT_EMERGENCY" ? "#FEF2F2" : ord.priority === "URGENT" ? "#FEF3C7" : "#F1F5F9",
+                            color: ord.priority === "STAT_EMERGENCY" ? "#DC2626" : ord.priority === "URGENT" ? "#B45309" : "#64748B",
+                          }}
+                        >
+                          {ord.priority}
+                        </span>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "center" }}>
+                        <StatusPill kind={ord.status === "VERIFIED" ? "success" : ord.status === "COLLECTED" ? "info" : "warn"}>
+                          {ord.status}
+                        </StatusPill>
+                      </td>
+
+                      <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                        {ord.status === "ORDERED" ? (
+                          <Button
+                            type="button"
+                            onClick={() => handleCollectSample(ord)}
+                            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12, padding: "6px 14px" }}
+                          >
+                            🧪 Collect & Print Tube Sticker
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            ghost
+                            onClick={() => {
+                              setSelectedPatientForBarcode({
+                                given_name: ord.patientName.split(" ")[0],
+                                family_name: ord.patientName.split(" ")[1] || "",
+                                national_id: ord.patientUhid,
+                                gender: ord.ageGender.includes("Female") ? "female" : "male",
+                              });
+                              setBarcodeModalOpen(true);
+                            }}
+                            style={{ fontSize: 11.5, padding: "5px 10px" }}
+                          >
+                            🏷️ Re-print Barcode
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -478,66 +376,72 @@ export default function LaboratoryWorkstationScreen() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
-            {orders.map((ord) => (
-              <div
-                key={ord.id}
-                style={{
-                  background: ord.hasPanicAlert ? "#FEF2F2" : "var(--wash-a)",
-                  border: ord.hasPanicAlert ? "2px solid #DC2626" : "1px solid var(--line)",
-                  borderRadius: 14,
-                  padding: "16px 18px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span style={{ fontSize: 11, fontFamily: "monospace", fontWeight: 700, color: "var(--indigo)" }}>
-                      {ord.sampleId}
-                    </span>
-                    {ord.hasPanicAlert ? (
-                      <span style={{ background: "#DC2626", color: "#fff", padding: "2px 8px", borderRadius: 4, fontWeight: 900, fontSize: 10.5 }}>
-                        🚨 PANIC ALERT
-                      </span>
-                    ) : (
-                      <StatusPill kind={ord.status === "VERIFIED" ? "success" : "warn"}>
-                        {ord.status}
-                      </StatusPill>
-                    )}
-                  </div>
-
-                  <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>{ord.patientName}</strong>
-                  <span style={{ fontSize: 12, color: "var(--slate)" }}>
-                    {ord.testName} · {ord.tubeCapLabel}
-                  </span>
-
-                  <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "12px 0", fontSize: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ color: "var(--slate)" }}>Referring Doctor:</span>
-                      <strong>{ord.doctorName}</strong>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "var(--slate)" }}>Ordered:</span>
-                      <span>{ord.orderedAt}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", gap: 8 }}>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setSelectedOrderForEntry(ord);
-                      setResultEntryModalOpen(true);
-                    }}
-                    style={{ flex: 1, background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
-                  >
-                    🧪 Enter / Edit Results
-                  </Button>
-                </div>
+            {orders.length === 0 ? (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "36px 14px", background: "var(--wash-a)", borderRadius: 12, border: "1px dashed var(--line)", color: "var(--slate)", fontStyle: "italic" }}>
+                No active specimens in testing bench.
               </div>
-            ))}
+            ) : (
+              orders.map((ord) => (
+                <div
+                  key={ord.id}
+                  style={{
+                    background: ord.hasPanicAlert ? "#FEF2F2" : "var(--wash-a)",
+                    border: ord.hasPanicAlert ? "2px solid #DC2626" : "1px solid var(--line)",
+                    borderRadius: 14,
+                    padding: "16px 18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, fontFamily: "monospace", fontWeight: 700, color: "var(--indigo)" }}>
+                        {ord.sampleId}
+                      </span>
+                      {ord.hasPanicAlert ? (
+                        <span style={{ background: "#DC2626", color: "#fff", padding: "2px 8px", borderRadius: 4, fontWeight: 900, fontSize: 10.5 }}>
+                          🚨 PANIC ALERT
+                        </span>
+                      ) : (
+                        <StatusPill kind={ord.status === "VERIFIED" ? "success" : "warn"}>
+                          {ord.status}
+                        </StatusPill>
+                      )}
+                    </div>
+
+                    <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>{ord.patientName}</strong>
+                    <span style={{ fontSize: 12, color: "var(--slate)" }}>
+                      {ord.testName} · {ord.tubeCapLabel}
+                    </span>
+
+                    <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "12px 0", fontSize: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ color: "var(--slate)" }}>Referring Doctor:</span>
+                        <strong>{ord.doctorName}</strong>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ color: "var(--slate)" }}>Ordered:</span>
+                        <span>{ord.orderedAt}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setSelectedOrderForEntry(ord);
+                        setResultEntryModalOpen(true);
+                      }}
+                      style={{ flex: 1, background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
+                    >
+                      🧪 Enter / Edit Results
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </Card>
       )}
@@ -557,55 +461,61 @@ export default function LaboratoryWorkstationScreen() {
           </div>
 
           <div style={{ display: "grid", gap: 12 }}>
-            {orders.map((ord) => (
-              <div
-                key={ord.id}
-                style={{
-                  background: ord.hasPanicAlert ? "#FEF2F2" : "var(--wash-a)",
-                  border: ord.hasPanicAlert ? "1px solid #DC2626" : "1px solid var(--line)",
-                  padding: "14px 18px",
-                  borderRadius: 12,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: 12,
-                }}
-              >
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <strong style={{ fontSize: 14.5, color: "var(--ink)" }}>{ord.patientName}</strong>
-                    <span style={{ fontSize: 12, color: "var(--slate)" }}>({ord.patientUhid})</span>
-                    {ord.hasPanicAlert && (
-                      <span style={{ background: "#DC2626", color: "#fff", padding: "2px 6px", borderRadius: 4, fontWeight: 900, fontSize: 10 }}>
-                        🚨 PANIC VALUE
-                      </span>
+            {orders.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "36px 14px", background: "var(--wash-a)", borderRadius: 12, border: "1px dashed var(--line)", color: "var(--slate)", fontStyle: "italic" }}>
+                No specimen results awaiting pathologist verification.
+              </div>
+            ) : (
+              orders.map((ord) => (
+                <div
+                  key={ord.id}
+                  style={{
+                    background: ord.hasPanicAlert ? "#FEF2F2" : "var(--wash-a)",
+                    border: ord.hasPanicAlert ? "1px solid #DC2626" : "1px solid var(--line)",
+                    padding: "14px 18px",
+                    borderRadius: 12,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 12,
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <strong style={{ fontSize: 14.5, color: "var(--ink)" }}>{ord.patientName}</strong>
+                      <span style={{ fontSize: 12, color: "var(--slate)" }}>({ord.patientUhid})</span>
+                      {ord.hasPanicAlert && (
+                        <span style={{ background: "#DC2626", color: "#fff", padding: "2px 6px", borderRadius: 4, fontWeight: 900, fontSize: 10 }}>
+                          🚨 PANIC VALUE
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 12.5, color: "var(--indigo)", fontWeight: 700, marginTop: 2 }}>
+                      {ord.testName} · Sample ID: {ord.sampleId}
+                    </div>
+                    {ord.comments && (
+                      <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--slate)" }}>
+                        Pathologist Note: <em>"{ord.comments}"</em>
+                      </p>
                     )}
                   </div>
-                  <div style={{ fontSize: 12.5, color: "var(--indigo)", fontWeight: 700, marginTop: 2 }}>
-                    {ord.testName} · Sample ID: {ord.sampleId}
-                  </div>
-                  {ord.comments && (
-                    <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--slate)" }}>
-                      Pathologist Note: <em>"{ord.comments}"</em>
-                    </p>
-                  )}
-                </div>
 
-                <div style={{ display: "flex", gap: 8 }}>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setSelectedReport(ord);
-                      setReportModalOpen(true);
-                    }}
-                    style={{ fontSize: 12, padding: "6px 14px" }}
-                  >
-                    📄 Review Full Report
-                  </Button>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setSelectedReport(ord);
+                        setReportModalOpen(true);
+                      }}
+                      style={{ fontSize: 12, padding: "6px 14px" }}
+                    >
+                      📄 Review Full Report
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
       )}
@@ -627,56 +537,58 @@ export default function LaboratoryWorkstationScreen() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
-            {filteredOrders.filter(o => o.status === "VERIFIED").map((ord) => (
-              <div
-                key={ord.id}
-                style={{
-                  background: "var(--wash-a)",
-                  border: "1px solid var(--line)",
-                  borderRadius: 14,
-                  padding: "16px 18px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
-              >
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <span style={{ fontSize: 11, fontFamily: "monospace", fontWeight: 700, color: "var(--indigo)" }}>
-                      {ord.sampleId}
-                    </span>
-                    <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                      ✓ VERIFIED
-                    </span>
-                  </div>
-
-                  <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>{ord.patientName}</strong>
-                  <span style={{ fontSize: 12, color: "var(--slate)" }}>{ord.patientUhid} · {ord.ageGender}</span>
-
-                  <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "12px 0", fontSize: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                      <span style={{ color: "var(--slate)" }}>Test Panel:</span>
-                      <strong style={{ color: "var(--indigo)" }}>{ord.testName}</strong>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px dashed var(--line)", paddingTop: 4 }}>
-                      <span style={{ color: "var(--slate)" }}>Reported At:</span>
-                      <span>{ord.reportedAt || "Today"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setSelectedReport(ord);
-                    setReportModalOpen(true);
-                  }}
-                  style={{ width: "100%", background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
-                >
-                  🖨️ View & Print Official Lab Report
-                </Button>
+            {filteredOrders.filter(o => o.status === "VERIFIED").length === 0 ? (
+              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "36px 14px", background: "var(--wash-a)", borderRadius: 12, border: "1px dashed var(--line)", color: "var(--slate)", fontStyle: "italic" }}>
+                No verified diagnostic reports generated yet.
               </div>
-            ))}
+            ) : (
+              filteredOrders.filter(o => o.status === "VERIFIED").map((ord) => (
+                <div
+                  key={ord.id}
+                  style={{
+                    background: "var(--wash-a)",
+                    border: "1px solid var(--line)",
+                    borderRadius: 14,
+                    padding: "16px 18px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, fontFamily: "monospace", fontWeight: 700, color: "var(--indigo)" }}>
+                        {ord.sampleId}
+                      </span>
+                      <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                        ✓ VERIFIED
+                      </span>
+                    </div>
+
+                    <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>{ord.patientName}</strong>
+                    <span style={{ fontSize: 12, color: "var(--slate)" }}>{ord.patientUhid} · {ord.ageGender}</span>
+
+                    <div style={{ background: "#fff", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--line)", margin: "12px 0", fontSize: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ color: "var(--slate)" }}>Test Panel:</span>
+                        <strong style={{ color: "var(--indigo)" }}>{ord.testName}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setSelectedReport(ord);
+                      setReportModalOpen(true);
+                    }}
+                    style={{ width: "100%", background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
+                  >
+                    🖨️ View & Print Official Lab Report
+                  </Button>
+                </div>
+              ))
+            )}
           </div>
         </Card>
       )}
