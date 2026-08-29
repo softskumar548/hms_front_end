@@ -71,8 +71,8 @@ export default function PaySlipPrintModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Official Employee Pay Slip (PAY-001)">
-      <div style={{ maxWidth: 840, minWidth: 720, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Official Employee Pay Slip (PAY-001)" maxWidth={860}>
+      <div style={{ width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Print & Action Controls Bar */}
         <div

@@ -37,8 +37,8 @@ export default function PACURecoveryModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Post-Anesthesia Care Unit (PACU) - Aldrete Score (PACU-001)">
-      <div style={{ display: "grid", gap: 14, maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Post-Anesthesia Care Unit (PACU) - Aldrete Score (PACU-001)" maxWidth={660}>
+      <div style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Header Summary */}
         <div style={{ background: "#F0FDF4", border: "1.5px solid #22C55E", padding: "10px 14px", borderRadius: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>

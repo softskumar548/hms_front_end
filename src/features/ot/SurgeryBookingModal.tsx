@@ -70,8 +70,8 @@ export default function SurgeryBookingModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Book & Schedule Surgical Case (OT-001)">
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Book & Schedule Surgical Case (OT-001)" maxWidth={660}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Patient Details */}
         <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr", gap: 10 }}>

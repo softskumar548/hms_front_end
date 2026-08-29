@@ -42,8 +42,8 @@ export default function BloodCrossMatchModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Transfusion Compatibility & Major Cross-Match (XM-001)">
-      <div style={{ display: "grid", gap: 14, maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Transfusion Compatibility & Major Cross-Match (XM-001)" maxWidth={660}>
+      <div style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Patient & Requisition Header */}
         <div style={{ background: "#FEF2F2", border: "1.5px solid #DC2626", padding: 12, borderRadius: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>

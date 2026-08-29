@@ -63,8 +63,8 @@ export default function InpatientAdmissionModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Inpatient Ward Bed Admission (IPD-001)">
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 540, minWidth: 440, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Inpatient Ward Bed Admission (IPD-001)" maxWidth={600}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         {/* Target Bed Header */}
         <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>

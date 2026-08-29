@@ -81,8 +81,8 @@ export default function EmergencyIntakeModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Rapid Emergency Casualty & Trauma Intake (ER-001)">
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 660, minWidth: 520, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Rapid Emergency Casualty & Trauma Intake (ER-001)" maxWidth={680}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Unidentified John Doe Quick Switch */}
         <div style={{ background: isUnknown ? "#FEF2F2" : "var(--wash-a)", padding: 12, borderRadius: 10, border: isUnknown ? "2px solid #DC2626" : "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>

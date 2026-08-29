@@ -116,8 +116,8 @@ export default function LabResultEntryModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Diagnostic Result Entry: ${panelKey} (RES-001)`}>
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title={`Diagnostic Result Entry: ${panelKey} (RES-001)`} maxWidth={660}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Patient & Order Header */}
         <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)" }}>

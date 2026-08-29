@@ -97,8 +97,8 @@ export default function SpecimenBarcodeModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Diagnostic Specimen Tube Barcode Label Generator (LAB-002)">
-      <div style={{ maxWidth: 680, minWidth: 540, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Diagnostic Specimen Tube Barcode Label Generator (LAB-002)" maxWidth={720}>
+      <div style={{ width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Controls Bar */}
         <div

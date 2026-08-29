@@ -45,8 +45,8 @@ export default function WristbandPrintModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Patient Thermal ID Wristband Printer (ZBR-001)">
-      <div style={{ maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Patient Thermal ID Wristband Printer (ZBR-001)" maxWidth={680}>
+      <div style={{ width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Controls Bar */}
         <div
@@ -57,25 +57,33 @@ export default function WristbandPrintModal({
             alignItems: "center",
             marginBottom: 16,
             background: "var(--wash-a)",
-            padding: "10px 16px",
+            padding: "12px 16px",
             borderRadius: 10,
             border: "1px solid var(--line)",
+            flexWrap: "wrap",
+            gap: 12,
+            boxSizing: "border-box",
           }}
         >
-          <div>
-            <strong style={{ fontSize: 13, color: "var(--indigo)" }}>
+          <div style={{ flex: "1 1 260px", minWidth: 0 }}>
+            <strong style={{ fontSize: 13, color: "var(--indigo)", display: "block" }}>
               🏷️ Thermal Wristband Profile (Zebra / TSC 100mm × 25mm)
             </strong>
-            <span style={{ fontSize: 11, color: "var(--slate)", display: "block" }}>
+            <span style={{ fontSize: 11.5, color: "var(--slate)", display: "block", marginTop: 2 }}>
               Standard tear-resistant waterproof inpatient wristband roll
             </span>
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
             <Button ghost onClick={onClose}>Close</Button>
             <Button
               onClick={handlePrint}
-              style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
+              style={{
+                background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
+                color: "#fff",
+                whiteSpace: "nowrap",
+                fontSize: 12.5,
+              }}
             >
               🖨️ Print Wristband (100×25mm)
             </Button>
@@ -86,55 +94,59 @@ export default function WristbandPrintModal({
         <div
           style={{
             background: "#F1F5F9",
-            padding: 24,
+            padding: "20px 16px",
             borderRadius: 12,
             border: "1px dashed var(--line)",
             display: "flex",
             justifyContent: "center",
+            alignItems: "center",
+            boxSizing: "border-box",
+            width: "100%",
+            overflowX: "auto",
           }}
         >
           <div
             className="wristband-container"
             style={{
               width: "100%",
-              maxWidth: 480,
-              height: 120,
+              maxWidth: 520,
+              minHeight: 110,
               background: "#FFFFFF",
               border: "2px solid #0F172A",
               borderRadius: 8,
-              padding: "8px 12px",
+              padding: "10px 14px",
               display: "grid",
-              gridTemplateColumns: "1.8fr 1fr",
-              gap: 8,
+              gridTemplateColumns: "1fr auto",
+              gap: 14,
               alignItems: "center",
               boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
-              position: "relative",
               color: "#000000",
               fontFamily: "system-ui, -apple-system, sans-serif",
+              boxSizing: "border-box",
             }}
           >
             {/* Left Column: Demographics & Clinical Info */}
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", gap: 6 }}>
               <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
                   <strong style={{ fontSize: 13, color: "#000", textTransform: "uppercase", letterSpacing: "0.02em" }}>
                     {facilityTitle}
                   </strong>
-                  <span style={{ fontSize: 10, fontWeight: 900, background: "#000", color: "#fff", padding: "1px 6px", borderRadius: 3 }}>
+                  <span style={{ fontSize: 10, fontWeight: 900, background: "#000", color: "#fff", padding: "1px 6px", borderRadius: 3, flexShrink: 0 }}>
                     INPATIENT
                   </span>
                 </div>
 
-                <div style={{ fontSize: 13.5, fontWeight: 900, marginTop: 2, color: "#000" }}>
+                <div style={{ fontSize: 14, fontWeight: 900, marginTop: 3, color: "#000" }}>
                   {patientName}
                 </div>
 
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#334155" }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: "#334155", marginTop: 2 }}>
                   {ageGender} · <strong style={{ color: "#DC2626" }}>BG: {bloodGroup}</strong>
                 </div>
               </div>
 
-              <div>
+              <div style={{ borderTop: "1px dashed #CBD5E1", paddingTop: 4 }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: "#000" }}>
                   UHID: {uhid} · IP: {ipNum}
                 </div>
@@ -145,7 +157,7 @@ export default function WristbandPrintModal({
             </div>
 
             {/* Right Column: 2D QR Code & Barcode */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderLeft: "1px dashed #94A3B8", paddingLeft: 8, height: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderLeft: "1px dashed #94A3B8", paddingLeft: 12, height: "100%", flexShrink: 0 }}>
               <img
                 src={qrApiUrl}
                 alt="Patient QR Code"

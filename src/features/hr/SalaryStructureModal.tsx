@@ -67,8 +67,8 @@ export default function SalaryStructureModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Configure Employee Compensation & CTC (PAY-002)">
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 580, minWidth: 460, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Configure Employee Compensation & CTC (PAY-002)" maxWidth={620}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         {/* Staff Header */}
         <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)" }}>
           <strong style={{ fontSize: 14, color: "var(--indigo)", display: "block" }}>

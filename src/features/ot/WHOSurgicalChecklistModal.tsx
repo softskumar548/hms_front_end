@@ -48,8 +48,8 @@ export default function WHOSurgicalChecklistModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="WHO Surgical Safety Checklist Verification (WHO-001)">
-      <div style={{ display: "grid", gap: 14, maxWidth: 760, minWidth: 600, fontFamily: "var(--font-body)", color: "var(--ink)", maxHeight: "78vh", overflowY: "auto", paddingRight: 4 }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="WHO Surgical Safety Checklist Verification (WHO-001)" maxWidth={780}>
+      <div style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Header Summary */}
         <div style={{ background: "var(--wash-a)", border: "1.5px solid var(--indigo)", padding: "10px 14px", borderRadius: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>

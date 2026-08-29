@@ -50,8 +50,8 @@ export default function PharmacyDispenseModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Dispense & Bill EMR Prescription (DISP-001)">
-      <div style={{ display: "grid", gap: 14, maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Dispense & Bill EMR Prescription (DISP-001)" maxWidth={660}>
+      <div style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Prescription Header */}
         <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)" }}>

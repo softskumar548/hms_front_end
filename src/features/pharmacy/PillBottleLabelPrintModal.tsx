@@ -42,8 +42,8 @@ export default function PillBottleLabelPrintModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Pill Bottle & Prescription Label Printer (PHARM-001)">
-      <div style={{ maxWidth: 640, minWidth: 500, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Pill Bottle & Prescription Label Printer (PHARM-001)" maxWidth={680}>
+      <div style={{ width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Controls Bar */}
         <div

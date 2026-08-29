@@ -62,8 +62,8 @@ export default function WardTransferModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Inpatient Bed Shift & Ward Transfer (IPD-002)">
-      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, maxWidth: 560, minWidth: 460, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Inpatient Bed Shift & Ward Transfer (IPD-002)" maxWidth={620}>
+      <form onSubmit={handleSubmit} style={{ display: "grid", gap: 14, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Patient & Source Bed Summary */}
         <div style={{ background: "var(--wash-a)", padding: 12, borderRadius: 10, border: "1px solid var(--line)" }}>

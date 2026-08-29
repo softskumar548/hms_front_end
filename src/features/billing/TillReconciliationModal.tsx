@@ -81,8 +81,8 @@ export default function TillReconciliationModal({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Daily Cashier Till Drawer Reconciliation (BIL-004)">
-      <div style={{ display: "grid", gap: 18, maxWidth: 680, minWidth: 540, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Daily Cashier Till Drawer Reconciliation (BIL-004)" maxWidth={700}>
+      <div style={{ display: "grid", gap: 18, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Top Shift Details Header */}
         <div style={{ background: "var(--wash-a)", padding: 14, borderRadius: 12, border: "1px solid var(--line)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>

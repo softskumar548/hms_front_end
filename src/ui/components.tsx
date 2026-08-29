@@ -193,7 +193,21 @@ export function DateChips({ options, value, onChange }: { options: DateChipOptio
   );
 }
 
-export function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  maxWidth = 560,
+  style,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+  maxWidth?: number | string;
+  style?: React.CSSProperties;
+}) {
   const modalRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -265,9 +279,19 @@ export function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; o
   return (
     <div
       style={{
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-        background: "rgba(10, 17, 102, 0.4)", display: "grid", placeItems: "center",
-        zIndex: 1000, padding: 20,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(10, 17, 102, 0.45)",
+        backdropFilter: "blur(2px)",
+        display: "grid",
+        placeItems: "center",
+        zIndex: 1000,
+        padding: "16px",
+        boxSizing: "border-box",
+        overflowY: "auto",
       }}
       onClick={onClose}
     >
@@ -277,28 +301,44 @@ export function Modal({ isOpen, onClose, title, children }: { isOpen: boolean; o
         aria-modal="true"
         aria-labelledby="modal-title"
         style={{
-          background: "#fff", borderRadius: "var(--r-card)", width: "100%", maxWidth: 500,
-          padding: 24, boxShadow: "var(--shadow-pop)", position: "relative",
+          background: "#fff",
+          borderRadius: "var(--r-card)",
+          width: "100%",
+          maxWidth: maxWidth,
+          maxHeight: "calc(100vh - 32px)",
+          padding: "22px 24px",
+          boxShadow: "var(--shadow-pop)",
+          position: "relative",
           animation: "fadeInScale 0.2s ease-out",
+          boxSizing: "border-box",
+          overflowY: "auto",
+          ...style,
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h3 id="modal-title" style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 700, margin: 0, color: "var(--indigo)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16, gap: 12 }}>
+          <h3 id="modal-title" style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 700, margin: 0, color: "var(--indigo)", lineHeight: 1.3 }}>
             {title}
           </h3>
           <button
             onClick={onClose}
             aria-label="Close modal"
             style={{
-              border: 0, background: "transparent", fontSize: 20, cursor: "pointer",
-              color: "var(--slate)", display: "grid", placeItems: "center", padding: 4
+              border: 0,
+              background: "transparent",
+              fontSize: 20,
+              cursor: "pointer",
+              color: "var(--slate)",
+              display: "grid",
+              placeItems: "center",
+              padding: 4,
+              flexShrink: 0,
             }}
           >
             ✕
           </button>
         </div>
-        <div>{children}</div>
+        <div style={{ width: "100%", boxSizing: "border-box" }}>{children}</div>
       </div>
     </div>
   );

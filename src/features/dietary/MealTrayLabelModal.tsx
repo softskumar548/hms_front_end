@@ -21,8 +21,8 @@ export default function MealTrayLabelModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Print Thermal Meal Tray Barcode Label (50×25mm)">
-      <div style={{ display: "grid", gap: 16, maxWidth: 520, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Print Thermal Meal Tray Barcode Label (50×25mm)" maxWidth={580}>
+      <div style={{ display: "grid", gap: 16, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {/* Printable Thermal Sticker Preview */}
         <div style={{ display: "flex", justifyContent: "center", padding: "14px 0", background: "var(--wash-a)", borderRadius: 10 }}>

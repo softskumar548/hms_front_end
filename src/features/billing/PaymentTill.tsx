@@ -153,8 +153,8 @@ export default function PaymentTill({ invoice, onClose }: PaymentTillProps) {
   const upiQrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiUri)}`;
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Cashier Invoicing & Payment Settlement (BIL-002)">
-      <div style={{ display: "grid", gap: 16, maxWidth: 580, minWidth: 460, fontFamily: "var(--font-body)", color: "var(--ink)" }}>
+    <Modal isOpen={true} onClose={onClose} title="Cashier Invoicing & Payment Settlement (BIL-002)" maxWidth={620}>
+      <div style={{ display: "grid", gap: 16, width: "100%", maxWidth: "100%", fontFamily: "var(--font-body)", color: "var(--ink)", boxSizing: "border-box" }}>
         
         {!generatedReceipt ? (
           <div>
