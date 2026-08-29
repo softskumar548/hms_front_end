@@ -48,11 +48,19 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
     },
   });
 
-  const calculateAge = (dobString?: string | null) => {
-    if (!dobString) return "Age unknown";
+  const calculateAge = (dobString?: string | null, isNewborn?: boolean | null) => {
+    if (!dobString) return isNewborn ? "Neonate (Day 1)" : "Age unknown";
     try {
       const birth = new Date(dobString);
       const now = new Date();
+      const diffMs = now.getTime() - birth.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (isNewborn || diffDays <= 30) {
+        if (diffDays <= 0) return "Neonate (Day 1 / Born Today)";
+        return `Neonate (${diffDays} days old)`;
+      }
+
       let age = now.getFullYear() - birth.getFullYear();
       const m = now.getMonth() - birth.getMonth();
       if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
@@ -60,7 +68,7 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
       }
       return `${age}y`;
     } catch (e) {
-      return "Age unknown";
+      return isNewborn ? "Neonate" : "Age unknown";
     }
   };
 
@@ -86,34 +94,41 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14 }}>
           {/* Patient name & sex/age signature */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <span style={{ fontSize: 24, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--ink)", margin: 0 }}>
-              {patient.given_name} {patient.family_name}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 24, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--ink)", margin: 0 }}>
+                {patient.given_name} {patient.family_name}
+              </span>
+              {patient.is_newborn && (
+                <StatusPill kind="brand">👶 NEWBORN</StatusPill>
+              )}
+            </div>
             <span style={{ color: "var(--slate)", fontSize: 13.5, fontWeight: 600 }}>
-              {patient.gender ? patient.gender.toUpperCase() : "UNSPECIFIED"} · {calculateAge(patient.dob)} ({patient.dob || "DOB Unknown"})
+              {patient.gender ? patient.gender.toUpperCase() : "UNSPECIFIED"} · {calculateAge(patient.dob, patient.is_newborn)} ({patient.dob || "DOB Unknown"})
             </span>
           </div>
 
           {/* ABDM/ABHA Connection Badges */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginLeft: "auto" }}>
             <StatusPill kind={patient.national_id ? "brand" : "warn"}>
-              {patient.national_id ? `Aadhaar Verified` : "No Aadhaar Linked"}
+              {patient.national_id ? `Aadhaar Verified` : (patient.is_newborn ? "ABDM Child Link" : "No Aadhaar Linked")}
             </StatusPill>
             <StatusPill kind={patient.abha_number ? "brand" : "info"}>
-              {patient.abha_number ? `ABHA: ${patient.abha_number}` : "No ABHA Link"}
+              {patient.abha_number ? `ABHA: ${patient.abha_number}` : (patient.is_newborn ? "Child ABHA Ready" : "No ABHA Link")}
             </StatusPill>
           </div>
         </div>
 
         {/* Info chips */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12, borderTop: "1px solid var(--line)", paddingTop: 10 }}>
-          <Chip active={false}>Mobile: {patient.phone || "—"}</Chip>
+          <Chip active={false}>{patient.is_newborn ? "Parent Mobile" : "Mobile"}: {patient.phone || "—"}</Chip>
+          {patient.is_newborn && patient.birth_time && <Chip active={false}>Birth Time: {patient.birth_time}</Chip>}
+          {patient.is_newborn && patient.birth_weight_grams && <Chip active={false}>Birth Weight: {patient.birth_weight_grams}g ({(patient.birth_weight_grams / 1000).toFixed(2)} kg)</Chip>}
           {patient.abha_address && <Chip active={false}>ABHA Address: {patient.abha_address}</Chip>}
           {patient.aarogyasri_id && <Chip active={false}>Aarogyasri ID: {patient.aarogyasri_id}</Chip>}
           {patient.pmjay_id && <Chip active={false}>PMJAY ID: {patient.pmjay_id}</Chip>}
           {patient.referred_by_name && (
             <Chip active={false}>
-              Referred by: {patient.referred_by_name} ({patient.referred_by_type})
+              {patient.is_newborn ? "Attending Clinician" : "Referred by"}: {patient.referred_by_name} ({patient.referred_by_type})
             </Chip>
           )}
         </div>

@@ -174,23 +174,34 @@ export default function PrintStationScreen() {
             {activePatient ? (
               <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 16, alignItems: "center" }}>
                 <div>
-                  <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>
-                    {activePatient.given_name} {activePatient.family_name}
-                  </strong>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong style={{ fontSize: 15, color: "var(--ink)", display: "block" }}>
+                      {activePatient.given_name} {activePatient.family_name}
+                    </strong>
+                    {activePatient.is_newborn && (
+                      <StatusPill kind="brand">👶 NEWBORN</StatusPill>
+                    )}
+                  </div>
                   <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
-                    UHID: {activePatient.national_id || `UHID-${activePatient.id?.slice(0, 6)}`} · {activePatient.gender}, {activePatient.dob || "Adult"}
+                    UHID: {activePatient.national_id || `UHID-${activePatient.id?.slice(0, 6)}`} · {activePatient.gender}, {activePatient.is_newborn ? `Neonate (${activePatient.birth_time || "12:00"})` : (activePatient.dob || "Adult")}
                   </span>
 
-                  <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                  <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
                     <span style={{ fontSize: 11, background: "#DCFCE7", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                      Bed: Inpatient Ward
+                      {activePatient.is_newborn ? "Bed: NICU / Bassinet" : "Bed: Inpatient Ward"}
                     </span>
                     <span style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                      General Medicine
+                      {activePatient.is_newborn ? "Neonatal & Pediatrics" : "General Medicine"}
                     </span>
-                    <span style={{ fontSize: 11, background: "#FEF2F2", color: "#DC2626", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
-                      Blood Group: AP-Verified
-                    </span>
+                    {activePatient.is_newborn && activePatient.birth_weight_grams ? (
+                      <span style={{ fontSize: 11, background: "#FEF3C7", color: "#92400E", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                        Weight: {activePatient.birth_weight_grams}g ({(activePatient.birth_weight_grams / 1000).toFixed(2)}kg)
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 11, background: "#FEF2F2", color: "#DC2626", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                        Blood Group: AP-Verified
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -198,9 +209,9 @@ export default function PrintStationScreen() {
                   <Button
                     type="button"
                     onClick={() => setWristbandModalOpen(true)}
-                    style={{ fontSize: 12, padding: "8px 18px" }}
+                    style={{ fontSize: 12, padding: "8px 18px", background: activePatient.is_newborn ? "linear-gradient(135deg, #059669 0%, #0D5C63 100%)" : undefined }}
                   >
-                    🏷️ Print 1-Click Wristband
+                    {activePatient.is_newborn ? "👶 Print Newborn Wristband" : "🏷️ Print 1-Click Wristband"}
                   </Button>
                 </div>
               </div>

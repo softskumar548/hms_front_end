@@ -2285,6 +2285,24 @@ export interface components {
             next_of_kin?: {
                 [key: string]: unknown;
             } | null;
+            /** Is Newborn */
+            is_newborn?: boolean | null;
+            /** Mother Patient Id */
+            mother_patient_id?: string | null;
+            /** Birth Time */
+            birth_time?: string | null;
+            /** Birth Weight Grams */
+            birth_weight_grams?: number | null;
+            /** Gestational Age Weeks */
+            gestational_age_weeks?: number | null;
+            /** Multiple Birth Order */
+            multiple_birth_order?: number | null;
+            /** Delivery Type */
+            delivery_type?: string | null;
+            /** Apgar Score 1min */
+            apgar_score_1min?: number | null;
+            /** Apgar Score 5min */
+            apgar_score_5min?: number | null;
         };
         /** PatientOut */
         PatientOut: {
@@ -2330,6 +2348,24 @@ export interface components {
             next_of_kin?: {
                 [key: string]: unknown;
             } | null;
+            /** Is Newborn */
+            is_newborn?: boolean | null;
+            /** Mother Patient Id */
+            mother_patient_id?: string | null;
+            /** Birth Time */
+            birth_time?: string | null;
+            /** Birth Weight Grams */
+            birth_weight_grams?: number | null;
+            /** Gestational Age Weeks */
+            gestational_age_weeks?: number | null;
+            /** Multiple Birth Order */
+            multiple_birth_order?: number | null;
+            /** Delivery Type */
+            delivery_type?: string | null;
+            /** Apgar Score 1min */
+            apgar_score_1min?: number | null;
+            /** Apgar Score 5min */
+            apgar_score_5min?: number | null;
             /** Fhir Resource */
             fhir_resource?: {
                 [key: string]: unknown;
