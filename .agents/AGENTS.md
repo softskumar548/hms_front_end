@@ -46,7 +46,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 🏢 **Account Settings** (`/settings?tab=account`): 
     - **Subscription Package Summary Card**: Real-time quota display tracking `Standard Master Catalogs (20 Included)`, `Custom Master Catalogs (x / limit)`, `Package Name`, `Expiry Date`, `Admins`, `Staff`, `Beds Limit`, `Doctors Limit`, `SMS Count`, `Email Count`, and `Whatsapp Count`.
     - Signatory details (`DR K R MURALI`), department sub-tabs, and compliance documents.
-  - 👥 **Users & Staff Directory** (`/settings?tab=users`): Full personnel lifecycle management with live quota meters (`Staff Limit`, `Doctor Limit`). Captures Indian Medical Council Reg No (`NMC / APMC`), designation, department linking (`specialization` catalog), chamber allocation (`room_type` catalog), standard OPD consultation fee (₹), 12-digit Indian Aadhaar ID, duty shifts, and on-call toggles. Includes printable **MediGo Hospital Staff ID Lanyard Badges** with 2D barcodes, Keycloak login passcode resets, and multi-filter search.
+  - 👥 **Users & Staff Directory** (`/settings?tab=users`): Full personnel lifecycle management with live quota meters (`Staff Limit`, `Doctor Limit`). Captures Indian Medical Council Reg No (`NMC / APMC`), designation, department linking (`specialization` catalog), chamber allocation (`room_type` catalog), standard OPD consultation fee (₹), 12-digit Indian Aadhaar ID, duty shifts, and on-call toggles. Directly provisions Keycloak user accounts via `api.inviteStaff` with customized passcodes and role mappings (`physician`, `doctor`, `nurse`, `receptionist`, `billing`), enabling immediate OIDC login for newly onboarded staff. Includes printable **MediGo Hospital Staff ID Lanyard Badges** with 2D barcodes, Keycloak login passcode resets, and multi-filter search.
   - 💳 **Payment** (`/settings?tab=payment`): Payment collection rails, daily till reconciliation limits, PMJAY 100% cashless rules.
   - 🌐 **Online Services** (`/settings?tab=online`): ABDM ABHA milestones, Telehealth switches, and SMS/WhatsApp gateway.
 
@@ -74,7 +74,8 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 📄 **Official Printable Pay Slips (`PaySlipPrintModal`)**: A4 printer-friendly pay slips with hospital letterhead, side-by-side earnings vs deductions breakdown, net take-home in Indian currency words, and digital HR stamp seal.
 
 ## 1.6 Universal Hospital Print Station & Barcode Label Engine (`/print-station`)
-- 🖨️ **Multi-Hardware Printer Profiles**:
+- 🖨️ **Multi-Hardware Printer Profiles & Responsive Layout Engine**:
+  - All print preview dialogues and application modals adhere to strict responsive boundary widths (`maxWidth: 520px - 860px`) with flex wrapping and internal scrolling (`maxHeight: calc(100vh - 48px)`), eliminating horizontal overflow across all display resolutions.
   - 🏷️ **Thermal Patient ID Wristbands (`WristbandPrintModal`)**: Zebra/TSC 100mm × 25mm waterproof inpatient wristband roll with high-contrast UHID, IP number, bed, blood group badge, and scannable 2D QR/barcode.
   - 🧪 **Diagnostic Specimen Vacutainer Tube Barcodes (`SpecimenBarcodeModal`)**: 50mm × 25mm tube stickers for Purple EDTA (CBC/ESR), Red Serum (LFT/RFT), Grey Fluoride (Glucose), and Urine containers with 1-click batch printing.
   - 📄 **A4 Standard Laser/Inkjet Hub**: Direct launcher for MediPass Prescriptions, Discharge Summaries, Employee Pay Slips, and Admission Undertakings.
@@ -145,13 +146,14 @@ Defined once in `src/ui/tokens.css`. **Never hardcode hex values in components.*
 2. **Persistent Allergy Banner**: Constant orange warning banner on all clinical patient screens (`EMR-005`).
 3. **MediPass**: Boarding pass-style confirmation stub for appointments and lab orders.
 4. **i18n Readiness**: English + Telugu language support; all user-facing strings keyed.
-5. **Synthetic Data**: Synthetic patient and staff data only in dev and fixtures.
+5. **Zero-Data Staging & Live Data Integrity**: Clean zero-data empty state cards across all 10 departmental workspaces; synthetic data restricted to local dev fixtures.
 
 ---
 
 # PART 3 — AUTHENTICATION & MULTI-TENANCY
 
 - **Keycloak OIDC Integration**: Realm `hms`, Client `hms-web` (SPA PKCE).
+- **Automated Identity Sync**: Tenant Admin and Operator staff onboarding pipelines provision real Keycloak user identities via Keycloak Admin REST API with role mappings and initial passcodes.
 - **Dynamic Subdomain Resolution**: `resolveTenantFromHostname()` automatically binds tenant context from the host subdomain (`*.hms.zensynq.com`), maintaining seamless multi-tenancy.
 - **Tenant Context**: Verified server-side and propagated via `app.tenant_id` claim in JWT.
 - Role-gated routing in `src/main.tsx` via `<RequireRole>`.
