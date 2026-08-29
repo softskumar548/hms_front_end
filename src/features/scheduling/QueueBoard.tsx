@@ -94,10 +94,10 @@ export default function QueueBoard() {
               <button
                 type="button"
                 style={{
-                  background: "linear-gradient(135deg, #0284C7 0%, #131A8F 100%)",
+                  background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
                   color: "#ffffff",
                   border: "none",
-                  borderRadius: 8,
+                  borderRadius: "var(--r-field)",
                   padding: "9px 16px",
                   fontSize: 13,
                   fontWeight: 800,
@@ -105,7 +105,7 @@ export default function QueueBoard() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
-                  boxShadow: "0 2px 8px rgba(2, 132, 199, 0.35)",
+                  boxShadow: "var(--shadow-card)",
                 }}
               >
                 🖥️ Launch Waiting Lounge TV Display ↗

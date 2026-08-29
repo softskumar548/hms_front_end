@@ -6,7 +6,7 @@ const s = {
   btnPrimary: {
     border: 0, borderRadius: "var(--r-pill)", fontWeight: 800, cursor: "pointer",
     background: "var(--indigo)", color: "#fff", padding: "12px 32px", fontSize: 15,
-    boxShadow: "0 10px 24px rgba(19,26,143,.35)", fontFamily: "inherit",
+    boxShadow: "0 2px 8px rgba(13,92,99,.2)", fontFamily: "inherit",
   } as React.CSSProperties,
   btnGhost: {
     borderRadius: "var(--r-pill)", fontWeight: 800, cursor: "pointer",
@@ -29,7 +29,7 @@ export function Card({ children, style, ...rest }: React.HTMLAttributes<HTMLDivE
   return <div style={{ ...s.card, ...style }} {...rest}>{children}</div>;
 }
 
-/** Airline-style field cell: tiny gray label over bold indigo value. */
+/** Airline-style field cell: tiny gray label over bold clinical teal value. */
 export function FieldCell({ label, sub, children }: { label: string; sub?: string; children: React.ReactNode }) {
   return (
     <div style={{ border: "1px solid var(--line)", borderRadius: "var(--r-field)", padding: "12px 16px" }}>
@@ -41,11 +41,11 @@ export function FieldCell({ label, sub, children }: { label: string; sub?: strin
 }
 
 const statusColors: Record<string, { bg: string; fg: string }> = {
-  info:    { bg: "#E1F4FB", fg: "#1585AC" },   // e.g. Arrived
-  warn:    { bg: "#FDEBDA", fg: "#C4620F" },   // e.g. In consult / attention
-  success: { bg: "#E3F5EA", fg: "#1C9A4E" },   // e.g. Done
+  info:    { bg: "#E0F2FE", fg: "#0284C7" },   // e.g. Arrived
+  warn:    { bg: "#FCEFE6", fg: "#B85D19" },   // e.g. In consult / attention
+  success: { bg: "#E4F6EB", fg: "#16794C" },   // e.g. Done
   brand:   { bg: "var(--indigo-soft)", fg: "var(--indigo)" },
-  danger:  { bg: "#FBE3E3", fg: "#B22B2B" },   // e.g. hard-stop prerequisite unmet
+  danger:  { bg: "#FDE8E8", fg: "#C52222" },   // e.g. hard-stop prerequisite unmet
 };
 
 export function StatusPill({ kind = "brand", children, ...props }: React.HTMLAttributes<HTMLSpanElement> & { kind?: keyof typeof statusColors; children: React.ReactNode }) {

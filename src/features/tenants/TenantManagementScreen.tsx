@@ -91,28 +91,28 @@ export const TenantManagementScreen: React.FC<{ token: string | null }> = ({ tok
       {/* Header Banner */}
       <div
         style={{
-          background: "linear-gradient(135deg, var(--indigo-deep, #0A1166) 0%, var(--indigo, #131A8F) 100%)",
+          background: "linear-gradient(135deg, var(--indigo-deep) 0%, var(--indigo) 100%)",
           color: "#FFF",
-          borderRadius: 22,
+          borderRadius: "var(--r-card, 12px)",
           padding: "24px 28px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "var(--shadow-pop, 0 10px 30px rgba(19, 26, 143, 0.15))",
+          boxShadow: "var(--shadow-card)",
         }}
       >
         <div>
-          <h1 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: 0, fontSize: 28, fontWeight: 700 }}>
+          <h1 style={{ fontFamily: "var(--font-display)", margin: 0, fontSize: 26, fontWeight: 700 }}>
             Platform Control Center — Subscribed Tenants
           </h1>
-          <p style={{ margin: "4px 0 0", color: "var(--indigo-soft, #E4E9FF)", fontSize: 14 }}>
+          <p style={{ margin: "4px 0 0", color: "var(--indigo-soft)", fontSize: 13.5, opacity: 0.9 }}>
             Multi-tenant SaaS provisioning, staff enrollment, and setup wizard lifecycle management
           </p>
         </div>
         <button
           onClick={() => navigate("/onboarding?mode=new")}
           style={{
-            background: "var(--cyan, #5FC6E9)",
+            background: "var(--cyan)",
             color: "#04364A",
             border: "none",
             borderRadius: 999,

@@ -302,7 +302,7 @@ export default function TelehealthScreen() {
           <Button
             type="button"
             onClick={() => setBookingModalOpen(true)}
-            style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontWeight: 800, fontSize: 13, padding: "9px 18px" }}
+            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontWeight: 800, fontSize: 13, padding: "9px 18px" }}
           >
             📅 Book Video Consultation
           </Button>
@@ -341,7 +341,7 @@ export default function TelehealthScreen() {
               
               {/* Patient Video Placeholder */}
               <div style={{ textAlign: "center", padding: 20 }}>
-                <div style={{ width: 110, height: 110, borderRadius: "50%", background: "linear-gradient(135deg, #00BCD4 0%, #131A8F 100%)", color: "#fff", display: "grid", placeItems: "center", fontSize: 44, margin: "0 auto 16px", boxShadow: "0 8px 24px rgba(0, 188, 212, 0.3)" }}>
+                <div style={{ width: 110, height: 110, borderRadius: "50%", background: "linear-gradient(135deg, #0284C7 0%, var(--indigo) 100%)", color: "#fff", display: "grid", placeItems: "center", fontSize: 44, margin: "0 auto 16px", boxShadow: "0 8px 24px rgba(2, 132, 199, 0.3)" }}>
                   👩
                 </div>
                 <strong style={{ fontSize: 18, display: "block" }}>{activeSession.patientName}</strong>

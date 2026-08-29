@@ -382,10 +382,10 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                       <button
                         onClick={() => navigate(`/onboarding?tenant_id=${item.id}`)}
                         style={{
-                          background: item.status === "provisioned" ? "var(--cyan, #5FC6E9)" : "var(--indigo-soft)",
+                          background: item.status === "provisioned" ? "var(--cyan)" : "var(--indigo-soft)",
                           color: item.status === "provisioned" ? "#04364A" : "var(--indigo)",
-                          border: item.status === "provisioned" ? "none" : "1px solid var(--line, #E3E8F4)",
-                          borderRadius: "var(--r-pill, 6px)",
+                          border: item.status === "provisioned" ? "none" : "1px solid var(--line)",
+                          borderRadius: "var(--r-pill)",
                           padding: "5px 14px",
                           fontSize: 12,
                           fontWeight: 800,
@@ -399,10 +399,10 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                         type="button"
                         onClick={() => openQuotaModal(item)}
                         style={{
-                          background: "#EEF2FF",
-                          color: "var(--indigo, #131A8F)",
-                          border: "1px solid #C7D2FE",
-                          borderRadius: "var(--r-pill, 6px)",
+                          background: "var(--indigo-soft)",
+                          color: "var(--indigo)",
+                          border: "1px solid var(--line)",
+                          borderRadius: "var(--r-pill)",
                           padding: "5px 12px",
                           fontSize: 12,
                           fontWeight: 700,
@@ -581,10 +581,10 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div>
-                <h2 style={{ color: "var(--indigo, #131A8F)", margin: 0, fontSize: 20, fontWeight: 800, fontFamily: "var(--font-display, 'Baloo 2')" }}>
+                <h2 style={{ color: "var(--indigo)", margin: 0, fontSize: 20, fontWeight: 800, fontFamily: "var(--font-display)" }}>
                   💳 Subscription Package & Quota Metering
                 </h2>
-                <span style={{ fontSize: 13, color: "var(--slate, #5B6172)" }}>
+                <span style={{ fontSize: 13, color: "var(--slate)" }}>
                   Tenant: <strong>{quotaTargetTenant.name}</strong> (<code>{quotaTargetTenant.id}</code>)
                 </span>
               </div>
@@ -607,8 +607,8 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
             {/* 2-Column Reference Subscription Summary Card */}
             <div
               style={{
-                background: "#F8FAFC",
-                border: "1px solid var(--line, #E3E8F4)",
+                background: "var(--wash-a)",
+                border: "1px solid var(--line)",
                 borderRadius: 12,
                 padding: "18px 22px",
                 display: "grid",
@@ -622,21 +622,21 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
               {/* Left Column */}
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--ink, #23263B)", width: 130 }}>Package Name :</strong>
-                  <span style={{ color: "var(--indigo, #131A8F)", fontWeight: 700 }}>
+                  <strong style={{ color: "var(--ink)", width: 130 }}>Package Name :</strong>
+                  <span style={{ color: "var(--indigo)", fontWeight: 700 }}>
                     {quotaData?.package_name || quotaData?.plan || "HMS Basic Subscription Annual"}
                   </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 130 }}>Expiry Date :</strong>
+                  <strong style={{ color: "var(--slate)", width: 130 }}>Expiry Date :</strong>
                   <span>{quotaData?.expiry_date || "25/07/2026"}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 130 }}>Admins :</strong>
+                  <strong style={{ color: "var(--slate)", width: 130 }}>Admins :</strong>
                   <span>{quotaData?.admins_used ?? 1}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 130 }}>Staff :</strong>
+                  <strong style={{ color: "var(--slate)", width: 130 }}>Staff :</strong>
                   <span>{quotaData?.staff_used ?? 3}</span>
                 </div>
               </div>
@@ -644,30 +644,30 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
               {/* Right Column */}
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Beds Limit :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Beds Limit :</strong>
                   <span>{quotaData?.beds_limit ?? 15}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Doctors Limit :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Doctors Limit :</strong>
                   <span>{quotaData?.doctors_limit ?? 5}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>SMS Count :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>SMS Count :</strong>
                   <span>{quotaData?.sms_count_limit ?? 200}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Email Count :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Email Count :</strong>
                   <span>{quotaData?.email_count_limit ?? 500}</span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <strong style={{ color: "var(--slate, #5B6172)", width: 140 }}>Whatsapp Count :</strong>
+                  <strong style={{ color: "var(--slate)", width: 140 }}>Whatsapp Count :</strong>
                   <span>{quotaData?.whatsapp_count_limit ?? 1000}</span>
                 </div>
               </div>
             </div>
 
             {/* Operator Plan Upgrade Action Bar */}
-            <div style={{ borderTop: "1px solid var(--line, #E3E8F4)", paddingTop: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <label style={{ fontSize: 12.5, fontWeight: 700, color: "var(--slate)" }}>Change Plan Tier:</label>
                 <select
@@ -695,7 +695,7 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                     background: "#FFF",
                     color: "var(--slate)",
                     border: "1px solid var(--line)",
-                    borderRadius: "var(--r-pill, 6px)",
+                    borderRadius: "var(--r-pill)",
                     padding: "6px 16px",
                     fontWeight: 700,
                     cursor: "pointer",
@@ -707,10 +707,10 @@ export const TenantDataTable: React.FC<TenantDataTableProps> = ({
                   type="button"
                   onClick={handleUpgradePlan}
                   style={{
-                    background: "var(--indigo, #131A8F)",
+                    background: "var(--indigo)",
                     color: "#FFF",
                     border: "none",
-                    borderRadius: "var(--r-pill, 6px)",
+                    borderRadius: "var(--r-pill)",
                     padding: "6px 18px",
                     fontWeight: 800,
                     cursor: "pointer",

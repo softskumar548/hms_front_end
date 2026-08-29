@@ -432,7 +432,7 @@ export default function LaboratoryWorkstationScreen() {
                         <Button
                           type="button"
                           onClick={() => handleCollectSample(ord)}
-                          style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 12, padding: "6px 14px" }}
+                          style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12, padding: "6px 14px" }}
                         >
                           🧪 Collect & Print Tube Sticker
                         </Button>
@@ -531,7 +531,7 @@ export default function LaboratoryWorkstationScreen() {
                       setSelectedOrderForEntry(ord);
                       setResultEntryModalOpen(true);
                     }}
-                    style={{ flex: 1, background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 12.5 }}
+                    style={{ flex: 1, background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
                   >
                     🧪 Enter / Edit Results
                   </Button>
@@ -671,7 +671,7 @@ export default function LaboratoryWorkstationScreen() {
                     setSelectedReport(ord);
                     setReportModalOpen(true);
                   }}
-                  style={{ width: "100%", background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 12.5 }}
+                  style={{ width: "100%", background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
                 >
                   🖨️ View & Print Official Lab Report
                 </Button>

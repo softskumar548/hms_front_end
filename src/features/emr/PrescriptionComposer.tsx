@@ -264,7 +264,25 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
             Bilingual Rx stub with Indian brand names & dosage timings
           </span>
         </div>
-        {isRxSigned && <StatusPill kind="success">AUTHORIZED RX</StatusPill>}
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button
+            data-testid="rx-open-composer"
+            type="button"
+            style={{
+              background: "var(--indigo-soft)",
+              color: "var(--indigo)",
+              border: "1px solid var(--line)",
+              borderRadius: "var(--r-pill)",
+              padding: "4px 14px",
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            💊 Open Rx Composer
+          </button>
+          {isRxSigned && <StatusPill kind="success">AUTHORIZED RX</StatusPill>}
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: isRxSigned ? "1fr" : "240px 1fr", gap: 18 }}>
@@ -404,19 +422,19 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                     onChange={(e) => {
                       const f = e.target.value;
                       setFrequency(f);
-                      if (f.includes("BD")) setTeluguInstruction("ఆహారం తర్వాత - ఉదయం, రాత్రి (2 సార్లు)");
-                      else if (f.includes("TDS")) setTeluguInstruction("ఆహారం తర్వాత - ఉదయం, మధ్యాహ్నం, రాత్రి (3 సార్లు)");
-                      else if (f.includes("Morning")) setTeluguInstruction("ఉదయం పరిగడుపున - రోజుకు 1 సారి");
+                      if (f.includes("BD") || f === "BID") setTeluguInstruction("ఆహారం తర్వాత - ఉదయం, రాత్రి (2 సార్లు)");
+                      else if (f.includes("TDS") || f === "TID") setTeluguInstruction("ఆహారం తర్వాత - ఉదయం, మధ్యాహ్నం, రాత్రి (3 సార్లు)");
+                      else if (f.includes("Morning") || f === "OD") setTeluguInstruction("ఉదయం పరిగడుపున - రోజుకు 1 సారి");
                       else if (f.includes("Night")) setTeluguInstruction("రాత్రి పడుకునే ముందు - 1 సారి");
                       else if (f.includes("SOS")) setTeluguInstruction("అవసరమైనప్పుడు మాత్రమే (SOS)");
                     }}
                   >
-                    <option value="1-0-1 (BD)">1-0-1 (Twice daily - BD)</option>
-                    <option value="1-1-1 (TDS)">1-1-1 (Thrice daily - TDS)</option>
-                    <option value="1-0-0 (OD Morning)">1-0-0 (Once daily - Morning OD)</option>
+                    <option value="TID">1-1-1 (Thrice daily - TID / TDS)</option>
+                    <option value="BID">1-0-1 (Twice daily - BID / BD)</option>
+                    <option value="OD">1-0-0 (Once daily - Morning OD)</option>
                     <option value="0-0-1 (OD Night)">0-0-1 (Once daily - Night OD)</option>
-                    <option value="1-1-1-1 (QID)">1-1-1-1 (Four times daily - QID)</option>
-                    <option value="SOS (As Needed)">SOS (As needed when pain/fever)</option>
+                    <option value="QID">1-1-1-1 (Four times daily - QID)</option>
+                    <option value="SOS">SOS (As needed when pain/fever)</option>
                   </Select>
                 </div>
               </div>
@@ -576,7 +594,7 @@ export default function PrescriptionComposer({ encounterId, patientId, isLocked 
                 type="button"
                 disabled={signMutation.isPending || (hasAllergyConflict && signAttempted && !overrideConfirmed)}
                 onClick={handleSign}
-                style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
               >
                 {signMutation.isPending ? "Signing Prescription..." : "🖋️ Sign & Authorize Prescription"}
               </Button>

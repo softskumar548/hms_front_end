@@ -57,20 +57,20 @@ export default function OpsDashboard() {
       {/* Welcome Admin & Clinic Banner */}
       <div
         style={{
-          background: "linear-gradient(135deg, #131A8F 0%, #1E3A8A 100%)",
-          borderRadius: "var(--r-card, 18px)",
+          background: "linear-gradient(135deg, var(--indigo-deep) 0%, var(--indigo) 100%)",
+          borderRadius: "var(--r-card, 12px)",
           padding: "20px 24px",
           color: "#ffffff",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "0 8px 24px rgba(19, 26, 143, 0.2)",
+          boxShadow: "var(--shadow-card)",
           flexWrap: "wrap",
           gap: 14,
         }}
       >
         <div>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--cyan, #5FC6E9)", marginBottom: 4 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--cyan)", marginBottom: 4 }}>
             Tenant Administration Console
           </div>
           <h1 style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, margin: "0 0 6px", color: "#ffffff" }}>

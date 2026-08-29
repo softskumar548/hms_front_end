@@ -318,7 +318,7 @@ export default function TillReconciliationModal({
               <Button
                 type="button"
                 onClick={handleCloseShift}
-                style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
               >
                 🔒 Close & Finalize Shift Till
               </Button>

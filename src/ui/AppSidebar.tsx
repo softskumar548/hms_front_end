@@ -107,10 +107,10 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           onClick={onToggleCollapse}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           style={{
-            background: "var(--wash-a, #F6FAFF)",
-            border: "1px solid var(--line, #E2E8F0)",
-            color: "var(--indigo, #131A8F)",
-            borderRadius: "var(--r-pill, 999px)",
+            background: "var(--wash-a)",
+            border: "1px solid var(--line)",
+            color: "var(--indigo)",
+            borderRadius: "var(--r-pill)",
             width: 28,
             height: 28,
             display: "grid",
@@ -139,11 +139,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
               justifyContent: collapsed ? "center" : "flex-start",
               borderRadius: 10,
               textDecoration: "none",
-              background: isCurrent("/dashboard") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-              color: isCurrent("/dashboard") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+              background: isCurrent("/dashboard") ? "var(--indigo-soft)" : "transparent",
+              color: isCurrent("/dashboard") ? "var(--indigo)" : "var(--ink)",
               fontWeight: isCurrent("/dashboard") ? 800 : 600,
               fontSize: 13.5,
-              borderLeft: isCurrent("/dashboard") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+              borderLeft: isCurrent("/dashboard") ? "3px solid var(--indigo)" : "3px solid transparent",
               transition: "all 0.15s ease",
             }}
           >
@@ -210,11 +210,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   justifyContent: collapsed ? "center" : "flex-start",
                   borderRadius: 10,
                   textDecoration: "none",
-                  background: isCurrent("/ot") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                  color: isCurrent("/ot") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  background: isCurrent("/ot") ? "var(--indigo-soft)" : "transparent",
+                  color: isCurrent("/ot") ? "var(--indigo)" : "var(--ink)",
                   fontWeight: isCurrent("/ot") ? 800 : 600,
                   fontSize: 13.5,
-                  borderLeft: isCurrent("/ot") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  borderLeft: isCurrent("/ot") ? "3px solid var(--indigo)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -233,11 +233,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   justifyContent: collapsed ? "center" : "flex-start",
                   borderRadius: 10,
                   textDecoration: "none",
-                  background: isCurrent("/inpatient") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                  color: isCurrent("/inpatient") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  background: isCurrent("/inpatient") ? "var(--indigo-soft)" : "transparent",
+                  color: isCurrent("/inpatient") ? "var(--indigo)" : "var(--ink)",
                   fontWeight: isCurrent("/inpatient") ? 800 : 600,
                   fontSize: 13.5,
-                  borderLeft: isCurrent("/inpatient") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  borderLeft: isCurrent("/inpatient") ? "3px solid var(--indigo)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -302,11 +302,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   justifyContent: collapsed ? "center" : "flex-start",
                   borderRadius: 10,
                   textDecoration: "none",
-                  background: isCurrent("/lab") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                  color: isCurrent("/lab") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  background: isCurrent("/lab") ? "var(--indigo-soft)" : "transparent",
+                  color: isCurrent("/lab") ? "var(--indigo)" : "var(--ink)",
                   fontWeight: isCurrent("/lab") ? 800 : 600,
                   fontSize: 13.5,
-                  borderLeft: isCurrent("/lab") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  borderLeft: isCurrent("/lab") ? "3px solid var(--indigo)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -325,11 +325,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   justifyContent: collapsed ? "center" : "flex-start",
                   borderRadius: 10,
                   textDecoration: "none",
-                  background: isCurrent("/pharmacy") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                  color: isCurrent("/pharmacy") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  background: isCurrent("/pharmacy") ? "var(--indigo-soft)" : "transparent",
+                  color: isCurrent("/pharmacy") ? "var(--indigo)" : "var(--ink)",
                   fontWeight: isCurrent("/pharmacy") ? 800 : 600,
                   fontSize: 13.5,
-                  borderLeft: isCurrent("/pharmacy") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  borderLeft: isCurrent("/pharmacy") ? "3px solid var(--indigo)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -348,11 +348,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   justifyContent: collapsed ? "center" : "flex-start",
                   borderRadius: 10,
                   textDecoration: "none",
-                  background: isCurrent("/print-station") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                  color: isCurrent("/print-station") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  background: isCurrent("/print-station") ? "var(--indigo-soft)" : "transparent",
+                  color: isCurrent("/print-station") ? "var(--indigo)" : "var(--ink)",
                   fontWeight: isCurrent("/print-station") ? 800 : 600,
                   fontSize: 13.5,
-                  borderLeft: isCurrent("/print-station") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  borderLeft: isCurrent("/print-station") ? "3px solid var(--indigo)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -371,11 +371,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   justifyContent: collapsed ? "center" : "flex-start",
                   borderRadius: 10,
                   textDecoration: "none",
-                  background: isCurrent("/hr") ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                  color: isCurrent("/hr") ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                  background: isCurrent("/hr") ? "var(--indigo-soft)" : "transparent",
+                  color: isCurrent("/hr") ? "var(--indigo)" : "var(--ink)",
                   fontWeight: isCurrent("/hr") ? 800 : 600,
                   fontSize: 13.5,
-                  borderLeft: isCurrent("/hr") ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                  borderLeft: isCurrent("/hr") ? "3px solid var(--indigo)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -404,11 +404,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                     justifyContent: collapsed ? "center" : "flex-start",
                     borderRadius: 10,
                     textDecoration: "none",
-                    background: active ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                    color: active ? "var(--indigo, #131A8F)" : "var(--ink, #23263B)",
+                    background: active ? "var(--indigo-soft)" : "transparent",
+                    color: active ? "var(--indigo)" : "var(--ink)",
                     fontWeight: active ? 800 : 600,
                     fontSize: 13.5,
-                    borderLeft: active ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+                    borderLeft: active ? "3px solid var(--indigo)" : "3px solid transparent",
                     transition: "all 0.15s ease",
                   }}
                 >
@@ -436,14 +436,14 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  color: "var(--indigo, #131A8F)",
+                  color: "var(--indigo)",
                   fontWeight: 800,
                   fontSize: 14,
                   borderRadius: 8,
                 }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ color: "var(--green, #1C9A4E)", fontSize: 16 }}>👥</span>
+                  <span style={{ color: "var(--green)", fontSize: 16 }}>👥</span>
                   <span>Admin</span>
                 </span>
                 <span style={{ fontSize: 11, color: "var(--slate)" }}>{adminOpen ? "▲" : "▼"}</span>
@@ -462,7 +462,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                   gap: 3,
                   marginTop: 4,
                   paddingLeft: collapsed ? 0 : 12,
-                  borderLeft: collapsed ? "none" : "2px solid var(--wash-b, #DDEBFC)",
+                  borderLeft: collapsed ? "none" : "2px solid var(--wash-b)",
                   marginLeft: collapsed ? 0 : 10,
                 }}
               >
@@ -481,8 +481,8 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
                         justifyContent: collapsed ? "center" : "flex-start",
                         borderRadius: 8,
                         textDecoration: "none",
-                        background: active ? "var(--indigo-soft, #E4E9FF)" : "transparent",
-                        color: active ? "var(--indigo, #131A8F)" : "var(--slate, #5B6172)",
+                        background: active ? "var(--indigo-soft)" : "transparent",
+                        color: active ? "var(--indigo)" : "var(--slate)",
                         fontWeight: active ? 800 : 600,
                         fontSize: 13,
                         transition: "all 0.15s ease",

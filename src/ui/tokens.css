@@ -1,26 +1,26 @@
-/* MediGo design tokens — single source of truth for the UI (matches the mockup). */
+/* MediGo Clinical Calm design tokens (Option B) — single source of truth for the UI. */
 :root {
-  --indigo: #131A8F;
-  --indigo-deep: #0A1166;
-  --indigo-soft: #E4E9FF;
-  --ink: #23263B;
-  --slate: #5B6172;
-  --line: #E3E8F4;
+  --indigo: #0D5C63;
+  --indigo-deep: #07393E;
+  --indigo-soft: #E5F3F3;
+  --ink: #1C2830;
+  --slate: #586B75;
+  --line: #E1ECEC;
   --card: #FFFFFF;
-  --wash-a: #F6FAFF;
-  --wash-b: #DDEBFC;
-  --cyan: #5FC6E9;    /* info */
-  --orange: #F08125;  /* attention */
-  --pink: #ED2E7C;    /* promo/highlight */
-  --green: #1C9A4E;   /* success */
-  --danger: #D93A3A;
-  --r-card: 22px;
-  --r-field: 14px;
-  --r-pill: 999px;
-  --shadow-card: 0 10px 30px rgba(19, 26, 143, 0.08);
-  --shadow-pop: 0 18px 50px rgba(10, 17, 102, 0.22);
-  --font-display: "Baloo 2", system-ui, sans-serif;
-  --font-body: "Nunito", system-ui, sans-serif;
+  --wash-a: #F7FBFA;
+  --wash-b: #ECF4F4;
+  --cyan: #0284C7;    /* info */
+  --orange: #B85D19;  /* attention */
+  --pink: #D83B72;    /* promo/highlight */
+  --green: #16794C;   /* success */
+  --danger: #C52222;
+  --r-card: 12px;
+  --r-field: 8px;
+  --r-pill: 8px;
+  --shadow-card: 0 2px 8px rgba(13, 92, 99, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-pop: 0 12px 30px rgba(7, 57, 62, 0.15);
+  --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
 body {
@@ -31,7 +31,7 @@ body {
   min-height: 100vh;
 }
 :focus-visible {
-  outline: 2px solid #6366F1 !important;
+  outline: 2px solid #0D5C63 !important;
   outline-offset: 2px !important;
 }
 input, select, textarea, .input-phone-group, .input-field-group {
@@ -39,20 +39,20 @@ input, select, textarea, .input-phone-group, .input-field-group {
 }
 input:focus, select:focus, textarea:focus {
   outline: none !important;
-  border-color: #6366F1 !important;
-  box-shadow: 0 0 0 1.5px #6366F1 !important;
+  border-color: #0D5C63 !important;
+  box-shadow: 0 0 0 1.5px #0D5C63 !important;
 }
 [data-theme="trusted-clinical"] input:focus,
 [data-theme="trusted-clinical"] select:focus,
 [data-theme="trusted-clinical"] textarea:focus {
   outline: none !important;
-  border-color: #6366F1 !important;
-  box-shadow: 0 0 0 1.5px #6366F1 !important;
+  border-color: #0D5C63 !important;
+  box-shadow: 0 0 0 1.5px #0D5C63 !important;
 }
 .input-phone-group:focus-within,
 .input-field-group:focus-within {
-  border-color: #6366F1 !important;
-  box-shadow: 0 0 0 1.5px #6366F1 !important;
+  border-color: #0D5C63 !important;
+  box-shadow: 0 0 0 1.5px #0D5C63 !important;
 }
 
 @keyframes pulse {

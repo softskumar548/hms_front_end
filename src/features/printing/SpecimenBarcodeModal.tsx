@@ -128,7 +128,7 @@ export default function SpecimenBarcodeModal({
             <Button
               onClick={handlePrint}
               disabled={selectedTubes.length === 0}
-              style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+              style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
             >
               🖨️ Print {selectedTubes.length} Labels Batch
             </Button>
@@ -237,7 +237,7 @@ export default function SpecimenBarcodeModal({
                   </div>
 
                   <div>
-                    <strong style={{ fontSize: 10, color: "#131A8F", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <strong style={{ fontSize: 10, color: "var(--indigo)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {tube.testName}
                     </strong>
                     <div style={{ fontSize: 8.5, color: "#64748B" }}>

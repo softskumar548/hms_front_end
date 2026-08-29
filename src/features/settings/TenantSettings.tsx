@@ -655,10 +655,10 @@ export default function TenantSettings() {
     localStorage.getItem(`brand-name-${tenant}`) || defaultOrgName
   );
   const [brandColor, setBrandColor] = useState(
-    localStorage.getItem(`brand-color-${tenant}`) || "#131A8F"
+    localStorage.getItem(`brand-color-${tenant}`) || "#0D5C63"
   );
   const [accentColor, setAccentColor] = useState(
-    localStorage.getItem(`accent-color-${tenant}`) || "#5FC6E9"
+    localStorage.getItem(`accent-color-${tenant}`) || "#0284C7"
   );
 
   const triggerToast = (msg: string) => {
@@ -2866,7 +2866,7 @@ export default function TenantSettings() {
                       setShowUpgradePlanModal(false);
                       navigate("?tab=account");
                     }}
-                    style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                    style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
                   >
                     View Account Quotas ➔
                   </Button>
@@ -3949,7 +3949,7 @@ export default function TenantSettings() {
                 type="button"
                 onClick={() => setShowOnboardStaffModal(true)}
                 style={{
-                  background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)",
+                  background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
                   color: "#fff",
                   display: "flex",
                   alignItems: "center",
@@ -4463,14 +4463,14 @@ export default function TenantSettings() {
                   style={{
                     background: "#ffffff",
                     borderRadius: 16,
-                    border: "2px solid #0A1166",
+                    border: "2px solid var(--indigo-deep)",
                     overflow: "hidden",
                     boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
                     textAlign: "center",
                   }}
                 >
-                  {/* Top Navy Header */}
-                  <div style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", padding: "14px 16px" }}>
+                  {/* Top Header */}
+                  <div style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", padding: "14px 16px" }}>
                     <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "0.05em" }}>
                       🏥 {brandName.toUpperCase()}
                     </div>
@@ -4549,7 +4549,7 @@ export default function TenantSettings() {
                   <Button
                     type="button"
                     onClick={() => window.print()}
-                    style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                    style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
                   >
                     🖨️ Print ID Card Badge
                   </Button>

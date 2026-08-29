@@ -74,7 +74,7 @@ export default function CalendarView() {
   const selectedPrac = practitioners.find((p) => p.id === currentPracId) || practitioners[0];
   const selectedServ = services.find((s) => s.id === currentServiceId) || services[0];
 
-  const { data: patientsList = [], isLoading } = useQuery({
+  const { data: patientsList = [], isLoading: isPatientsLoading } = useQuery({
     queryKey: ["patients"],
     queryFn: () => api.listPatients(token),
   });
@@ -93,7 +93,7 @@ export default function CalendarView() {
   const [scanning, setScanning] = useState(false);
   const [scannedSlot, setScannedSlot] = useState<string | null>(null);
 
-  const { data: appointments = [], refetch } = useQuery<any[]>({
+  const { data: appointments = [], isLoading: isApptsLoading, refetch } = useQuery<any[]>({
     queryKey: ["appointments"],
     queryFn: () => api.listAppointments(token),
   });
@@ -112,12 +112,30 @@ export default function CalendarView() {
     setBookingOpen(true);
   };
 
-  // Calendar times slots definitions
+  // Calendar times slots definitions - full day OPD schedule
   const slots = [
+    { label: "08:00 AM", time: "08:00:00" },
+    { label: "08:30 AM", time: "08:30:00" },
+    { label: "09:00 AM", time: "09:00:00" },
+    { label: "09:30 AM", time: "09:30:00" },
+    { label: "10:00 AM", time: "10:00:00" },
+    { label: "10:30 AM", time: "10:30:00" },
     { label: "11:00 AM", time: "11:00:00" },
     { label: "11:30 AM", time: "11:30:00" },
+    { label: "12:00 PM", time: "12:00:00" },
+    { label: "12:30 PM", time: "12:30:00" },
+    { label: "02:00 PM", time: "14:00:00" },
+    { label: "02:30 PM", time: "14:30:00" },
     { label: "03:00 PM", time: "15:00:00" },
+    { label: "03:30 PM", time: "15:30:00" },
+    { label: "04:00 PM", time: "16:00:00" },
+    { label: "04:30 PM", time: "16:30:00" },
     { label: "05:00 PM", time: "17:00:00" },
+    { label: "05:30 PM", time: "17:30:00" },
+    { label: "06:00 PM", time: "18:00:00" },
+    { label: "06:30 PM", time: "18:30:00" },
+    { label: "07:00 PM", time: "19:00:00" },
+    { label: "07:30 PM", time: "19:30:00" },
   ];
 
   return (
@@ -210,7 +228,7 @@ export default function CalendarView() {
             </div>
           </div>
 
-          {isLoading ? (
+          {isApptsLoading ? (
             <div style={{ display: "grid", gap: 10 }}>
               <Skeleton height={50} />
               <Skeleton height={50} />

@@ -124,22 +124,24 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 
 ---
 
-# PART 2 — THEME & DESIGN TOKENS (MediGo)
+# PART 2 — THEME & DESIGN TOKENS (Clinical Calm — Option B)
 
 Defined once in `src/ui/tokens.css`. **Never hardcode hex values in components.**
-- `--indigo` (#131A8F): Primary brand color, field values, active nav.
-- `--indigo-deep` (#0A1166): Dark buttons, toasts, active states.
-- `--indigo-soft` (#E4E9FF): Selected row fills, active sidebar item backgrounds.
-- `--ink` (#23263B): Body headings and text.
-- `--slate` (#5B6172): Secondary text, labels, captions.
-- `--line` (#E3E8F4): Hairline borders and dividers.
+- `--indigo` (#0D5C63): Deep Clinical Teal (primary brand color, field values, active nav, primary actions).
+- `--indigo-deep` (#07393E): Dark Forest Teal (dark buttons, toasts, active states).
+- `--indigo-soft` (#E5F3F3): Soft mint/teal tint (selected row fills, active sidebar item backgrounds).
+- `--ink` (#1C2830): Slate-Charcoal (body headings and text).
+- `--slate` (#586B75): Secondary text, labels, captions.
+- `--line` (#E1ECEC): Hairline borders and dividers.
 - `--card` (#FFFFFF): Floating cards.
-- `--wash-a` (#F6FAFF) / `--wash-b` (#DDEBFC): Sky wash background gradient.
-- Semantics: Info (`--cyan` #5FC6E9), Attention (`--orange` #F08125), Success (`--green` #1C9A4E), Danger (`--danger` #D93A3A).
-- Minimalist Focus: Non-intrusive 1px focus borders (`#6366F1`) replacing heavy glow rings.
+- `--wash-a` (#F7FBFA) / `--wash-b` (#ECF4F4): Calming, low-saturation clinical background wash.
+- Semantics: Info (`--cyan` #0284C7), Attention / Blocked (`--orange` #B85D19), Success / Passed (`--green` #16794C), Danger (`--danger` #C52222).
+- Minimalist Focus: Non-intrusive 1.5px focus borders (`#0D5C63`) replacing heavy glow rings.
+- Typography: Display & Body set to `"Plus Jakarta Sans", system-ui, sans-serif` for clean, professional minimalism.
+- Softened Radii: Cards (`12px`), Fields (`8px`), Pills/Buttons (`8px`–`10px`).
 
 ### Signature UI Patterns
-1. **FieldCell Grid**: Airline-booking inspired cell grid (tiny slate label above, bold Baloo-2 value below).
+1. **FieldCell Grid**: Airline-booking inspired cell grid (tiny slate label above, bold Plus Jakarta Sans teal value below).
 2. **Persistent Allergy Banner**: Constant orange warning banner on all clinical patient screens (`EMR-005`).
 3. **MediPass**: Boarding pass-style confirmation stub for appointments and lab orders.
 4. **i18n Readiness**: English + Telugu language support; all user-facing strings keyed.

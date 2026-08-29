@@ -199,7 +199,7 @@ export default function WardTransferModal({
           <Button
             type="submit"
             disabled={availableBeds.length === 0}
-            style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
           >
             🔀 Confirm Ward & Bed Shift
           </Button>

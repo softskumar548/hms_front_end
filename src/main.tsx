@@ -253,15 +253,15 @@ function Shell({ children }: { children: React.ReactNode }) {
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                background: "var(--indigo, #131A8F)",
+                background: "var(--indigo)",
                 color: "#ffffff",
-                border: "2px solid var(--indigo-soft, #E4E9FF)",
+                border: "2px solid var(--indigo-soft)",
                 display: "grid",
                 placeItems: "center",
                 fontWeight: 800,
                 fontSize: 15,
                 cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(19, 26, 143, 0.25)",
+                boxShadow: "0 2px 8px rgba(13, 92, 99, 0.25)",
               }}
               title="User Profile & Settings"
             >
@@ -275,9 +275,9 @@ function Shell({ children }: { children: React.ReactNode }) {
                   top: "calc(100% + 10px)",
                   right: 0,
                   background: "#ffffff",
-                  borderRadius: "var(--r-card, 16px)",
+                  borderRadius: "var(--r-card)",
                   boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                  border: "1px solid var(--line, #E2E8F0)",
+                  border: "1px solid var(--line)",
                   width: 270,
                   padding: 16,
                   zIndex: 99999,
@@ -286,8 +286,8 @@ function Shell({ children }: { children: React.ReactNode }) {
                 }}
               >
                 {/* User Info Header */}
-                <div style={{ borderBottom: "1px solid var(--line, #E2E8F0)", paddingBottom: 10 }}>
-                  <strong style={{ fontSize: 14.5, color: "var(--indigo, #131A8F)", display: "block" }}>
+                <div style={{ borderBottom: "1px solid var(--line)", paddingBottom: 10 }}>
+                  <strong style={{ fontSize: 14.5, color: "var(--indigo)", display: "block" }}>
                     {role === "admin" ? "DR K R MURALI (Dean)" : `${role?.toUpperCase()} USER`}
                   </strong>
                   <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
@@ -498,15 +498,15 @@ function Login() {
 
   return (
     <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "linear-gradient(135deg, var(--wash-a) 0%, var(--wash-b) 100%)", padding: 20 }}>
-      <Card style={{ width: "100%", maxWidth: 420, padding: 36, position: "relative", boxShadow: "var(--shadow-card)", borderRadius: 22 }}>
+      <Card style={{ width: "100%", maxWidth: 420, padding: 36, position: "relative", boxShadow: "var(--shadow-card)", borderRadius: "var(--r-card, 12px)" }}>
         {/* Top Header: Language Switcher & MediGo Logo */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24 }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <div style={{ background: "var(--indigo)", color: "#FFF", borderRadius: 10, padding: "6px 12px", fontWeight: 800, fontSize: 16, fontFamily: "var(--font-display, 'Baloo 2', sans-serif)" }}>
+              <div style={{ background: "var(--indigo)", color: "#FFF", borderRadius: 8, padding: "6px 12px", fontWeight: 800, fontSize: 16, fontFamily: "var(--font-display)" }}>
                 MediGo
               </div>
-              <span style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", fontSize: 24, fontWeight: 700, color: "var(--indigo)" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 700, color: "var(--indigo)" }}>
                 MediGo HMS
               </span>
             </div>
@@ -1173,7 +1173,7 @@ function EMRStub() {
                           <Button
                             type="button"
                             style={{
-                              background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)",
+                              background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
                               color: "#fff",
                               fontSize: 12,
                               padding: "6px 14px",
@@ -1422,7 +1422,7 @@ function App() {
           } />
 
           <Route path="/settings" element={
-            <RequireRole roles={["admin"]}>
+            <RequireRole roles={["admin", "operator"]}>
               <TenantSettings />
             </RequireRole>
           } />

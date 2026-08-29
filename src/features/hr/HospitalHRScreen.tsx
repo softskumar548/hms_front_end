@@ -544,7 +544,7 @@ export default function HospitalHRScreen() {
                     setIsPayrollLocked(true);
                     triggerToast(`Payroll batch for ${selectedMonth} locked and approved for bank payout.`);
                   }}
-                  style={{ background: isPayrollLocked ? "#16A34A" : "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                  style={{ background: isPayrollLocked ? "#16A34A" : "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
                 >
                   {isPayrollLocked ? "🔒 Payroll Batch Locked" : "🔒 Finalize & Lock Monthly Batch"}
                 </Button>
@@ -905,7 +905,7 @@ export default function HospitalHRScreen() {
                         setSelectedStaffForPaySlip(s);
                         setPaySlipModalOpen(true);
                       }}
-                      style={{ width: "100%", background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 12.5 }}
+                      style={{ width: "100%", background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
                     >
                       🖨️ View & Print Official Pay Slip
                     </Button>

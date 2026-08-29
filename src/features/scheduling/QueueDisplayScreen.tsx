@@ -332,12 +332,12 @@ export function QueueDisplayScreen() {
             style={{
               width: 48,
               height: 48,
-              borderRadius: 12,
-              background: "linear-gradient(135deg, #00BCD4 0%, #131A8F 100%)",
+              borderRadius: "var(--r-card, 12px)",
+              background: "linear-gradient(135deg, var(--cyan) 0%, var(--indigo) 100%)",
               display: "grid",
               placeItems: "center",
               fontSize: 26,
-              boxShadow: "0 4px 12px rgba(0, 188, 212, 0.35)",
+              boxShadow: "var(--shadow-card)",
             }}
           >
             🏥
@@ -347,15 +347,15 @@ export function QueueDisplayScreen() {
               style={{
                 margin: 0,
                 fontSize: 24,
-                fontWeight: 900,
+                fontWeight: 800,
                 letterSpacing: "0.03em",
-                color: isDark ? "#38BDF8" : "#131A8F",
+                color: isDark ? "#38BDF8" : "var(--indigo)",
                 textTransform: "uppercase",
               }}
             >
               {tenant ? `${tenant.replace("_", " ")} HOSPITAL` : "ZEN CLINIC"}
             </h1>
-            <span style={{ fontSize: 13, color: isDark ? "#94A3B8" : "#64748B", fontWeight: 600 }}>
+            <span style={{ fontSize: 13, color: isDark ? "#94A3B8" : "var(--slate)", fontWeight: 600 }}>
               OUTPATIENT WAITING LOUNGE & TOKEN CALLING DISPLAY
             </span>
           </div>
@@ -445,15 +445,15 @@ export function QueueDisplayScreen() {
               title="Open Token Call Console"
               onClick={() => setShowControlDrawer(!showControlDrawer)}
               style={{
-                background: "linear-gradient(135deg, #0284C7 0%, #131A8F 100%)",
+                background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
                 border: "none",
                 color: "#FFFFFF",
-                borderRadius: 8,
+                borderRadius: "var(--r-field)",
                 padding: "8px 14px",
                 cursor: "pointer",
                 fontSize: 14,
                 fontWeight: 800,
-                boxShadow: "0 2px 8px rgba(2, 132, 199, 0.4)",
+                boxShadow: "var(--shadow-card)",
               }}
             >
               ⚙️ Call Console
@@ -515,8 +515,8 @@ export function QueueDisplayScreen() {
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <div
                     style={{
-                      background: isDark ? "#1E293B" : "#F1F5F9",
-                      color: isDark ? "#38BDF8" : "#131A8F",
+                      background: isDark ? "#1E293B" : "var(--indigo-soft)",
+                      color: isDark ? "#38BDF8" : "var(--indigo)",
                       padding: "6px 14px",
                       borderRadius: 12,
                       fontSize: 16,
@@ -526,7 +526,7 @@ export function QueueDisplayScreen() {
                   >
                     📍 {ch.chamberName.toUpperCase()}
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: isDark ? "#94A3B8" : "#64748B" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: isDark ? "#94A3B8" : "var(--slate)" }}>
                     {ch.specialty}
                   </span>
                 </div>
@@ -541,14 +541,14 @@ export function QueueDisplayScreen() {
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                     background: isCalling
-                      ? "#38BDF8"
+                      ? "var(--cyan)"
                       : isInConsult
-                      ? "#F59E0B"
+                      ? "var(--orange)"
                       : isAvailable
-                      ? "#10B981"
-                      : "#6B7280",
+                      ? "var(--green)"
+                      : "var(--slate)",
                     color: isCalling ? "#0F172A" : "#FFFFFF",
-                    boxShadow: isCalling ? "0 0 12px #38BDF8" : "none",
+                    boxShadow: isCalling ? "0 0 12px var(--cyan)" : "none",
                   }}
                 >
                   {isCalling ? "🔔 CALLING NOW" : isInConsult ? "🩺 IN CONSULT" : isAvailable ? "🟢 AVAILABLE" : "☕ ON BREAK"}
@@ -557,7 +557,7 @@ export function QueueDisplayScreen() {
 
               {/* Doctor Details */}
               <div style={{ marginBottom: 16 }}>
-                <strong style={{ fontSize: 16, color: isDark ? "#F8FAFC" : "#0F172A", display: "block" }}>
+                <strong style={{ fontSize: 16, color: isDark ? "#F8FAFC" : "var(--ink)", display: "block" }}>
                   {ch.doctorName}
                 </strong>
               </div>
@@ -565,15 +565,15 @@ export function QueueDisplayScreen() {
               {/* Big Impact Current Token Calling Box */}
               <div
                 style={{
-                  background: isDark ? "rgba(0, 0, 0, 0.4)" : "var(--wash-a, #F8FAFC)",
+                  background: isDark ? "rgba(0, 0, 0, 0.4)" : "var(--wash-a)",
                   borderRadius: 16,
-                  border: isCalling ? "2px dashed #38BDF8" : "1px solid " + (isDark ? "#374151" : "#CBD5E1"),
+                  border: isCalling ? "2px dashed var(--cyan)" : "1px solid " + (isDark ? "#374151" : "var(--line)"),
                   padding: "16px 20px",
                   textAlign: "center",
                   marginBottom: 16,
                 }}
               >
-                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", color: isDark ? "#94A3B8" : "#64748B", textTransform: "uppercase", display: "block" }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", color: isDark ? "#94A3B8" : "var(--slate)", textTransform: "uppercase", display: "block" }}>
                   {isCalling ? "PROCEED TO CHAMBER" : "CURRENTLY CONSULTING"}
                 </span>
 
@@ -581,13 +581,13 @@ export function QueueDisplayScreen() {
                   style={{
                     fontSize: 52,
                     fontWeight: 900,
-                    fontFamily: "'Baloo 2', Impact, sans-serif",
+                    fontFamily: "var(--font-display)",
                     color: isCalling
-                      ? "#38BDF8"
+                      ? "var(--cyan)"
                       : isInConsult
                       ? isDark
                         ? "#F8FAFC"
-                        : "#131A8F"
+                        : "var(--indigo)"
                       : "#9CA3AF",
                     letterSpacing: "0.04em",
                     margin: "4px 0",
@@ -647,8 +647,8 @@ export function QueueDisplayScreen() {
       {/* 3. MARQUEE ANNOUNCEMENT FOOTER TICKER */}
       <footer
         style={{
-          background: isDark ? "#070B14" : "#131A8F",
-          borderTop: isDark ? "2px solid #1E3A8A" : "2px solid #0A1166",
+          background: isDark ? "#070B14" : "var(--indigo-deep)",
+          borderTop: isDark ? "2px solid #1E3A8A" : "2px solid var(--indigo)",
           padding: "12px 24px",
           color: "#FFFFFF",
           display: "flex",
@@ -660,7 +660,7 @@ export function QueueDisplayScreen() {
       >
         <div
           style={{
-            background: "#00BCD4",
+            background: "var(--cyan)",
             color: "#0F172A",
             padding: "4px 14px",
             borderRadius: 8,
@@ -713,7 +713,7 @@ export function QueueDisplayScreen() {
             width: 440,
             background: isDark ? "#1E293B" : "#FFFFFF",
             borderRadius: 20,
-            border: isDark ? "2px solid #38BDF8" : "2px solid #131A8F",
+            border: isDark ? "2px solid #38BDF8" : "2px solid var(--indigo)",
             boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
             padding: "20px 24px",
             zIndex: 9999,
@@ -721,7 +721,7 @@ export function QueueDisplayScreen() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: isDark ? "#38BDF8" : "#131A8F" }}>
+            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: isDark ? "#38BDF8" : "var(--indigo)" }}>
               📢 Token Calling Station Console
             </h3>
             <button

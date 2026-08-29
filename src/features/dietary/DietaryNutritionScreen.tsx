@@ -268,7 +268,7 @@ export default function DietaryNutritionScreen() {
           <Button
             type="button"
             onClick={() => setPrescribeModalOpen(true)}
-            style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontWeight: 800, fontSize: 13, padding: "9px 18px" }}
+            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontWeight: 800, fontSize: 13, padding: "9px 18px" }}
           >
             📝 Prescribe Therapeutic Diet
           </Button>

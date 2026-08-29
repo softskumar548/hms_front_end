@@ -62,7 +62,7 @@ export default function MealTrayLabelModal({
                 <span style={{ fontSize: 9.5, color: "#333" }}>{diet.patientUhid}</span>
               </div>
               <div style={{ textAlign: "right" }}>
-                <strong style={{ fontSize: 12, color: "#131A8F" }}>{diet.bedLocation.split("(")[0]}</strong>
+                <strong style={{ fontSize: 12, color: "var(--indigo)" }}>{diet.bedLocation.split("(")[0]}</strong>
                 <span style={{ fontSize: 9, color: "#555", display: "block" }}>{diet.bedLocation.split("(")[1]?.replace(")", "")}</span>
               </div>
             </div>
@@ -132,7 +132,7 @@ export default function MealTrayLabelModal({
           <Button
             type="button"
             onClick={handlePrint}
-            style={{ background: "#131A8F", color: "#fff", fontWeight: 800 }}
+            style={{ background: "var(--indigo)", color: "#fff", fontWeight: 800 }}
           >
             🖨️ Print 50×25mm Thermal Label
           </Button>

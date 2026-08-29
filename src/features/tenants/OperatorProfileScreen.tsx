@@ -79,31 +79,31 @@ export const OperatorProfileScreen: React.FC<{ token: string | null }> = () => {
       {/* Header Banner */}
       <div
         style={{
-          background: "linear-gradient(135deg, var(--indigo-deep, #0A1166) 0%, var(--indigo, #131A8F) 100%)",
+          background: "linear-gradient(135deg, var(--indigo-deep) 0%, var(--indigo) 100%)",
           color: "#FFF",
-          borderRadius: 22,
+          borderRadius: "var(--r-card, 12px)",
           padding: "24px 28px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "var(--shadow-pop, 0 10px 30px rgba(19, 26, 143, 0.15))",
+          boxShadow: "var(--shadow-card)",
           flexWrap: "wrap",
           gap: 16,
         }}
       >
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <span style={{ background: "var(--cyan, #5FC6E9)", color: "#04364A", borderRadius: 999, padding: "4px 14px", fontWeight: 800, fontSize: 12 }}>
+            <span style={{ background: "var(--cyan)", color: "#04364A", borderRadius: 999, padding: "4px 14px", fontWeight: 800, fontSize: 12 }}>
               PLATFORM OPERATOR CONSOLE
             </span>
             <span style={{ background: "rgba(255,255,255,0.18)", color: "#FFF", borderRadius: 999, padding: "4px 14px", fontWeight: 700, fontSize: 12 }}>
               🛡️ PHI-Free Session
             </span>
           </div>
-          <h1 style={{ fontFamily: "var(--font-display, 'Baloo 2', sans-serif)", margin: 0, fontSize: 28, fontWeight: 700 }}>
+          <h1 style={{ fontFamily: "var(--font-display)", margin: 0, fontSize: 26, fontWeight: 700 }}>
             Operator Profile & Security Management
           </h1>
-          <p style={{ margin: "4px 0 0", color: "var(--indigo-soft, #E4E9FF)", fontSize: 14 }}>
+          <p style={{ margin: "4px 0 0", color: "var(--indigo-soft)", fontSize: 13.5, opacity: 0.9 }}>
             Platform operator credentials, Keycloak authentication, and active session controls
           </p>
         </div>
@@ -111,10 +111,10 @@ export const OperatorProfileScreen: React.FC<{ token: string | null }> = () => {
         <button
           onClick={() => navigate("/operator/dashboard")}
           style={{
-            background: "var(--indigo-soft, #E4E9FF)",
-            color: "var(--indigo, #131A8F)",
+            background: "var(--indigo-soft)",
+            color: "var(--indigo)",
             border: "none",
-            borderRadius: 999,
+            borderRadius: "var(--r-pill)",
             padding: "10px 22px",
             fontWeight: 800,
             cursor: "pointer",
@@ -126,18 +126,18 @@ export const OperatorProfileScreen: React.FC<{ token: string | null }> = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div style={{ display: "flex", gap: 12, borderBottom: "2px solid var(--line, #E2E8F0)", paddingBottom: 2 }}>
+      <div style={{ display: "flex", gap: 12, borderBottom: "2px solid var(--line)", paddingBottom: 2 }}>
         <button
           type="button"
           onClick={() => navigate("/operator/profile?tab=profile")}
           style={{
             background: "none",
             border: "none",
-            borderBottom: activeTab === "profile" ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+            borderBottom: activeTab === "profile" ? "3px solid var(--indigo)" : "3px solid transparent",
             padding: "10px 20px",
             fontSize: 15,
             fontWeight: activeTab === "profile" ? 800 : 600,
-            color: activeTab === "profile" ? "var(--indigo, #131A8F)" : "var(--slate, #5B6172)",
+            color: activeTab === "profile" ? "var(--indigo)" : "var(--slate)",
             cursor: "pointer",
             marginBottom: -2,
             transition: "all 0.15s ease",
@@ -155,11 +155,11 @@ export const OperatorProfileScreen: React.FC<{ token: string | null }> = () => {
           style={{
             background: "none",
             border: "none",
-            borderBottom: activeTab === "security" ? "3px solid var(--indigo, #131A8F)" : "3px solid transparent",
+            borderBottom: activeTab === "security" ? "3px solid var(--indigo)" : "3px solid transparent",
             padding: "10px 20px",
             fontSize: 15,
             fontWeight: activeTab === "security" ? 800 : 600,
-            color: activeTab === "security" ? "var(--indigo, #131A8F)" : "var(--slate, #5B6172)",
+            color: activeTab === "security" ? "var(--indigo)" : "var(--slate)",
             cursor: "pointer",
             marginBottom: -2,
             transition: "all 0.15s ease",

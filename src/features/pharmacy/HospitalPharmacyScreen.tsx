@@ -554,7 +554,7 @@ export default function HospitalPharmacyScreen() {
                         setSelectedRxForDispense(rx);
                         setDispenseModalOpen(true);
                       }}
-                      style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 12.5, padding: "8px 18px" }}
+                      style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5, padding: "8px 18px" }}
                     >
                       💊 Dispense & Bill Prescription (FEFO)
                     </Button>

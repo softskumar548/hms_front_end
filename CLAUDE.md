@@ -10,12 +10,12 @@ Launch market: **Andhra Pradesh, India**. Product host: `hms.zensynq.com`.
 
 ---
 
-# PART 1 — THEME & VISUAL LANGUAGE (the MediGo design system)
+# PART 1 — THEME & VISUAL LANGUAGE (Clinical Calm — Option B)
 
-The look is derived from IndiGo airlines' design language, adapted for healthcare:
-**deep indigo on a soft sky wash, rounded friendly type, pill-shaped controls,
-white floating cards, four candy accents used only for meaning.** Warm but
-clinical: legibility always beats decoration.
+The visual direction is **Clinical Calm**:
+**deep clinical teal on a soft clinical wash, crisp Plus Jakarta Sans typography, softened rounded controls,
+white floating cards, semantic accents used strictly for meaning.** Minimalist, elegant, and enterprise-grade:
+legibility and professionalism always beat decoration.
 
 ## 1.1 Color — tokens and exact usage
 
@@ -24,69 +24,62 @@ screen.** If a color isn't listed here, it doesn't exist in this product.
 
 | Token | Hex | Use for | Never for |
 |---|---|---|---|
-| `--indigo` | #131A8F | Primary actions, active nav/tabs, field values, links, key figures | Large text blocks, backgrounds of content areas |
-| `--indigo-deep` | #0A1166 | Hover/pressed primary, toasts, dark panels | Body text |
-| `--indigo-soft` | #E4E9FF | Selected chip/row fills, brand badges | Text |
-| `--ink` | #23263B | Headings and body text on light | Buttons |
-| `--slate` | #5B6172 | Secondary text, labels, captions, placeholders | Primary content |
-| `--line` | #E3E8F4 | Hairline borders, dividers | Text |
+| `--indigo` | #0D5C63 | Primary actions, active nav/tabs, field values, links, key figures | Large text blocks, backgrounds of content areas |
+| `--indigo-deep` | #07393E | Hover/pressed primary, toasts, dark panels | Body text |
+| `--indigo-soft` | #E5F3F3 | Selected chip/row fills, brand badges | Text |
+| `--ink` | #1C2830 | Headings and body text on light | Buttons |
+| `--slate` | #586B75 | Secondary text, labels, captions, placeholders | Primary content |
+| `--line` | #E1ECEC | Hairline borders, dividers | Text |
 | `--card` | #FFFFFF | All card/panel surfaces | — |
-| `--wash-a → --wash-b` | #F6FAFF → #DDEBFC | Page background gradient only | Inside cards |
-| `--cyan` | #5FC6E9 | **Info** status (Arrived, informational badges) | Decoration |
-| `--orange` | #F08125 | **Attention** (In consult, warnings, allergy banner) | Decoration |
-| `--pink` | #ED2E7C | **Promo/highlight** (offers, VIP) — rare in clinical screens | Errors |
-| `--green` | #1C9A4E | **Success** (Done, confirmed, savings) | Decoration |
-| `--danger` | #D93A3A | Errors, destructive actions, hard-stop blocked states | Anything non-error |
+| `--wash-a → --wash-b` | #F7FBFA → #ECF4F4 | Page background gradient only | Inside cards |
+| `--cyan` | #0284C7 | **Info** status (Arrived, informational badges) | Decoration |
+| `--orange` | #B85D19 | **Attention / Blocked** (In consult, warnings, allergy banner) | Decoration |
+| `--pink` | #D83B72 | **Promo/highlight** (offers, VIP) | Errors |
+| `--green` | #16794C | **Success / Passed** (Done, confirmed, sites configured) | Decoration |
+| `--danger` | #C52222 | Errors, destructive actions, hard-stop blocked states | Anything non-error |
 
-Accent rule: the four accents are **semantic, never decorative**. If you can't
+Accent rule: the accents are **semantic, never decorative**. If you can't
 name the meaning (info/attention/promo/success), don't use the color. Tinted
 badge fills pair each accent with its light background (see `StatusPill`):
-info #E1F4FB/#1585AC · warn #FDEBDA/#C4620F · success #E3F5EA/#1C9A4E ·
-danger #FBE3E3/#B22B2B · brand `--indigo-soft`/`--indigo`.
+info #E0F2FE/#0284C7 · warn #FCEFE6/#B85D19 · success #E4F6EB/#16794C ·
+danger #FDE8E8/#C52222 · brand `--indigo-soft`/`--indigo`.
 
 Contrast: all text meets WCAG 2.2 AA (≥4.5:1 normal, ≥3:1 large). White text is
 allowed on `--indigo`, `--indigo-deep`, `--green`, `--pink`, `--orange`,
-`--danger` — not on `--cyan` (use #04364A ink on cyan).
+`--danger`.
 
 ## 1.2 Typography
 
-Two families, loaded in `index.html`:
+Primary family loaded in `index.html`:
 
-- **`--font-display` = 'Baloo 2'** (weights 500–700): the brand voice. Headings,
-  field values, big numbers, MediPass. Rounded and optimistic.
-- **`--font-body` = 'Nunito'** (400/600/700/800): everything else — body, labels,
-  buttons, table text. Quiet and highly readable at small sizes.
+- **`--font-display` & `--font-body` = 'Plus Jakarta Sans'** (weights 400, 500, 600, 700, 800): Clean, modern, highly legible clinical typography.
 
 Scale (px / weight / family):
-- Display (page hero): 30–42 / 700 / Baloo 2, line-height 1.15
-- H2 (section): 20–26 / 700 / Baloo 2
-- **Field value** (the signature): 19 / 600 / Baloo 2, color `--indigo`
-- Body: 14.5–15 / 400–600 / Nunito, line-height 1.5–1.6
-- Label/caption: 11.5–12 / 700 / Nunito, color `--slate`
-- Button: 13.5–15 / 800 / Nunito
-- Badge/pill: 12 / 800 / Nunito
-
-Rules: no font sizes outside the scale; numbers in clinical/financial data may
-use tabular alignment; never use Baloo 2 below 16px (it loses legibility).
+- Display (page hero): 28–32 / 700 / Plus Jakarta Sans, line-height 1.15
+- H2 (section): 20–24 / 700 / Plus Jakarta Sans
+- **Field value** (the signature): 18 / 600 / Plus Jakarta Sans, color `--indigo`
+- Body: 14–14.5 / 400–600 / Plus Jakarta Sans, line-height 1.5–1.6
+- Label/caption: 11.5–12 / 700 / Plus Jakarta Sans, color `--slate`
+- Button: 13.5–15 / 700–800 / Plus Jakarta Sans
+- Badge/pill: 12 / 700–800 / Plus Jakarta Sans
 
 ## 1.3 Shape, elevation, spacing, motion
 
-- Radii: cards **22px** (`--r-card`), inputs/fields **14px** (`--r-field`),
-  every button/chip/badge is a **pill** (`--r-pill: 999px`). No other radii.
-- Shadows are **indigo-tinted, never gray**: resting `--shadow-card`
-  (0 10px 30px rgba(19,26,143,.08)); floating (modals, drawers, MediPass)
-  `--shadow-pop` (0 18px 50px rgba(10,17,102,.22)). No other shadows.
+- Radii: cards **12px** (`--r-card`), inputs/fields **8px** (`--r-field`),
+  buttons/chips/badges **8px–10px** (`--r-pill`).
+- Shadows: resting `--shadow-card`
+  (0 2px 8px rgba(13,92,99,.05), 0 1px 2px rgba(0,0,0,.03)); floating (modals, drawers)
+  `--shadow-pop` (0 12px 30px rgba(7,57,62,.15)).
 - Spacing: 4px base grid; common steps 8/12/16/20/24; card padding 20px;
   page max-width 1080–1120px centered, 20px side padding.
 - Motion: subtle and fast — 150–250ms ease; hover = slight lift
-  (translateY(-1..-3px)) or fill change; drawers slide, modals fade+scale.
-  Always honor `prefers-reduced-motion` (already in tokens.css). No bouncing,
-  no attention-seeking animation in clinical screens.
+  (translateY(-1..-2px)) or fill change; drawers slide, modals fade+scale.
+  Always honor `prefers-reduced-motion` (already in tokens.css).
 
 ## 1.4 Signature patterns (what makes this product recognizable)
 
-1. **Field-grid cell** (`FieldCell`): airline-booking style — tiny slate label
-   on top, bold indigo Baloo-2 value below, optional sub-caption; cells sit in a
+1. **Field-grid cell** (`FieldCell`): Clean grid — tiny slate label
+   on top, bold clinical teal Plus Jakarta Sans value below, optional sub-caption; cells sit in a
    hairline-bordered grid. Use for all "chosen values" (specialty, date, doctor,
    payer). This is the product's visual signature — use it, don't reinvent it.
 2. **Pill controls everywhere**: actions, chips, filters, statuses. If it's

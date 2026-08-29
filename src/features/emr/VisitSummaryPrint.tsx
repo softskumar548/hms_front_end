@@ -64,7 +64,7 @@ export default function VisitSummaryPrint() {
           <Button ghost onClick={() => navigate(-1)}>← Back</Button>
           <Button
             onClick={handlePrint}
-            style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
           >
             🖨️ Print Prescription (A4)
           </Button>

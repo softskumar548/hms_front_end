@@ -626,7 +626,7 @@ export default function EncounterNote() {
                   data-testid="note-signoff"
                   disabled={signOffMutation.isPending}
                   onClick={handleSignOff}
-                  style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+                  style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
                 >
                   {signOffMutation.isPending ? "Finalizing Note..." : "🖋️ Sign-off Encounter & Lock"}
                 </Button>

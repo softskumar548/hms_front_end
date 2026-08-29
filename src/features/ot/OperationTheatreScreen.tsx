@@ -329,7 +329,7 @@ export default function OperationTheatreScreen() {
           <Button
             type="button"
             onClick={() => setBookingModalOpen(true)}
-            style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontWeight: 800, fontSize: 13, padding: "9px 18px" }}
+            style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontWeight: 800, fontSize: 13, padding: "9px 18px" }}
           >
             📅 Schedule Surgical Case
           </Button>
@@ -422,7 +422,7 @@ export default function OperationTheatreScreen() {
                         setWhoModalOpen(true);
                       }}
                       style={{
-                        background: surg.whoChecklistDone ? "#16A34A" : "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)",
+                        background: surg.whoChecklistDone ? "#16A34A" : "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)",
                         color: "#fff",
                         fontSize: 11.5,
                         padding: "7px 10px",

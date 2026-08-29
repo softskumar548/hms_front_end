@@ -160,7 +160,7 @@ export default function PrintStationScreen() {
             <Button
               type="button"
               onClick={() => setWristbandModalOpen(true)}
-              style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+              style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
             >
               🖨️ Open Thermal Wristband Printer
             </Button>
@@ -220,7 +220,7 @@ export default function PrintStationScreen() {
             <Button
               type="button"
               onClick={() => setSpecimenModalOpen(true)}
-              style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+              style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
             >
               🧪 Print Specimen Tube Batch
             </Button>

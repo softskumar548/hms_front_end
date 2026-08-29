@@ -72,7 +72,7 @@ export default function PillBottleLabelPrintModal({
             <Button ghost onClick={onClose}>Close</Button>
             <Button
               onClick={handlePrint}
-              style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff" }}
+              style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff" }}
             >
               🖨️ Print Label (50×25mm)
             </Button>
@@ -114,7 +114,7 @@ export default function PillBottleLabelPrintModal({
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <strong style={{ fontSize: 10, color: "#131A8F", textTransform: "uppercase" }}>
+                  <strong style={{ fontSize: 10, color: "var(--indigo)", textTransform: "uppercase" }}>
                     {facilityTitle}
                   </strong>
                   <span style={{ fontSize: 9, fontWeight: 700, color: "#64748B" }}>

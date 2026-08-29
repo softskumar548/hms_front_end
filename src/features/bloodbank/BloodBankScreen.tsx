@@ -448,7 +448,7 @@ export default function BloodBankScreen() {
                             setSelectedRequisition(req);
                             setCrossMatchModalOpen(true);
                           }}
-                          style={{ background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 11.5, padding: "6px 12px" }}
+                          style={{ background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 11.5, padding: "6px 12px" }}
                         >
                           🧪 Perform Cross-Match
                         </Button>

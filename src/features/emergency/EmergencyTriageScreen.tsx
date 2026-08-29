@@ -506,7 +506,7 @@ export default function EmergencyTriageScreen() {
               <Button
                 type="button"
                 onClick={() => triggerToast("Bedside FAST Ultrasound team paged to Trauma Resuscitation Bay.")}
-                style={{ width: "100%", background: "linear-gradient(135deg, #131A8F 0%, #0A1166 100%)", color: "#fff", fontSize: 12.5 }}
+                style={{ width: "100%", background: "linear-gradient(135deg, var(--indigo) 0%, var(--indigo-deep) 100%)", color: "#fff", fontSize: 12.5 }}
               >
                 Page FAST Ultrasound Team
               </Button>
