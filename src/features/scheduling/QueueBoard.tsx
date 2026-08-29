@@ -7,7 +7,7 @@ import { Card, Button, StatusPill, Select, Skeleton, Toast } from "../../ui/comp
 import CheckInDrawer from "./CheckInDrawer";
 
 export default function QueueBoard() {
-  const { token, role } = useAuth();
+  const { token, tenant, role } = useAuth();
   const qc = useQueryClient();
 
   const [selectedRoom, setSelectedRoom] = useState("");
@@ -22,6 +22,42 @@ export default function QueueBoard() {
     setToastMessage(msg);
     setToastVisible(true);
   };
+
+  // Fetch configured rooms dynamically from backend
+  const { data: dbRooms = [] } = useQuery({
+    queryKey: ["rooms", tenant],
+    queryFn: () => (token ? api.listRooms(token) : Promise.resolve([])),
+  });
+
+  // Read master config rooms and staff chambers
+  const configData = (() => {
+    try {
+      const saved = localStorage.getItem(`hms-config-data-${tenant || "default"}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  })();
+  const masterRooms: any[] = configData["room_type"] || [];
+
+  const staffList: any[] = (() => {
+    try {
+      const saved = localStorage.getItem(`hms-staff-roster-${tenant || "default"}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  })();
+  const staffChambers = staffList
+    .filter((s) => s.chamberRoom && s.chamberRoom.trim() && s.chamberRoom !== "General Counter")
+    .map((s) => ({ id: s.chamberRoom, name: `${s.chamberRoom} (${s.name})` }));
+
+  // Combined unique list of consultation rooms
+  const combinedRooms = [
+    ...dbRooms.map((r: any) => ({ id: r.id, name: r.name })),
+    ...masterRooms.map((r: any) => ({ id: r.id || r.name, name: r.name })),
+    ...staffChambers,
+  ].filter((v, idx, arr) => arr.findIndex((t) => t.id === v.id || t.name === v.name) === idx);
 
   // Fetch active queue items
   const { data: queue = [], isLoading: loadingQueue, refetch: refetchQueue } = useQuery({
@@ -114,8 +150,11 @@ export default function QueueBoard() {
 
             <Select value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)}>
               <option value="">-- All consultation rooms --</option>
-              <option value="room-101">Room 101 - Cardiology OPD</option>
-              <option value="room-102">Room 102 - General OPD</option>
+              {combinedRooms.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
             </Select>
           </div>
         </div>

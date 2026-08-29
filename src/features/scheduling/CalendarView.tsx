@@ -5,68 +5,82 @@ import { useAuth } from "../../auth/AuthProvider";
 import { Card, Button, Select, Input, StatusPill, Skeleton } from "../../ui/components";
 import BookingModal from "./BookingModal";
 
-// Mock Practitioners & Rooms List
-const practitioners = [
-  { id: "doc_apollo_1", name: "Dr. Rao (Cardiology)", roomId: "room_apollo_1", roomName: "Room 101 - Cardiology OPD" },
-  { id: "doc_apollo_2", name: "Dr. Lakshmi (General)", roomId: "room_apollo_2", roomName: "Room 102 - General OPD" },
-];
-
-const services = [
-  { id: "svc_ct_apollo", name: "CT Scan Cardiology" },
-  { id: "svc_gp_apollo", name: "General Health Checkup" },
-];
-
 export default function CalendarView() {
   const { token, tenant } = useAuth();
 
   const [practitionerId, setPractitionerId] = useState("");
   const [serviceId, setServiceId] = useState("");
-  const [selectedDate, setSelectedDate] = useState("2026-07-21");
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [patientSearch, setPatientSearch] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState("");
 
   const { data: dbPractitioners = [] } = useQuery({
     queryKey: ["practitioners", tenant],
-    queryFn: () => api.listPractitioners(token),
+    queryFn: () => (token ? api.listPractitioners(token) : Promise.resolve([])),
   });
 
   const { data: dbSites = [] } = useQuery({
     queryKey: ["sites", tenant],
-    queryFn: () => api.listSites(token),
+    queryFn: () => (token ? api.listSites(token) : Promise.resolve([])),
   });
 
   const { data: dbRooms = [] } = useQuery({
     queryKey: ["rooms", tenant],
-    queryFn: () => api.listRooms(token),
+    queryFn: () => (token ? api.listRooms(token) : Promise.resolve([])),
   });
 
   const { data: dbServices = [] } = useQuery({
     queryKey: ["services", tenant],
-    queryFn: () => api.listServices(token),
+    queryFn: () => (token ? api.listServices(token) : Promise.resolve([])),
   });
 
-  // Construct dynamic practitioners list for active tenant
-  const practitioners = dbPractitioners.length > 0
-    ? dbPractitioners.map((p) => ({
-        id: p.id,
-        name: p.name,
-        roomId: dbRooms[0]?.id || `room_${tenant}_1`,
-        roomName: dbRooms[0]?.name || "Room 101 OPD",
-        siteId: dbSites[0]?.id || `site_${tenant}_1`,
-      }))
-    : [
-        { id: `prac_${tenant}_1`, name: "Dr. Lead Physician", roomId: `room_${tenant}_1`, roomName: "Room 101 OPD", siteId: `site_${tenant}_1` },
-        { id: "doc_apollo_1", name: "Dr. Rao (Cardiology)", roomId: "room_apollo_1", roomName: "Room 101 - Cardiology OPD", siteId: "site_apollo_main" },
-        { id: "doc_apollo_2", name: "Dr. Lakshmi (General)", roomId: "room_apollo_2", roomName: "Room 102 - General OPD", siteId: "site_apollo_main" },
-      ];
+  // Read staff roster and master configs
+  const staffList: any[] = (() => {
+    try {
+      const saved = localStorage.getItem(`hms-staff-roster-${tenant || "default"}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  })();
 
-  const services = dbServices.length > 0
-    ? dbServices.map((s) => ({ id: s.id, name: s.name }))
-    : [
-        { id: `svc_${tenant}_1`, name: "General Consultation" },
-        { id: "svc_ct_apollo", name: "CT Scan Cardiology" },
-        { id: "svc_gp_apollo", name: "General Health Checkup" },
-      ];
+  const configData = (() => {
+    try {
+      const saved = localStorage.getItem(`hms-config-data-${tenant || "default"}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  })();
+  const masterVisitTypes: any[] = configData["visit_type"] || [];
+
+  // Dynamic practitioners
+  const staffDoctors = staffList
+    .filter((s) => s.role === "doctor" || s.role === "admin")
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      roomId: s.chamberRoom || "General Counter",
+      roomName: s.chamberRoom || "General Counter",
+      siteId: `site_${tenant || "main"}`,
+    }));
+
+  const practitioners = [
+    ...dbPractitioners.map((p) => ({
+      id: p.id,
+      name: p.name,
+      roomId: dbRooms[0]?.id || "Chamber 1",
+      roomName: dbRooms[0]?.name || "Chamber 1",
+      siteId: dbSites[0]?.id || `site_${tenant || "main"}`,
+    })),
+    ...staffDoctors,
+  ].filter((v, idx, arr) => arr.findIndex((t) => t.id === v.id) === idx);
+
+  // Dynamic services
+  const services = [
+    ...dbServices.map((s) => ({ id: s.id, name: s.name })),
+    ...masterVisitTypes.map((v) => ({ id: v.id || v.name, name: v.name })),
+  ].filter((v, idx, arr) => arr.findIndex((t) => t.name === v.name) === idx);
 
   const currentPracId = practitionerId || practitioners[0]?.id || "";
   const currentServiceId = serviceId || services[0]?.id || "";
