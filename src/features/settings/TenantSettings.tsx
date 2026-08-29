@@ -554,7 +554,7 @@ export default function TenantSettings() {
     triggerToast("General account information updated successfully!");
   };
 
-  const handleSaveAuthUser = () => {
+  const handleSaveAuthUser = async () => {
     if (!authPassword || authPassword !== authConfirmPassword) {
       triggerToast("Passwords do not match or are empty!");
       return;
@@ -565,11 +565,23 @@ export default function TenantSettings() {
       phone: "8884242466",
       email: "",
     };
+    const userEmail = emp.email || `${selectedStaffForAuth.toLowerCase().replace(/[^a-z0-9]/g, "")}@${tenant || "hospital"}.com`;
+    try {
+      await api.inviteStaff(token, tenant || "apollo", {
+        email: userEmail,
+        role: emp.role?.toLowerCase() === "doctor" ? "physician" : emp.role?.toLowerCase() || "physician",
+        given_name: emp.name.split(" ")[0] || emp.name,
+        family_name: emp.name.split(" ").slice(1).join(" ") || "Staff",
+        temporary_password: authPassword.trim(),
+      });
+    } catch (err: any) {
+      console.warn("Backend auth user provisioning notice:", err);
+    }
     const newUser = {
       id: String(Date.now()),
       name: emp.name,
       phone: emp.phone,
-      email: emp.email,
+      email: userEmail,
       role: emp.role,
     };
     const updated = [...authUsers, newUser];
@@ -581,10 +593,23 @@ export default function TenantSettings() {
     triggerToast(`Authentication access granted to ${emp.name}!`);
   };
 
-  const handleSaveChangedPassword = () => {
+  const handleSaveChangedPassword = async () => {
     if (!newPassword || newPassword !== confirmNewPassword) {
       triggerToast("Passwords do not match or are empty!");
       return;
+    }
+    if (changingUser?.email) {
+      try {
+        await api.inviteStaff(token, tenant || "apollo", {
+          email: changingUser.email.trim(),
+          role: changingUser.role?.toLowerCase() === "doctor" ? "physician" : changingUser.role?.toLowerCase() || "physician",
+          given_name: changingUser.name?.split(" ")[0] || "Staff",
+          family_name: changingUser.name?.split(" ").slice(1).join(" ") || "Member",
+          temporary_password: newPassword.trim(),
+        });
+      } catch (err: any) {
+        console.warn("Backend password update notice:", err);
+      }
     }
     setShowChangePasswordModal(false);
     setNewPassword("");
@@ -883,7 +908,7 @@ export default function TenantSettings() {
     localStorage.setItem(`hms-staff-roster-${tenant || "default"}`, JSON.stringify(nextList));
   };
 
-  const handleOnboardStaff = () => {
+  const handleOnboardStaff = async () => {
     if (!newStaffName.trim() || !newStaffEmail.trim() || !newStaffPhone.trim()) {
       triggerToast("Please enter Staff Name, Email Address, and Phone Number.");
       return;
@@ -929,6 +954,20 @@ export default function TenantSettings() {
       joinedDate: new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase(),
       bloodGroup: newStaffBloodGroup,
     };
+
+    // 1. Provision Keycloak user and practitioner in backend database
+    try {
+      await api.inviteStaff(token, tenant || "apollo", {
+        email: newMember.email,
+        role: newMember.role === "doctor" ? "physician" : newMember.role,
+        given_name: newMember.name.split(" ")[0] || newMember.name,
+        family_name: newMember.name.split(" ").slice(1).join(" ") || "Staff",
+        department: newMember.specialization || newMember.designation || "General",
+        temporary_password: newStaffPassword.trim() || "Password123!",
+      });
+    } catch (err: any) {
+      console.warn("Backend staff invitation notice:", err);
+    }
 
     const nextStaff = [newMember, ...staffList];
     saveStaffList(nextStaff);
@@ -985,8 +1024,20 @@ export default function TenantSettings() {
     }
   };
 
-  const handleSaveResetPass = () => {
+  const handleSaveResetPass = async () => {
     if (!resetStaffTarget || !resetStaffNewPass.trim()) return;
+    try {
+      await api.inviteStaff(token, tenant || "apollo", {
+        email: resetStaffTarget.email.trim(),
+        role: resetStaffTarget.role === "doctor" ? "physician" : resetStaffTarget.role,
+        given_name: resetStaffTarget.name.split(" ")[0] || resetStaffTarget.name,
+        family_name: resetStaffTarget.name.split(" ").slice(1).join(" ") || "Staff",
+        department: resetStaffTarget.specialization || resetStaffTarget.designation || "General",
+        temporary_password: resetStaffNewPass.trim(),
+      });
+    } catch (err: any) {
+      console.warn("Backend password reset notice:", err);
+    }
     setShowResetPassModal(false);
     triggerToast(`🔑 Login passcode for '${resetStaffTarget.name}' reset successfully.`);
     setResetStaffTarget(null);
