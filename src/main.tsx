@@ -48,6 +48,11 @@ const OperationTheatreScreen = React.lazy(() => import("./features/ot/OperationT
 const TelehealthScreen = React.lazy(() => import("./features/telehealth/TelehealthScreen"));
 const DietaryNutritionScreen = React.lazy(() => import("./features/dietary/DietaryNutritionScreen"));
 const BloodBankScreen = React.lazy(() => import("./features/bloodbank/BloodBankScreen"));
+const AIInsightsScreen = React.lazy(() => import("./features/reports/AIInsightsScreen"));
+const RadiologyScreen = React.lazy(() => import("./features/lab/RadiologyScreen"));
+const PatientFeedbacksScreen = React.lazy(() => import("./features/portal/PatientFeedbacksScreen"));
+const NABHQualityScreen = React.lazy(() => import("./features/reports/NABHQualityScreen"));
+const ReportsHubScreen = React.lazy(() => import("./features/reports/ReportsHubScreen"));
 import { OperatorSidebar } from "./features/tenants/OperatorSidebar";
 import { AppSidebar } from "./ui/AppSidebar";
 
@@ -1418,6 +1423,36 @@ function App() {
           <Route path="/pharmacy" element={
             <RequireRole roles={["admin", "physician", "doctor", "billing", "receptionist", "nurse"]}>
               <HospitalPharmacyScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/insights" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]}>
+              <AIInsightsScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/radiology" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing"]}>
+              <RadiologyScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/feedbacks" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing"]}>
+              <PatientFeedbacksScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/nabh" element={
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist"]}>
+              <NABHQualityScreen />
+            </RequireRole>
+          } />
+
+          <Route path="/reports" element={
+            <RequireRole roles={["admin", "billing", "receptionist", "physician"]}>
+              <ReportsHubScreen />
             </RequireRole>
           } />
 
