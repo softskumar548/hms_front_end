@@ -338,7 +338,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           true,
           [
             { label: "Dispensary POS & Checkout", path: "/pharmacy" },
-            { label: "EMR Rx Dispensing Queue", path: "/pharmacy" },
+            { label: "Rx Dispensing Queue", path: "/pharmacy" },
             { label: "FEFO Multi-Batch Inventory", path: "/pharmacy" },
           ]
         )}

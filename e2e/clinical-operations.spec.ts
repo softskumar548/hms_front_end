@@ -84,7 +84,7 @@ test.describe("Clinical Operations & Surgical Suites Suite", () => {
 
     // Verify EMR Prescription Dispensing Queue
     await expect(page.getByText(/Hospital Pharmacy & FEFO Dispensary POS/i)).toBeVisible();
-    await expect(page.getByText(/EMR Rx Dispensing Queue/i)).toBeVisible();
+    await expect(page.getByText(/EMR Rx Dispensing Queue/i).first()).toBeVisible();
 
     // Verify Dispense Medication Modal & Telugu Labels
     const dispenseBtn = page.getByRole("button", { name: /Dispense Rx/i }).first();

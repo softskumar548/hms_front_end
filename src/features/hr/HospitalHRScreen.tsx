@@ -519,10 +519,10 @@ export default function HospitalHRScreen() {
     { key: "referrals", label: "Referrals", icon: "🔄" },
     { key: "doctor-ratings", label: "Doctor Ratings", icon: "⭐" },
     { key: "payroll-dashboard", label: "Payroll Dashboard", icon: "📊" },
-    { key: "payroll-list", label: "Payroll List", icon: "📋" },
+    { key: "payroll-list", label: "Monthly Payroll Run", icon: "📋" },
     { key: "employee-salary", label: "Employee Salary", icon: "💼" },
     { key: "timesheet", label: "Timesheet", icon: "⏱️" },
-    { key: "attendance", label: "Attendance Dashboard", icon: "📅" },
+    { key: "attendance", label: "Attendance & Leave Desk", icon: "📅" },
     { key: "payout-structure", label: "Payout Structure", icon: "📐" },
     { key: "employee-payouts", label: "Employee Payouts", icon: "💳" },
   ];
@@ -572,7 +572,7 @@ export default function HospitalHRScreen() {
           <span>Employee</span>
           <span>🏠</span>
           <span>
-            Employee Details
+            Employee Details · Hospital Human Resources (HR) & Automated Payroll Engine
             {employeeFormMode === "add" && " - Add Employee"}
             {employeeFormMode === "edit" && " - Edit Employee"}
             {employeeFormMode === "view" && " - View Profile"}
@@ -659,6 +659,41 @@ export default function HospitalHRScreen() {
         )}
       </div>
 
+      {/* Top 4 KPI Metrics Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+        <Card style={{ borderLeft: "4px solid var(--indigo)", padding: "14px 18px" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Total Active Staff</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "var(--indigo)" }}>{totalEmployees}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>{totalDoctors} Doctors · {totalEmployees - totalDoctors} Staff</span>
+          </div>
+        </Card>
+
+        <Card style={{ borderLeft: "4px solid #0284C7", padding: "14px 18px" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Monthly Payroll Liability</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "#0284C7" }}>{formatRupees(totalPayrollLiability)}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>Gross CTC</span>
+          </div>
+        </Card>
+
+        <Card style={{ borderLeft: "4px solid #DC2626", padding: "14px 18px" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Statutory Deductions</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "#DC2626" }}>{formatRupees(totalStatutoryDeductions)}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>EPF + ESIC + PT</span>
+          </div>
+        </Card>
+
+        <Card style={{ borderLeft: "4px solid #16A34A", padding: "14px 18px" }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--slate)", textTransform: "uppercase" }}>Net Bank Disbursement</span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+            <strong style={{ fontSize: 24, color: "#16A34A" }}>{formatRupees(totalNetPayout)}</strong>
+            <span style={{ fontSize: 12, color: "var(--slate)" }}>NEFT CMS</span>
+          </div>
+        </Card>
+      </div>
+
       {/* Horizontal Sub-Tabs Bar (Matching the 11 Submenu items) */}
       <div style={{ display: "flex", gap: 6, borderBottom: "2px solid var(--line)", paddingBottom: 6, overflowX: "auto", whiteSpace: "nowrap" }}>
         {navTabs.map((tab) => (
@@ -670,9 +705,9 @@ export default function HospitalHRScreen() {
               padding: "8px 14px",
               borderRadius: "8px 8px 0 0",
               border: "none",
-              background: activeTab === tab.key ? "var(--indigo)" : "transparent",
-              color: activeTab === tab.key ? "#ffffff" : "var(--slate)",
-              fontWeight: activeTab === tab.key ? 800 : 600,
+              background: (activeTab === tab.key || (tab.key === "payroll-list" && activeTab === "payroll")) ? "var(--indigo)" : "transparent",
+              color: (activeTab === tab.key || (tab.key === "payroll-list" && activeTab === "payroll")) ? "#ffffff" : "var(--slate)",
+              fontWeight: (activeTab === tab.key || (tab.key === "payroll-list" && activeTab === "payroll")) ? 800 : 600,
               fontSize: 13,
               cursor: "pointer",
               display: "inline-flex",
@@ -1420,13 +1455,13 @@ export default function HospitalHRScreen() {
       )}
 
       {/* ====================================================================
-          TAB 6: PAYROLL LIST
+          TAB 6: PAYROLL LIST / MONTHLY PAYROLL RUN
          ==================================================================== */}
       {(activeTab === "payroll-list" || activeTab === "payroll") && (
         <Card style={{ borderRadius: 10, padding: 18 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Batch Month:</label>
+              <label style={{ fontSize: 13, fontWeight: 700, color: "var(--slate)" }}>Payroll Month:</label>
               <Select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
@@ -1607,7 +1642,7 @@ export default function HospitalHRScreen() {
       )}
 
       {/* ====================================================================
-          TAB 9: ATTENDANCE DASHBOARD
+          TAB 9: ATTENDANCE DASHBOARD / ATTENDANCE & LEAVE DESK
          ==================================================================== */}
       {activeTab === "attendance" && (
         <Card style={{ borderRadius: 10, padding: 18 }}>
@@ -1646,6 +1681,27 @@ export default function HospitalHRScreen() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Pending Leave Requests */}
+          <div style={{ marginTop: 22, borderTop: "1px solid var(--line)", paddingTop: 16 }}>
+            <h4 style={{ margin: "0 0 10px", fontSize: 14, color: "var(--indigo)", fontWeight: 700 }}>
+              ⏳ Pending Staff Leave Applications
+            </h4>
+            <div style={{ display: "grid", gap: 8 }}>
+              {leaveRequests.map((lv) => (
+                <div key={lv.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--wash-a)", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--line)" }}>
+                  <div>
+                    <strong>{lv.staffName}</strong> · <span style={{ color: "var(--slate)", fontSize: 12 }}>{lv.leaveType} ({lv.days}d) - {lv.dates}</span>
+                    <div style={{ fontSize: 11.5, color: "var(--slate)" }}>Reason: {lv.reason}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <Button type="button" onClick={() => triggerToast(`Leave for ${lv.staffName} approved.`)} style={{ fontSize: 11, padding: "4px 8px", background: "#16A34A", color: "#fff" }}>Approve</Button>
+                    <Button type="button" ghost onClick={() => triggerToast(`Leave for ${lv.staffName} rejected.`)} style={{ fontSize: 11, padding: "4px 8px" }}>Reject</Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </Card>
       )}

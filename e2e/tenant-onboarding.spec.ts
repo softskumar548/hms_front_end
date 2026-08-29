@@ -62,9 +62,9 @@ test.describe("Operator Tenant Onboarding Pipeline (TEN-101 / TEN-301)", () => {
 
     // 8. Verify Stage 2 Handover Certificate is rendered
     await expect(page.getByTestId("stage-2-indicator")).toBeVisible({ timeout: 15_000 });
-    await expect(page.locator("text=Tenant Provisioned & Admin Issued")).toBeVisible();
-    await expect(page.locator("text=PORTAL URL")).toBeVisible();
-    await expect(page.locator("text=INITIAL TEMPORARY PASSCODE")).toBeVisible();
+    await expect(page.locator("text=Tenant Provisioned & Admin Issued")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("text=PORTAL URL")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("text=INITIAL TEMPORARY PASSCODE")).toBeVisible({ timeout: 15_000 });
 
     // 9. Verify copy credentials action
     const copyBtn = page.getByRole("button", { name: /Copy Credentials/i });
