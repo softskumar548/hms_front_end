@@ -52,7 +52,11 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 
 
 ## 1.4 Clinical Staff Navigation & EMR Workstation
-- **Receptionist**: Live Queue / Check-in board (`/queue`), Waiting Lounge TV Token Calling Display (`/queue/display`), Patients (`/patients`), Scheduling (`/scheduling`).
+- **Receptionist**: Live Queue / Check-in board (`/queue`), Waiting Lounge TV Token Calling Display (`/queue/display`), Patients directory (`/patients`), Scheduling (`/scheduling`).
+- **👶 Newborn & Neonate Registration Workstation (`REG-010`)**:
+  - Dedicated neonatal intake module linked to mother's profile (`mother_patient_id` / Mother UHID search).
+  - Captures gestational age (weeks), delivery type (Normal Vaginal, LSCS C-Section, Assisted Forceps/Vacuum), birth weight (kg), 1-minute & 5-minute APGAR scores (`0-10`), birth complications, pediatric specialist assignment, and birth time.
+  - 1-click trigger to print Thermal Newborn Identification Wristband (`NewbornWristbandPrintModal`).
 - **Physician / Nurse**:
   - 🩺 **Doctor EMR Launchpad (`/emr`)**: Outpatient consultation queue with live wait times, triage priority, and 1-click encounter launch.
   - 📝 **SOAP Clinical Note Pad (`/emr/patients/:id/encounter/:encounterId`)**: Structured Subjective symptoms chips, Objective systemic exam, Assessment with ICD-10 diagnosis picker, Plan with lifestyle advice, and direct Diagnostic Lab Requisition desk.
@@ -60,6 +64,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
   - 💊 **Bilingual Rx Medication Composer (`RX-002` / `RX-003`)**: Indian pharmaceutical brand catalog, structured frequency/route/food-timing matrix, Telugu patient instructions, and hard-stop allergy overrides.
   - 🖨️ **MediPass Printable Stub (`/emr/patients/:id/print`)**: A4 printer-friendly prescription and visit summary with hospital letterhead and physician registration credentials.
   - 🛏️ **Inpatient Bed Matrix & Ward Transfer (`/inpatient`)**: Interactive visual bed grid across 4 hospital floors, 1-click ward transfers with live daily tariff adjustment, admission intake, and 4-point discharge clearance.
+  - 🏢 **Dynamic Consultation Room & Practitioner Lookups**: Consultation chambers, rooms, and attending practitioners loaded dynamically from live master configuration (`room_type`, `specialization`) and database endpoints.
 - **Biller**:
   - 💳 **Invoicing & Ledger (`/billing`)**: Itemized charge sheets, gross invoice totals, PMJAY/Aarogyasri eligibility indicators, and invoice locking.
   - 💵 **Daily Till Drawer Reconciliation (`TillReconciliationModal`)**: Physical currency denomination breakdown (`₹500`...`₹1`), opening float, cash refunds, and live till variance/shortage audits.
@@ -68,6 +73,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 
 ## 1.5 Hospital Human Resources (HR) & Automated Payroll Engine (`/hr`)
 - 👥 **Staff Lifecycle & Statutory Compliance**: Comprehensive staff roster tracking 12-digit Indian Aadhaar ID, PAN, UAN/EPF registration, ESIC numbers, Andhra Pradesh Professional Tax (PT), and Medical Council Reg Nos (`NMC/APMC`).
+- ➕ **Employee Directory & Onboarding Workflow**: Dedicated staff management view with detailed profile cards, salary breakdowns, duty shift assignment, and modal-driven Add Employee workflow.
 - 💵 **Monthly Payroll Run & Bank NEFT Payout (`/hr?tab=payroll`)**: Automated gross-to-net salary batch calculation with EPF (12%), ESIC (0.75%), PT (₹200), and TDS deductions with 1-click batch locking and NEFT CMS bank file export (`.csv`).
 - 📅 **Attendance & Duty Rostering (`/hr?tab=attendance`)**: Monthly biometric attendance calendar, Present/Absent/LOP days, night-shift & on-call duty counters, and leave application approval queue.
 - 💼 **Salary Structure & CTC Configurator (`SalaryStructureModal`)**: Custom earnings breakdown (Basic 50%, HRA 40%, Medical, Special Allowances, Doctor OPD revenue share) and statutory enrollment controls.
@@ -77,6 +83,7 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
 - 🖨️ **Multi-Hardware Printer Profiles & Responsive Layout Engine**:
   - All print preview dialogues and application modals adhere to strict responsive boundary widths (`maxWidth: 520px - 860px`) with flex wrapping and internal scrolling (`maxHeight: calc(100vh - 48px)`), eliminating horizontal overflow across all display resolutions.
   - 🏷️ **Thermal Patient ID Wristbands (`WristbandPrintModal`)**: Zebra/TSC 100mm × 25mm waterproof inpatient wristband roll with high-contrast UHID, IP number, bed, blood group badge, and scannable 2D QR/barcode.
+  - 👶 **Thermal Newborn Identification Wristbands (`NewbornWristbandPrintModal`)**: Specialized 100mm × 25mm neonatal wristband roll printing Infant UHID, Mother's Name & UHID, Date/Time of Birth, Sex, Birth Weight, APGAR score, Blood Group badge, and 2D barcode.
   - 🧪 **Diagnostic Specimen Vacutainer Tube Barcodes (`SpecimenBarcodeModal`)**: 50mm × 25mm tube stickers for Purple EDTA (CBC/ESR), Red Serum (LFT/RFT), Grey Fluoride (Glucose), and Urine containers with 1-click batch printing.
   - 📄 **A4 Standard Laser/Inkjet Hub**: Direct launcher for MediPass Prescriptions, Discharge Summaries, Employee Pay Slips, and Admission Undertakings.
   - 🧾 **80mm POS Thermal Receipts**: Cashier till receipts, OPD token calling slips, and pharmacy dispensing tags.
@@ -147,6 +154,7 @@ Defined once in `src/ui/tokens.css`. **Never hardcode hex values in components.*
 3. **MediPass**: Boarding pass-style confirmation stub for appointments and lab orders.
 4. **i18n Readiness**: English + Telugu language support; all user-facing strings keyed.
 5. **Zero-Data Staging & Live Data Integrity**: Clean zero-data empty state cards across all 10 departmental workspaces; synthetic data restricted to local dev fixtures.
+6. **UI Hygiene & Clean Presentation Standards**: Internal requirement/spec codes (e.g., `[TEN-101]`, `(REG-010)`, `[EMR-005]`) must never appear in user-facing UI labels, headers, toasts, or action buttons. All user-facing views must display clean, professional, patient/clinician-friendly medical terminology only.
 
 ---
 
