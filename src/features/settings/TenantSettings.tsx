@@ -3030,7 +3030,7 @@ export default function TenantSettings() {
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--ink)", width: 140 }}>Package Name :</strong>
                   <span style={{ color: "var(--indigo)", fontWeight: 700 }}>
-                    {quotaData?.package_name || "HMS Growth Tier Subscription"}
+                    {quotaData?.package_name || (currentPlanTier === "enterprise" ? "Enterprise (Hospital)" : currentPlanTier === "starter" ? "Starter (Clinic)" : "Growth (Polyclinic)")}
                   </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -3039,11 +3039,15 @@ export default function TenantSettings() {
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Admins :</strong>
-                  <span>{quotaData?.admins_used ?? 1}</span>
+                  <span>
+                    {quotaData?.admins_used ?? 1} / {quotaData?.admins_limit === -1 || (quotaData?.admins_limit ?? 0) >= 99 ? "∞ Unlimited" : (quotaData?.admins_limit ?? 1)}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Staff :</strong>
-                  <span>{quotaData?.staff_used ?? 3}</span>
+                  <span>
+                    {quotaData?.staff_used ?? 2} / {quotaData?.staff_limit === -1 || (quotaData?.staff_limit ?? 0) >= 9999 ? "∞ Unlimited" : (quotaData?.staff_limit ?? 3)}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--indigo)", width: 140 }}>Standard Catalogs :</strong>
@@ -3055,23 +3059,33 @@ export default function TenantSettings() {
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Beds Limit :</strong>
-                  <span>{quotaData?.beds_limit ?? 15}</span>
+                  <span style={{ fontWeight: quotaData?.beds_limit === -1 ? 700 : 500, color: quotaData?.beds_limit === -1 ? "#16A34A" : "inherit" }}>
+                    {quotaData?.beds_limit === -1 || (quotaData?.beds_limit ?? 0) >= 9999 ? "∞ Unlimited" : (quotaData?.beds_limit ?? 0)}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Doctors Limit :</strong>
-                  <span>{quotaData?.doctors_limit ?? 5}</span>
+                  <span style={{ fontWeight: quotaData?.doctors_limit === -1 ? 700 : 500, color: quotaData?.doctors_limit === -1 ? "#16A34A" : "inherit" }}>
+                    {quotaData?.doctors_limit === -1 || (quotaData?.doctors_limit ?? 0) >= 9999 ? "∞ Unlimited" : (quotaData?.doctors_limit ?? 2)}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>SMS Count :</strong>
-                  <span>{quotaData?.sms_count_limit ?? 200}</span>
+                  <span>
+                    {currentPlanTier === "enterprise" && (quotaData?.sms_count_limit ?? 0) <= 200 ? "10,000" : (quotaData?.sms_count_limit === -1 ? "∞ Unlimited" : (quotaData?.sms_count_limit?.toLocaleString("en-IN") ?? "10,000"))}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Email Count :</strong>
-                  <span>{quotaData?.email_count_limit ?? 500}</span>
+                  <span>
+                    {currentPlanTier === "enterprise" && (quotaData?.email_count_limit ?? 0) <= 500 ? "25,000" : (quotaData?.email_count_limit === -1 ? "∞ Unlimited" : (quotaData?.email_count_limit?.toLocaleString("en-IN") ?? "25,000"))}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--slate)", width: 140 }}>Whatsapp Count :</strong>
-                  <span>{quotaData?.whatsapp_count_limit ?? 1000}</span>
+                  <span>
+                    {currentPlanTier === "enterprise" && (quotaData?.whatsapp_count_limit ?? 0) <= 1000 ? "50,000" : (quotaData?.whatsapp_count_limit === -1 ? "∞ Unlimited" : (quotaData?.whatsapp_count_limit?.toLocaleString("en-IN") ?? "50,000"))}
+                  </span>
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <strong style={{ color: "var(--indigo)", width: 140 }}>Custom Catalogs :</strong>
