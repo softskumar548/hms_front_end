@@ -38,6 +38,69 @@ async function request<T>(path: string, token: string | null, init?: RequestInit
   return res.json() as Promise<T>;
 }
 
+export interface SubscriptionPlan {
+  id: string;
+  code: string;
+  name: string;
+  description?: string | null;
+  price_inr_monthly: number;
+  price_inr_annual: number;
+  max_practitioners: number;
+  max_beds: number;
+  max_monthly_encounters: number;
+  admins_limit: number;
+  staff_limit: number;
+  custom_catalogs_limit: number;
+  catalog_item_limit: number;
+  abdm_level: string;
+  sms_limit: number;
+  email_limit: number;
+  whatsapp_limit: number;
+  active: boolean;
+  subscribers_count: number;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface SubscriptionPlanCreatePayload {
+  code: string;
+  name: string;
+  description?: string;
+  price_inr_monthly: number;
+  price_inr_annual?: number;
+  max_practitioners: number;
+  max_beds: number;
+  max_monthly_encounters: number;
+  admins_limit: number;
+  staff_limit: number;
+  custom_catalogs_limit: number;
+  catalog_item_limit: number;
+  abdm_level: string;
+  sms_limit: number;
+  email_limit: number;
+  whatsapp_limit: number;
+  active: boolean;
+}
+
+export interface SubscriptionPlanEditPayload {
+  name?: string;
+  description?: string;
+  price_inr_monthly?: number;
+  price_inr_annual?: number;
+  max_practitioners?: number;
+  max_beds?: number;
+  max_monthly_encounters?: number;
+  admins_limit?: number;
+  staff_limit?: number;
+  custom_catalogs_limit?: number;
+  catalog_item_limit?: number;
+  abdm_level?: string;
+  sms_limit?: number;
+  email_limit?: number;
+  whatsapp_limit?: number;
+  active?: boolean;
+}
+
 export const api = {
   listPatients: (token: string | null) => request<PatientOut[]>("/patients", token),
   createPatient: (token: string | null, body: PatientCreate, force = false) =>
@@ -183,5 +246,13 @@ export const api = {
     request<any>(`/tenants/${id}/quotas`, token),
   updateTenantPlan: (token: string | null, id: string, body: any) =>
     request<any>(`/tenants/${id}/subscription/plan`, token, { method: "PUT", body: JSON.stringify(body) }),
+  getSubscriptionPlans: (token: string | null) =>
+    request<SubscriptionPlan[]>("/tenants/plans", token),
+  createSubscriptionPlan: (token: string | null, body: SubscriptionPlanCreatePayload) =>
+    request<SubscriptionPlan>("/tenants/plans", token, { method: "POST", body: JSON.stringify(body) }),
+  updateSubscriptionPlan: (token: string | null, idOrCode: string, body: SubscriptionPlanEditPayload) =>
+    request<SubscriptionPlan>(`/tenants/plans/${idOrCode}`, token, { method: "PUT", body: JSON.stringify(body) }),
+  deleteSubscriptionPlan: (token: string | null, idOrCode: string) =>
+    request<{ status: string; code: string; detail: string }>(`/tenants/plans/${idOrCode}`, token, { method: "DELETE" }),
 };
 

@@ -36,6 +36,7 @@ const OperationalControlScreen = React.lazy(() => import("./features/tenants/Ope
 const OperatorDashboardScreen = React.lazy(() => import("./features/tenants/OperatorDashboardScreen").then(m => ({ default: m.OperatorDashboardScreen })));
 const OperatorInsightsScreen = React.lazy(() => import("./features/tenants/OperatorInsightsScreen").then(m => ({ default: m.OperatorInsightsScreen })));
 const OperatorProfileScreen = React.lazy(() => import("./features/tenants/OperatorProfileScreen").then(m => ({ default: m.OperatorProfileScreen })));
+const SubscriptionPlansScreen = React.lazy(() => import("./features/tenants/SubscriptionPlansScreen").then(m => ({ default: m.SubscriptionPlansScreen })));
 const MyScheduleView = React.lazy(() => import("./features/scheduling/MyScheduleView"));
 const QueueDisplayScreen = React.lazy(() => import("./features/scheduling/QueueDisplayScreen"));
 const InpatientBedMatrixScreen = React.lazy(() => import("./features/inpatient/InpatientBedMatrixScreen"));
@@ -1482,6 +1483,11 @@ function App() {
           <Route path="/operator/insights" element={
             <RequireRole roles={["operator", "admin"]}>
               <OperatorInsightsScreen token={token} />
+            </RequireRole>
+          } />
+          <Route path="/operator/plans" element={
+            <RequireRole roles={["operator", "admin"]}>
+              <SubscriptionPlansScreen token={token} />
             </RequireRole>
           } />
           <Route path="/tenants" element={

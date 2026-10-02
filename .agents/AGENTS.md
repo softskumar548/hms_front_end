@@ -31,6 +31,9 @@ Staging deployment: `https://stage.zensynq.com` (VPS: `103.174.103.158`).
       - Minimalist, lightweight styling with subtle 1px focus states.
     - **Stage 2 (Tenant Admin Handover Certificate)**:
       - Issues copyable credentials certificate (Custom Portal URL, Keycloak `role: admin`, and temporary passcode).
+  - 💎 **SaaS Subscription Plans & Quota Limits (`/operator/plans`)**:
+    - Full commercial tier lifecycle engine: Create new subscription plans, edit pricing (Monthly & Annual INR ₹), configure doctor/bed/monthly encounter limits, custom schema allocations, and comms quotas.
+    - Real-time subscriber metrics display, active/archived state filters, and safety safeguards preventing the deletion of tiers with active subscribed facilities.
   - 👤 **Operator Profile & Security (`/operator/profile`)**:
     - Dedicated Operator Profile and Keycloak Password Reset tabs.
 

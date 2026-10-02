@@ -41,6 +41,7 @@ export function OperatorSidebar() {
     {
       title: "PLATFORM",
       items: [
+        { label: "Subscription Plans", path: "/operator/plans", icon: "💎" },
         { label: "Billing & Ops", path: "/ops-control", icon: "💳" },
         { label: "Suspend & Override", path: "/ops-control#suspend", icon: "🛡️" },
       ],
