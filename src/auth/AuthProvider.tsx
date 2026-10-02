@@ -9,6 +9,7 @@ export interface AuthState {
   tenant: string | null;
   role: string | null;
   userName: string | null;
+  userEmail: string | null;
   sessionExpired: boolean;
   setSessionExpired: (expired: boolean) => void;
   login: (tenant: string, role: string) => void;
@@ -115,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [tenant, setTenant] = useState<string | null>(getInitialTenant);
   const [role, setRole] = useState<string | null>(getInitialRole);
   const [userName, setUserName] = useState<string | null>(() => localStorage.getItem("hms_username"));
+  const [userEmail, setUserEmail] = useState<string | null>(() => localStorage.getItem("hms_useremail"));
   const [sessionExpired, setSessionExpired] = useState<boolean>(false);
 
   // Parse OIDC claims if token is a real JWT
@@ -129,11 +131,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let parsedRole = rolesList.find((r: string) => knownRoles.includes(r)) || rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") || "receptionist";
         if (parsedRole === "doctor") parsedRole = "physician";
         const parsedName = claims["name"] || claims["preferred_username"] || (claims["given_name"] ? `${claims["given_name"]} ${claims["family_name"] || ""}`.trim() : null);
+        const parsedEmail = claims["email"] || (claims["preferred_username"] && claims["preferred_username"].includes("@") ? claims["preferred_username"] : null);
         setTenant(parsedTenant);
         setRole(parsedRole);
         if (parsedName) {
           setUserName(parsedName);
           localStorage.setItem("hms_username", parsedName);
+        }
+        if (parsedEmail) {
+          setUserEmail(parsedEmail);
+          localStorage.setItem("hms_useremail", parsedEmail);
         }
         localStorage.setItem("hms_tenant", parsedTenant);
         localStorage.setItem("hms_role", parsedRole);
@@ -209,11 +216,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTenant(newTenant);
     setRole(newRole);
     setUserName(null);
+    setUserEmail(null);
     setSessionExpired(false);
     localStorage.setItem("hms_token", devToken);
     localStorage.setItem("hms_tenant", newTenant);
     localStorage.setItem("hms_role", newRole);
     localStorage.removeItem("hms_username");
+    localStorage.removeItem("hms_useremail");
 
     let targetPath = "/";
     if (newRole === "operator") targetPath = "/operator/dashboard";
@@ -241,10 +250,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTenant(null);
     setRole(null);
     setUserName(null);
+    setUserEmail(null);
     localStorage.removeItem("hms_token");
     localStorage.removeItem("hms_tenant");
     localStorage.removeItem("hms_role");
     localStorage.removeItem("hms_username");
+    localStorage.removeItem("hms_useremail");
 
     if (isOidc) {
       const logoutUrl = `${OIDC_AUTHORITY}/protocol/openid-connect/logout?post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/")}&client_id=${OIDC_CLIENT_ID}`;
@@ -264,7 +275,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [logout]);
 
   return (
-    <AuthCtx.Provider value={{ token, tenant, role, userName, sessionExpired, setSessionExpired, login, logout, loginWithOidc }}>
+    <AuthCtx.Provider value={{ token, tenant, role, userName, userEmail, sessionExpired, setSessionExpired, login, logout, loginWithOidc }}>
       {children}
     </AuthCtx.Provider>
   );

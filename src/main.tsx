@@ -87,7 +87,7 @@ function formatHeaderDateTime(d: Date): string {
 /* ---------- Shell ---------- */
 function Shell({ children }: { children: React.ReactNode }) {
   const { t, i18n } = useTranslation();
-  const { tenant, role, logout } = useAuth();
+  const { tenant, role, userName, userEmail, logout } = useAuth();
   const location = useLocation();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -294,10 +294,10 @@ function Shell({ children }: { children: React.ReactNode }) {
                 {/* User Info Header */}
                 <div style={{ borderBottom: "1px solid var(--line)", paddingBottom: 10 }}>
                   <strong style={{ fontSize: 14.5, color: "var(--indigo)", display: "block" }}>
-                    {role === "admin" ? "DR K R MURALI (Dean)" : `${role?.toUpperCase()} USER`}
+                    {userName || (role === "admin" ? "Tenant Administrator" : `${role?.toUpperCase()} USER`)}
                   </strong>
                   <span style={{ fontSize: 12, color: "var(--slate)", display: "block", marginTop: 2 }}>
-                    {role === "admin" ? "drkrmurali9090@yopmail.com" : `${role}@${tenant}.com`}
+                    {userEmail || `${role}@${tenant}.com`}
                   </span>
                   <div style={{ marginTop: 8 }}>
                     <StatusPill kind="brand">{tenant} · {role}</StatusPill>

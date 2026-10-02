@@ -8,7 +8,7 @@ import { Card, FieldCell, Button, Select, StatusPill, Toast, Input } from "../..
 
 export default function TenantSettings() {
   const { t } = useTranslation();
-  const { token, tenant, role } = useAuth();
+  const { token, tenant, role, userName, userEmail } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -236,6 +236,76 @@ export default function TenantSettings() {
     },
     enabled: Boolean(token && tenant),
   });
+
+  const { data: tenantData } = useQuery({
+    queryKey: ["tenant-details", tenant],
+    queryFn: async () => {
+      if (!token || !tenant) return null;
+      try {
+        return await api.getTenant(token, tenant);
+      } catch {
+        return null;
+      }
+    },
+    enabled: Boolean(token && tenant),
+  });
+
+  // Synchronize General Information with live Tenant details from API
+  useEffect(() => {
+    if (tenantData) {
+      const f = tenantData.features || {};
+      const target = f.admin_contact_target === "secondary" && f.secondary_contact ? f.secondary_contact : (f.primary_contact || {});
+      const savedName = localStorage.getItem(`admin-name-${tenant}`);
+      const savedEmail = localStorage.getItem(`admin-email-${tenant}`);
+      const savedProject = localStorage.getItem(`project-name-${tenant}`);
+      const savedPhone = localStorage.getItem(`admin-phone-${tenant}`);
+      const savedStreet = localStorage.getItem(`address-street-${tenant}`);
+      const savedCity = localStorage.getItem(`address-city-${tenant}`);
+      const savedState = localStorage.getItem(`address-state-${tenant}`);
+
+      if (!savedProject || savedProject === defaultOrgName || savedProject === "ZEN CLINIC" || savedProject.replace(/\s+/g, "") === (tenant || "").toUpperCase()) {
+        if (tenantData.name) setProjectName(tenantData.name);
+      }
+      if (!savedName || savedName === "DR K R MURALI" || savedName === "PLATFORM OPERATOR") {
+        if (target.name) setAdminName(target.name);
+        else if (userName) setAdminName(userName);
+      }
+      if (!savedEmail || savedEmail === "drkrmurali9090@yopmail.com" || savedEmail === "operator@zensynq.com") {
+        if (target.email) setAdminEmail(target.email);
+        else if (userEmail) setAdminEmail(userEmail);
+      }
+      if (!savedPhone || savedPhone === "9100242466") {
+        if (target.phone || f.landline) setAdminPhone(target.phone || f.landline);
+      }
+      if (!savedStreet || savedStreet === "srinivasa Nagar") {
+        const addrObj = typeof f.address === "object" && f.address !== null ? f.address : {};
+        const door = f.door_no || addrObj.door_no || "";
+        const l1 = f.address_line1 || addrObj.address_line1 || "";
+        const l2 = f.address_line2 || addrObj.address_line2 || "";
+        const street = [door, l1, l2].filter(Boolean).join(", ") || (typeof f.address === "string" ? f.address : "");
+        if (street) setAddressStreet(street);
+      }
+      if (!savedCity || savedCity === "Nandyal") {
+        const addrObj = typeof f.address === "object" && f.address !== null ? f.address : {};
+        const cityVal = f.city || addrObj.city;
+        if (cityVal) setAddressCity(cityVal);
+      }
+      if (!savedState || savedState === "Andhra Pradesh") {
+        const addrObj = typeof f.address === "object" && f.address !== null ? f.address : {};
+        const stateVal = f.state || addrObj.state;
+        if (stateVal) setAddressState(stateVal);
+      }
+      if (!localStorage.getItem(`brand-name-${tenant}`) && tenantData.name) {
+        setBrandName(tenantData.name);
+      }
+      if (!localStorage.getItem(`print-header-${tenant}`) && tenantData.name) {
+        setPrintHeader(`${tenantData.name.toUpperCase()} SPECIALTY MEDICAL CENTER`);
+      }
+      if (!localStorage.getItem(`print-phone-${tenant}`) && (target.phone || f.landline)) {
+        setPrintPhone(target.phone || f.landline);
+      }
+    }
+  }, [tenantData, tenant, userName, userEmail, defaultOrgName]);
 
   // Custom Field Definition for Dynamic User-Defined Catalogs
   interface CustomFieldDef {
@@ -2918,7 +2988,7 @@ export default function TenantSettings() {
                 <span>TOKEN: #004</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", margin: "6px 0" }}>
-                <span>CONSULTANT: DR K R MURALI (DEAN)</span>
+                <span>CONSULTANT: {adminName ? `${adminName.toUpperCase()} (DEAN)` : "CONSULTANT (DEAN)"}</span>
                 <span>DATE: 23-AUG-2026</span>
               </div>
               {includeBarcode && (

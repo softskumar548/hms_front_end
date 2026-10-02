@@ -7,7 +7,21 @@ import OnboardingChecklist from "./OnboardingChecklist";
 
 export default function OpsDashboard() {
   const { token, tenant, userName, role } = useAuth();
-  const currentTenantName = tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "CLINIC";
+
+  const { data: tenantData } = useQuery({
+    queryKey: ["tenant-details", tenant],
+    queryFn: async () => {
+      if (!token || !tenant) return null;
+      try {
+        return await api.getTenant(token, tenant);
+      } catch {
+        return null;
+      }
+    },
+    enabled: Boolean(token && tenant),
+  });
+
+  const currentTenantName = tenantData?.name || (tenant ? tenant.replace(/[_|-]/g, " ").toUpperCase() : "CLINIC");
   const displayName = userName || (role === "admin" ? "Hospital Administrator" : "Clinical Staff");
 
   // Site selection filter
