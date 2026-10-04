@@ -1473,6 +1473,8 @@ export function UserPermissionsMatrix() {
           <div style={{ display: "flex", justifyContent: "center" }}>
             <div style={{ width: "100%", maxWidth: 580 }}>
               <select
+                data-testid="role-permissions-select"
+                aria-label="Select User Role to Configure"
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
                 style={{
@@ -1514,7 +1516,8 @@ export function UserPermissionsMatrix() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <input
               type="text"
-              placeholder="Filter screens (e.g. Appointments, Bills, Stock)..."
+              data-testid="permissions-search-input"
+              placeholder="Search screens / Filter screens (e.g. Appointments, Bills, Stock)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{

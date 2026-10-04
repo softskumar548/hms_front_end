@@ -12,7 +12,7 @@ test.describe("Role-Based Screen & Action Permissions Matrix E2E Pipeline", () =
     await expect(page.getByText("List of Users")).toBeVisible();
 
     // 3. Verify Role Selector contains all 19 standard roles
-    const roleSelect = page.locator("select").first();
+    const roleSelect = page.locator("select[data-testid='role-permissions-select']");
     await expect(roleSelect).toBeVisible();
 
     // Select 'Doctor' role
@@ -27,7 +27,7 @@ test.describe("Role-Based Screen & Action Permissions Matrix E2E Pipeline", () =
     await expect(page.locator("th:has-text('DELETE')")).toBeVisible();
 
     // 5. Verify search filter functionality across screens
-    const searchInput = page.locator("input[placeholder*='Search screens']");
+    const searchInput = page.locator("[data-testid='permissions-search-input']");
     await searchInput.fill("Pharmacy");
     await expect(page.getByText("Pharmacy / Medicine").first()).toBeVisible();
     await searchInput.fill("");
