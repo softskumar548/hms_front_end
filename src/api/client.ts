@@ -254,5 +254,12 @@ export const api = {
     request<SubscriptionPlan>(`/tenants/plans/${idOrCode}`, token, { method: "PUT", body: JSON.stringify(body) }),
   deleteSubscriptionPlan: (token: string | null, idOrCode: string) =>
     request<{ status: string; code: string; detail: string }>(`/tenants/plans/${idOrCode}`, token, { method: "DELETE" }),
+  getTenantPermissions: (token: string | null, tenantId: string) =>
+    request<{ tenant_id: string; permissions: Record<string, any>; updated_at?: string }>(`/tenants/${tenantId}/permissions`, token),
+  updateTenantPermissions: (token: string | null, tenantId: string, permissions: Record<string, any>) =>
+    request<{ tenant_id: string; permissions: Record<string, any>; updated_at?: string }>(`/tenants/${tenantId}/permissions`, token, {
+      method: "PUT",
+      body: JSON.stringify({ permissions }),
+    }),
 };
 

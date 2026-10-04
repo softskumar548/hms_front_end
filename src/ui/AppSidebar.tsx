@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
+import { useScreenPermissions } from "../features/settings/UserPermissionsMatrix";
+
+interface SubItemDef {
+  label: string;
+  path: string;
+  tab?: string;
+  screenId?: string;
+  screenIds?: string[];
+}
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -10,6 +19,7 @@ interface AppSidebarProps {
 export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
   const location = useLocation();
   const { role } = useAuth();
+  const { canAccessScreen } = useScreenPermissions();
 
   const searchParams = new URLSearchParams(location.search);
   const currentTab = searchParams.get("tab") || "";
@@ -51,16 +61,40 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
     return location.pathname.startsWith(path);
   };
 
-  // Section item styling helper
+  // Section item styling helper with dynamic permission checks
   const renderParentItem = (
     key: string,
     label: string,
     iconSvg: React.ReactNode,
     primaryPath: string,
     hasSubmenu: boolean,
-    subItems?: { label: string; path: string; tab?: string }[]
+    subItems?: SubItemDef[],
+    primaryScreenId?: string
   ) => {
-    const isSectionActive = isCurrent(primaryPath) || (subItems && subItems.some((s) => isCurrent(s.path, s.tab)));
+    // 1. Check standalone screen permission
+    if (!hasSubmenu && primaryScreenId) {
+      if (!canAccessScreen(primaryScreenId)) {
+        return null;
+      }
+    }
+
+    // 2. Filter submenus based on role permissions
+    const accessibleSubItems = subItems
+      ? subItems.filter((sub) => {
+          if (sub.screenId) return canAccessScreen(sub.screenId);
+          if (sub.screenIds && sub.screenIds.length > 0) {
+            return sub.screenIds.some((sId) => canAccessScreen(sId));
+          }
+          return true;
+        })
+      : [];
+
+    // If section requires submenu but user has 0 accessible child screens, omit parent section
+    if (hasSubmenu && accessibleSubItems.length === 0) {
+      return null;
+    }
+
+    const isSectionActive = isCurrent(primaryPath) || accessibleSubItems.some((s) => isCurrent(s.path, s.tab));
     const isOpen = !!openSections[key];
 
     return (
@@ -85,15 +119,10 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
             }
           }}
         >
-          {/* Left part: Icon + Label (Wrapped in Link if no submenu, or Link for primary) */}
+          {/* Left part: Icon + Label */}
           <Link
-            to={primaryPath}
+            to={hasSubmenu && accessibleSubItems.length > 0 ? accessibleSubItems[0].path : primaryPath}
             title={collapsed ? label : undefined}
-            onClick={(e) => {
-              if (hasSubmenu && !collapsed) {
-                // If it has submenu, let the accordion toggle handle it without hijacking
-              }
-            }}
             style={{
               display: "flex",
               alignItems: "center",
@@ -136,7 +165,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
         </div>
 
         {/* Submenu child links (rendered when open & not collapsed) */}
-        {hasSubmenu && !collapsed && isOpen && subItems && (
+        {hasSubmenu && !collapsed && isOpen && accessibleSubItems.length > 0 && (
           <div
             style={{
               display: "flex",
@@ -149,7 +178,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
               marginLeft: 18,
             }}
           >
-            {subItems.map((sub, idx) => {
+            {accessibleSubItems.map((sub, idx) => {
               const active = isCurrent(sub.path, sub.tab);
               return (
                 <Link
@@ -238,7 +267,7 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
         </button>
       </div>
 
-      {/* Main Menu List in Exact Hierarchy */}
+      {/* Main Menu List in Exact Hierarchy with Role Matrix Permissions */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {/* 1. Dashboard */}
         {renderParentItem(
@@ -251,7 +280,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
           </svg>,
           "/dashboard",
-          false
+          false,
+          undefined,
+          "dashboard_home"
         )}
 
         {/* 2. AI Insight */}
@@ -264,7 +295,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
             <line x1="6" y1="20" x2="6" y2="14" />
           </svg>,
           "/insights",
-          false
+          false,
+          undefined,
+          "ai_insight"
         )}
 
         {/* 3. Out-Patient */}
@@ -279,13 +312,13 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/queue",
           true,
           [
-            { label: "Doctor EMR Launchpad", path: "/emr" },
-            { label: "Queue Board & Tokens", path: "/queue" },
-            { label: "Waiting Lounge TV Display", path: "/queue/display" },
-            { label: "Appointment Scheduling", path: "/scheduling" },
-            { label: "Patients Directory", path: "/patients" },
-            { label: "Quick Register Patient", path: "/patients/new" },
-            { label: "Billing & Cashier Till", path: "/billing" },
+            { label: "Doctor EMR Launchpad", path: "/emr", screenId: "opd_medical_records" },
+            { label: "Queue Board & Tokens", path: "/queue", screenId: "opd_appointments" },
+            { label: "Waiting Lounge TV Display", path: "/queue/display", screenId: "opd_appointments" },
+            { label: "Appointment Scheduling", path: "/scheduling", screenId: "opd_appointments" },
+            { label: "Patients Directory", path: "/patients", screenId: "opd_patient_list" },
+            { label: "Quick Register Patient", path: "/patients/new", screenId: "opd_patient_register" },
+            { label: "Billing & Cashier Till", path: "/billing", screenId: "opd_bills" },
           ]
         )}
 
@@ -302,9 +335,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/inpatient",
           true,
           [
-            { label: "Visual Bed Matrix & Wards", path: "/inpatient" },
-            { label: "Ward Transfers & Daily Tariff", path: "/inpatient" },
-            { label: "Admission & Discharge Clearance", path: "/inpatient" },
+            { label: "Visual Bed Matrix & Wards", path: "/inpatient", screenId: "ipd_bed_status" },
+            { label: "Ward Transfers & Daily Tariff", path: "/inpatient", screenId: "ipd_bed_transfer" },
+            { label: "Admission & Discharge Clearance", path: "/inpatient", screenIds: ["ipd_admission", "ipd_admitted_discharge"] },
           ]
         )}
 
@@ -320,9 +353,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/lab",
           true,
           [
-            { label: "Pathology Workstation", path: "/lab" },
-            { label: "Phlebotomy Intake Queue", path: "/lab" },
-            { label: "Results Inbox & Panic Alerts", path: "/results" },
+            { label: "Pathology Workstation", path: "/lab", screenIds: ["lab_bill_history", "lab_patient_incidents"] },
+            { label: "Phlebotomy Intake Queue", path: "/lab", screenIds: ["lab_supplier", "lab_purchase_indent"] },
+            { label: "Results Inbox & Panic Alerts", path: "/results", screenIds: ["lab_rate_plan_master", "lab_package_master"] },
           ]
         )}
 
@@ -337,9 +370,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/pharmacy",
           true,
           [
-            { label: "Dispensary POS & Checkout", path: "/pharmacy" },
-            { label: "Rx Dispensing Queue", path: "/pharmacy" },
-            { label: "FEFO Multi-Batch Inventory", path: "/pharmacy" },
+            { label: "Dispensary POS & Checkout", path: "/pharmacy", screenId: "pharma_bill" },
+            { label: "Rx Dispensing Queue", path: "/pharmacy", screenId: "pharma_distribution" },
+            { label: "FEFO Multi-Batch Inventory", path: "/pharmacy", screenIds: ["pharma_stock", "pharma_purchase", "pharma_medicine"] },
           ]
         )}
 
@@ -355,8 +388,8 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/radiology",
           true,
           [
-            { label: "Modality Worklist & Orders", path: "/radiology" },
-            { label: "PACS Imaging & Reports", path: "/radiology" },
+            { label: "Modality Worklist & Orders", path: "/radiology", screenIds: ["rad_usg_cases", "rad_xray_cases"] },
+            { label: "PACS Imaging & Reports", path: "/radiology", screenIds: ["rad_bills", "rad_usg_templates", "rad_xray_templates"] },
           ]
         )}
 
@@ -368,7 +401,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>,
           "/feedbacks",
-          false
+          false,
+          undefined,
+          "hr_doctor_ratings"
         )}
 
         {/* 9. NABH */}
@@ -382,9 +417,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/nabh",
           true,
           [
-            { label: "Quality Indicators (QI)", path: "/nabh" },
-            { label: "Infection Control (HIC)", path: "/nabh" },
-            { label: "WHO Safety Checklist Audit", path: "/ot" },
+            { label: "Quality Indicators (QI)", path: "/nabh", screenId: "nabh_dashboard" },
+            { label: "Infection Control (HIC)", path: "/nabh", screenId: "nabh_incidents" },
+            { label: "WHO Safety Checklist Audit", path: "/ot", screenId: "nabh_indicator_def" },
           ]
         )}
 
@@ -399,9 +434,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/portal",
           true,
           [
-            { label: "Patient Portal & Intake", path: "/portal" },
-            { label: "Telehealth Video Consultations", path: "/telehealth" },
-            { label: "Referral Partner Network", path: "/reports/referrals" },
+            { label: "Patient Portal & Intake", path: "/portal", screenId: "crm_contacts" },
+            { label: "Telehealth Video Consultations", path: "/telehealth", screenIds: ["crm_campaign_scheduling", "crm_lead_mgmt"] },
+            { label: "Referral Partner Network", path: "/reports/referrals", screenId: "hr_referrals" },
           ]
         )}
 
@@ -417,11 +452,11 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/emergency",
           true,
           [
-            { label: "Emergency Casualty & Triage", path: "/emergency" },
-            { label: "Operation Theatre Complex", path: "/ot" },
-            { label: "Blood Bank & Serology", path: "/blood-bank" },
-            { label: "Dietary & Clinical Nutrition", path: "/dietary" },
-            { label: "Hospital Print Station", path: "/print-station" },
+            { label: "Emergency Casualty & Triage", path: "/emergency", screenId: "more_incidents" },
+            { label: "Operation Theatre Complex", path: "/ot", screenId: "more_asset_items" },
+            { label: "Blood Bank & Serology", path: "/blood-bank", screenId: "more_inventory_items" },
+            { label: "Dietary & Clinical Nutrition", path: "/dietary", screenId: "more_expenses" },
+            { label: "Hospital Print Station", path: "/print-station", screenId: "more_download_center" },
           ]
         )}
 
@@ -437,16 +472,16 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/settings?tab=config",
           true,
           [
-            { label: "Configuration", path: "/settings?tab=config", tab: "config" },
-            { label: "Account Settings", path: "/settings?tab=account", tab: "account" },
-            { label: "Users & Staff Directory", path: "/settings?tab=users", tab: "users" },
-            { label: "User Authentication", path: "/settings?tab=auth", tab: "auth" },
-            { label: "Payment Rails & PMJAY", path: "/settings?tab=payment", tab: "payment" },
-            { label: "Online Services & ABDM", path: "/settings?tab=online", tab: "online" },
+            { label: "Configuration", path: "/settings?tab=config", tab: "config", screenId: "admin_account_settings" },
+            { label: "Account Settings", path: "/settings?tab=account", tab: "account", screenId: "admin_account_settings" },
+            { label: "Users & Staff Directory", path: "/settings?tab=users", tab: "users", screenId: "admin_users" },
+            { label: "User Details & Permissions", path: "/settings?tab=auth", tab: "auth", screenId: "admin_user_auth" },
+            { label: "Payment Rails & PMJAY", path: "/settings?tab=payment", tab: "payment", screenId: "admin_payment" },
+            { label: "Online Services & ABDM", path: "/settings?tab=online", tab: "online", screenId: "admin_online_services" },
           ]
         )}
 
-        {/* 13. HR & PayRoll (Exact 11 sub-items matching screenshot) */}
+        {/* 13. HR & PayRoll */}
         {renderParentItem(
           "hr",
           "HR & PayRoll",
@@ -459,21 +494,21 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/hr?tab=employees",
           true,
           [
-            { label: "Employees", path: "/hr?tab=employees", tab: "employees" },
-            { label: "Doctors", path: "/hr?tab=doctors", tab: "doctors" },
-            { label: "Referrals", path: "/reports/referrals" },
-            { label: "Doctor Ratings", path: "/feedbacks" },
-            { label: "Payroll Dashboard", path: "/hr?tab=payroll-dashboard", tab: "payroll-dashboard" },
-            { label: "Payroll List", path: "/hr?tab=payroll-list", tab: "payroll-list" },
-            { label: "Employee Salary", path: "/hr?tab=employee-salary", tab: "employee-salary" },
-            { label: "Timesheet", path: "/hr?tab=timesheet", tab: "timesheet" },
-            { label: "Attendance Dashboard", path: "/hr?tab=attendance", tab: "attendance" },
-            { label: "Payout Structure", path: "/hr?tab=payout-structure", tab: "payout-structure" },
-            { label: "Employee Payouts", path: "/hr?tab=employee-payouts", tab: "employee-payouts" },
+            { label: "Employees", path: "/hr?tab=employees", tab: "employees", screenId: "hr_employees" },
+            { label: "Doctors", path: "/hr?tab=doctors", tab: "doctors", screenId: "hr_doctors" },
+            { label: "Referrals", path: "/reports/referrals", screenId: "hr_referrals" },
+            { label: "Doctor Ratings", path: "/feedbacks", screenId: "hr_doctor_ratings" },
+            { label: "Payroll Dashboard", path: "/hr?tab=payroll-dashboard", tab: "payroll-dashboard", screenId: "hr_payroll_dashboard" },
+            { label: "Payroll List", path: "/hr?tab=payroll-list", tab: "payroll-list", screenId: "hr_payroll_list" },
+            { label: "Employee Salary", path: "/hr?tab=employee-salary", tab: "employee-salary", screenId: "hr_employee_salary" },
+            { label: "Timesheet", path: "/hr?tab=timesheet", tab: "timesheet", screenId: "hr_timesheet" },
+            { label: "Attendance Dashboard", path: "/hr?tab=attendance", tab: "attendance", screenId: "hr_attendance_dashboard" },
+            { label: "Payout Structure", path: "/hr?tab=payout-structure", tab: "payout-structure", screenId: "hr_payout_structure" },
+            { label: "Employee Payouts", path: "/hr?tab=employee-payouts", tab: "employee-payouts", screenId: "hr_employee_payouts" },
           ]
         )}
 
-        {/* 14. Reports (Standalone Individual Module at the End) */}
+        {/* 14. Reports */}
         {renderParentItem(
           "reports",
           "Reports",
@@ -485,9 +520,9 @@ export function AppSidebar({ collapsed, onToggleCollapse }: AppSidebarProps) {
           "/reports",
           true,
           [
-            { label: "Operations & Footfall", path: "/reports" },
-            { label: "Revenue & Till Collections", path: "/reports" },
-            { label: "Referral Partner Analytics", path: "/reports/referrals" },
+            { label: "Operations & Footfall", path: "/reports", screenIds: ["rpt_daily_tx", "rpt_opd", "rpt_ipd", "rpt_ip_admission", "rpt_ip_discharge"] },
+            { label: "Revenue & Till Collections", path: "/reports", screenIds: ["rpt_total_sales", "rpt_op_sales", "rpt_all_tx"] },
+            { label: "Referral Partner Analytics", path: "/reports/referrals", screenId: "hr_referrals" },
           ]
         )}
       </nav>

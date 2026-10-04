@@ -553,7 +553,7 @@ export default function HospitalHRScreen() {
   };
 
   return (
-    <div style={{ display: "grid", gap: 16, maxWidth: 1160, margin: "0 auto" }}>
+    <div style={{ display: "grid", gap: 16, width: "100%" }}>
       {/* Top Cyan Breadcrumb Banner matching Image 1 & 2 */}
       <div
         style={{
