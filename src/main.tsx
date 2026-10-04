@@ -1408,19 +1408,19 @@ function App() {
           } />
 
           <Route path="/telehealth" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "operator"]} screenIds={["crm_campaign_scheduling", "crm_lead_mgmt"]}>
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "operator"]} screenIds={["opd_appointments", "crm_contacts"]}>
               <TelehealthScreen />
             </RequireRole>
           } />
 
           <Route path="/emergency" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenId="more_incidents">
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenIds={["opd_patient_list", "ipd_admission", "more_incidents"]}>
               <EmergencyTriageScreen />
             </RequireRole>
           } />
 
           <Route path="/ot" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "operator"]} screenId="more_asset_items">
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "operator"]} screenIds={["ipd_medical_records", "opd_medical_records", "more_asset_items"]}>
               <OperationTheatreScreen />
             </RequireRole>
           } />
@@ -1432,13 +1432,13 @@ function App() {
           } />
 
           <Route path="/dietary" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenId="more_expenses">
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenIds={["ipd_bed_status", "ipd_medical_records", "more_expenses"]}>
               <DietaryNutritionScreen />
             </RequireRole>
           } />
 
           <Route path="/blood-bank" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenId="more_inventory_items">
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenIds={["ipd_medical_records", "lab_patient_incidents", "more_inventory_items"]}>
               <BloodBankScreen />
             </RequireRole>
           } />
@@ -1450,19 +1450,19 @@ function App() {
           } />
 
           <Route path="/print-station" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenId="more_download_center">
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenIds={["opd_medical_records", "ipd_medical_records", "more_download_center"]}>
               <PrintStationScreen />
             </RequireRole>
           } />
 
           <Route path="/lab" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenIds={["lab_bill_history", "lab_patient_incidents", "lab_supplier", "lab_purchase_indent"]}>
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "billing", "operator"]} screenIds={["rad_usg_cases", "opd_medical_records", "lab_bill_history", "lab_patient_incidents"]}>
               <LaboratoryWorkstationScreen />
             </RequireRole>
           } />
 
           <Route path="/pharmacy" element={
-            <RequireRole roles={["admin", "physician", "doctor", "billing", "receptionist", "nurse", "operator"]} screenIds={["pharma_bill", "pharma_distribution", "pharma_stock", "pharma_purchase", "pharma_medicine"]}>
+            <RequireRole roles={["admin", "physician", "doctor", "billing", "receptionist", "nurse", "operator"]} screenIds={["pharma_medicine", "pharma_bill", "pharma_distribution", "pharma_stock"]}>
               <HospitalPharmacyScreen />
             </RequireRole>
           } />
@@ -1486,7 +1486,7 @@ function App() {
           } />
 
           <Route path="/nabh" element={
-            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "operator"]} screenIds={["nabh_dashboard", "nabh_incidents", "nabh_indicator_def"]}>
+            <RequireRole roles={["admin", "physician", "doctor", "nurse", "receptionist", "operator"]} screenIds={["nabh_dashboard", "nabh_incidents", "nabh_indicator_def", "opd_medical_records"]}>
               <NABHQualityScreen />
             </RequireRole>
           } />
