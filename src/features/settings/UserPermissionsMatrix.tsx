@@ -1627,13 +1627,27 @@ export function UserPermissionsMatrix() {
 
             <tbody>
               {filteredScreens.map((screen, idx) => {
-                const rec = currentPermissions[screen.id] || {
+                const isAdminLocked =
+                  (selectedRole === "Administrator" || selectedRole === "Super Administrator") &&
+                  (screen.id === "admin_user_auth" || screen.id === "admin_account_settings");
+
+                const baseRec = currentPermissions[screen.id] || {
                   isAccessible: false,
                   canCreate: false,
                   canRead: false,
                   canUpdate: false,
                   canDelete: false,
                 };
+
+                const rec: PermissionRecord = isAdminLocked
+                  ? {
+                      isAccessible: true,
+                      canCreate: baseRec.canCreate,
+                      canRead: true,
+                      canUpdate: true,
+                      canDelete: baseRec.canDelete,
+                    }
+                  : baseRec;
 
                 return (
                   <tr
@@ -1653,6 +1667,21 @@ export function UserPermissionsMatrix() {
                         <span style={{ fontSize: 13, color: rec.isAccessible ? "#0F172A" : "#64748B" }}>
                           {screen.name}
                         </span>
+                        {isAdminLocked && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              background: "#EEF2FF",
+                              color: "#4F46E5",
+                              border: "1px solid #C7D2FE",
+                              borderRadius: 4,
+                              padding: "1px 5px",
+                              fontWeight: 700,
+                            }}
+                          >
+                            🔒 LOCKED
+                          </span>
+                        )}
                       </div>
                     </td>
 
@@ -1661,12 +1690,14 @@ export function UserPermissionsMatrix() {
                       <input
                         type="checkbox"
                         checked={rec.isAccessible}
+                        disabled={isAdminLocked}
                         onChange={() => handleToggleCell(screen.id, "isAccessible")}
                         style={{
                           width: 17,
                           height: 17,
                           accentColor: "#5C6BC0",
-                          cursor: "pointer",
+                          cursor: isAdminLocked ? "not-allowed" : "pointer",
+                          opacity: isAdminLocked ? 0.6 : 1,
                         }}
                       />
                     </td>
@@ -1676,14 +1707,14 @@ export function UserPermissionsMatrix() {
                       <input
                         type="checkbox"
                         checked={rec.canCreate}
-                        disabled={!rec.isAccessible}
+                        disabled={isAdminLocked || !rec.isAccessible}
                         onChange={() => handleToggleCell(screen.id, "canCreate")}
                         style={{
                           width: 17,
                           height: 17,
                           accentColor: "#5C6BC0",
-                          cursor: rec.isAccessible ? "pointer" : "not-allowed",
-                          opacity: rec.isAccessible ? 1 : 0.4,
+                          cursor: isAdminLocked || !rec.isAccessible ? "not-allowed" : "pointer",
+                          opacity: isAdminLocked || !rec.isAccessible ? 0.4 : 1,
                         }}
                       />
                     </td>
@@ -1693,14 +1724,14 @@ export function UserPermissionsMatrix() {
                       <input
                         type="checkbox"
                         checked={rec.canRead}
-                        disabled={!rec.isAccessible}
+                        disabled={isAdminLocked || !rec.isAccessible}
                         onChange={() => handleToggleCell(screen.id, "canRead")}
                         style={{
                           width: 17,
                           height: 17,
                           accentColor: "#5C6BC0",
-                          cursor: rec.isAccessible ? "pointer" : "not-allowed",
-                          opacity: rec.isAccessible ? 1 : 0.4,
+                          cursor: isAdminLocked || !rec.isAccessible ? "not-allowed" : "pointer",
+                          opacity: isAdminLocked ? 0.6 : !rec.isAccessible ? 0.4 : 1,
                         }}
                       />
                     </td>
@@ -1710,14 +1741,14 @@ export function UserPermissionsMatrix() {
                       <input
                         type="checkbox"
                         checked={rec.canUpdate}
-                        disabled={!rec.isAccessible}
+                        disabled={isAdminLocked || !rec.isAccessible}
                         onChange={() => handleToggleCell(screen.id, "canUpdate")}
                         style={{
                           width: 17,
                           height: 17,
                           accentColor: "#5C6BC0",
-                          cursor: rec.isAccessible ? "pointer" : "not-allowed",
-                          opacity: rec.isAccessible ? 1 : 0.4,
+                          cursor: isAdminLocked || !rec.isAccessible ? "not-allowed" : "pointer",
+                          opacity: isAdminLocked ? 0.6 : !rec.isAccessible ? 0.4 : 1,
                         }}
                       />
                     </td>
@@ -1727,14 +1758,14 @@ export function UserPermissionsMatrix() {
                       <input
                         type="checkbox"
                         checked={rec.canDelete}
-                        disabled={!rec.isAccessible}
+                        disabled={isAdminLocked || !rec.isAccessible}
                         onChange={() => handleToggleCell(screen.id, "canDelete")}
                         style={{
                           width: 17,
                           height: 17,
                           accentColor: "#5C6BC0",
-                          cursor: rec.isAccessible ? "pointer" : "not-allowed",
-                          opacity: rec.isAccessible ? 1 : 0.4,
+                          cursor: isAdminLocked || !rec.isAccessible ? "not-allowed" : "pointer",
+                          opacity: isAdminLocked || !rec.isAccessible ? 0.4 : 1,
                         }}
                       />
                     </td>
