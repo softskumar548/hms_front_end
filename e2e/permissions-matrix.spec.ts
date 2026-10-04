@@ -8,8 +8,8 @@ test.describe("Role-Based Screen & Action Permissions Matrix E2E Pipeline", () =
     await page.goto("/settings?tab=auth");
 
     // 2. Verify Top Breadcrumb Banner & List of Users Header
-    await expect(page.locator("text=User Details").first()).toBeVisible();
-    await expect(page.locator("text=List of Users")).toBeVisible();
+    await expect(page.getByText("User Details").first()).toBeVisible();
+    await expect(page.getByText("List of Users")).toBeVisible();
 
     // 3. Verify Role Selector contains all 19 standard roles
     const roleSelect = page.locator("select").first();
@@ -29,7 +29,7 @@ test.describe("Role-Based Screen & Action Permissions Matrix E2E Pipeline", () =
     // 5. Verify search filter functionality across screens
     const searchInput = page.locator("input[placeholder*='Search screens']");
     await searchInput.fill("Pharmacy");
-    await expect(page.locator("text=Pharmacy / Medicine").first()).toBeVisible();
+    await expect(page.getByText("Pharmacy / Medicine").first()).toBeVisible();
     await searchInput.fill("");
 
     // 6. Test Admin Self-Lockout Safeguard:
@@ -48,7 +48,7 @@ test.describe("Role-Based Screen & Action Permissions Matrix E2E Pipeline", () =
     await updateBtn.click();
 
     // 8. Verify Success Toast notification
-    await expect(page.locator("text=/successfully saved and synced/i").first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/successfully saved and synced/i).first()).toBeVisible({ timeout: 10_000 });
   });
 
   test("Restricted user direct URL access is gated by RequireRole screen permission guard", async ({ page }) => {
@@ -59,8 +59,8 @@ test.describe("Role-Based Screen & Action Permissions Matrix E2E Pipeline", () =
     await page.goto("/billing");
 
     // 3. Verify Access Restricted card is displayed instead of sensitive financial data
-    await expect(page.locator("text=/Access Denied|ACCESS RESTRICTED/i")).toBeVisible();
-    await expect(page.locator("text=/Unauthorized Access|Permission Required/i")).toBeVisible();
-    await expect(page.locator("text=Return to Dashboard")).toBeVisible();
+    await expect(page.getByText(/Access Denied|ACCESS RESTRICTED/i)).toBeVisible();
+    await expect(page.getByText(/Unauthorized Access|Permission Required/i)).toBeVisible();
+    await expect(page.getByText("Return to Dashboard")).toBeVisible();
   });
 });
