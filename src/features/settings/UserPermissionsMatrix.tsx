@@ -1336,8 +1336,8 @@ export function UserPermissionsMatrix() {
         // Lockout safeguard on column toggle for Admin
         if (
           (selectedRole === "Administrator" || selectedRole === "Super Administrator") &&
-          s.id === "admin_user_auth" &&
-          field === "isAccessible" &&
+          (s.id === "admin_user_auth" || s.id === "admin_account_settings") &&
+          (field === "isAccessible" || field === "canRead" || field === "canUpdate") &&
           !nextVal
         ) {
           return;

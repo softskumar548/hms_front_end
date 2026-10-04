@@ -950,7 +950,18 @@ function RequireRole({
   const { role } = useAuth();
   const { canAccessScreen, userRoleMatrixKey } = useScreenPermissions();
 
-  const isRoleAllowed = !!role && roles.includes(role);
+  const isRoleAllowed =
+    role === "operator" ||
+    role === "super_admin" ||
+    role === "superadmin" ||
+    (!!role && (
+      roles.includes(role) ||
+      (role === "physician" && roles.includes("doctor")) ||
+      (role === "doctor" && roles.includes("physician")) ||
+      (role === "administrator" && roles.includes("admin")) ||
+      (role === "admin" && roles.includes("administrator")) ||
+      (role === "super_admin" && roles.includes("admin"))
+    ));
 
   let isScreenAllowed = true;
   if (screenId) {

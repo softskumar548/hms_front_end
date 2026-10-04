@@ -126,10 +126,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (claims) {
         const parsedTenant = claims["app"]?.["tenant_id"] || claims["app.tenant_id"] || claims["tenant_id"] || claims["tenant"] || "apollo";
         const roles = claims["roles"] || claims["realm_access"]?.roles || [];
-        const knownRoles = ["doctor", "physician", "receptionist", "admin", "billing", "operator", "patient", "nurse"];
+        const rolePriority = [
+          "operator",
+          "super_admin",
+          "superadmin",
+          "admin",
+          "administrator",
+          "doctor",
+          "physician",
+          "nurse",
+          "pharmacist",
+          "pharmacy_incharge",
+          "lab_incharge",
+          "lab_assistant",
+          "radiographer",
+          "billing",
+          "accountant",
+          "receptionist",
+          "hr",
+          "patient"
+        ];
         const rolesList = Array.isArray(roles) ? roles : [];
-        let parsedRole = rolesList.find((r: string) => knownRoles.includes(r)) || rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") || "receptionist";
+        let parsedRole = rolePriority.find((pr) => rolesList.includes(pr)) ||
+          rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") ||
+          "receptionist";
         if (parsedRole === "doctor") parsedRole = "physician";
+        if (parsedRole === "administrator") parsedRole = "admin";
+        if (parsedRole === "superadmin") parsedRole = "super_admin";
         const parsedName = claims["name"] || claims["preferred_username"] || (claims["given_name"] ? `${claims["given_name"]} ${claims["family_name"] || ""}`.trim() : null);
         const parsedEmail = claims["email"] || (claims["preferred_username"] && claims["preferred_username"].includes("@") ? claims["preferred_username"] : null);
         setTenant(parsedTenant);
@@ -185,20 +208,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (claims) {
               const parsedTenant = claims["app"]?.["tenant_id"] || claims["app.tenant_id"] || claims["tenant_id"] || claims["tenant"] || "apollo";
               const roles = claims["roles"] || claims["realm_access"]?.roles || [];
-              const knownRoles = ["doctor", "physician", "receptionist", "admin", "billing", "operator", "patient", "nurse"];
+              const rolePriority = [
+                "operator",
+                "super_admin",
+                "superadmin",
+                "admin",
+                "administrator",
+                "doctor",
+                "physician",
+                "nurse",
+                "pharmacist",
+                "pharmacy_incharge",
+                "lab_incharge",
+                "lab_assistant",
+                "radiographer",
+                "billing",
+                "accountant",
+                "receptionist",
+                "hr",
+                "patient"
+              ];
               const rolesList = Array.isArray(roles) ? roles : [];
-              let parsedRole = rolesList.find((r: string) => knownRoles.includes(r)) || rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") || "receptionist";
+              let parsedRole = rolePriority.find((pr) => rolesList.includes(pr)) ||
+                rolesList.find((r: string) => !r.startsWith("default-") && r !== "offline_access" && r !== "uma_authorization") ||
+                "receptionist";
               if (parsedRole === "doctor") parsedRole = "physician";
+              if (parsedRole === "administrator") parsedRole = "admin";
+              if (parsedRole === "superadmin") parsedRole = "super_admin";
               setTenant(parsedTenant);
               setRole(parsedRole);
               localStorage.setItem("hms_tenant", parsedTenant);
               localStorage.setItem("hms_role", parsedRole);
 
               if (parsedRole === "operator") targetPath = "/operator/dashboard";
+              else if (parsedRole === "admin" || parsedRole === "super_admin") targetPath = "/dashboard";
               else if (parsedRole === "receptionist") targetPath = "/queue";
               else if (parsedRole === "physician" || parsedRole === "nurse") targetPath = "/my-schedule";
               else if (parsedRole === "billing") targetPath = "/billing";
-              else if (parsedRole === "admin") targetPath = "/dashboard";
               else if (parsedRole === "patient") targetPath = "/portal";
             }
 
